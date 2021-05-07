@@ -35,7 +35,7 @@ class DataHandler(BaseHandler):
     def get_response(self, h5file, path):
         response = create_response(h5file, path)
         assert isinstance(response, DatasetResponse)
-        return response.data()
+        return response.data(self.get_query_argument("selection"))
 
 
 class MetadataHandler(BaseHandler):

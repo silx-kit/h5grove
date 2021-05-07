@@ -7,7 +7,7 @@ try:
     import hdf5plugin  # noqa: F401
 except ImportError:
     pass
-from .utils import attrMetaDict, get_entity_from_file, sorted_dict
+from .utils import attrMetaDict, get_entity_from_file, parse_slice, sorted_dict
 
 
 class EntityResponse:
@@ -91,8 +91,14 @@ class DatasetResponse(ResolvedEntityResponse[h5py.Dataset]):
             *super().metadata().items(),
         )
 
-    def data(self):
-        return self._h5py_entity[()]
+    def data(self, selection: str = None):
+        if selection is None:
+            return self._h5py_entity[()]
+
+        parsed_slice = parse_slice(self._h5py_entity, selection)
+        print("P", parsed_slice)
+
+        return self._h5py_entity[parsed_slice]
 
 
 class GroupResponse(ResolvedEntityResponse[h5py.Group]):
