@@ -28,25 +28,25 @@ def npy_stream(array: Sequence[Number]) -> Generator[bytes, None, None]:
 
     :param array: Data to stream
     """
-    array = sanitize_array(array)
+    sanitized_array = sanitize_array(array)
 
     # Stream header
     with io.BytesIO() as buffer:
         np.lib.format.write_array_header_1_0(
-            buffer, np.lib.format.header_data_from_array_1_0(array)
+            buffer, np.lib.format.header_data_from_array_1_0(sanitized_array)
         )
         header = buffer.getvalue()
     yield header
 
     # Taken from numpy.lib.format.write_array
-    if array.itemsize == 0:
+    if sanitized_array.itemsize == 0:
         buffersize = 0
     else:
         # Set buffer size to 16 MiB to hide the Python loop overhead.
-        buffersize = max(16 * 1024 ** 2 // array.itemsize, 1)
+        buffersize = max(16 * 1024 ** 2 // sanitized_array.itemsize, 1)
 
     for chunk in np.nditer(
-        array,
+        sanitized_array,
         flags=["external_loop", "buffered", "zerosize_ok"],
         buffersize=buffersize,
         order="C",

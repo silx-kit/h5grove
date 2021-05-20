@@ -70,6 +70,32 @@ def sorted_dict(*args: Tuple[str, Any]):
     return dict(sorted(args))
 
 
+def _sanitize_dtype(dtype: np.dtype) -> np.dtype:
+    """Convert dtype to a dtype supported by js-numpy-parser.
+
+    See https://github.com/ludwigschubert/js-numpy-parser
+
+    :raises ValueError: For unsupported array dtype
+    """
+    if dtype.kind not in ("f", "i", "u"):
+        raise ValueError("Unsupported array type")
+
+    # Convert to little endian
+    sanitized_dtype = dtype.newbyteorder("little")
+
+    if sanitized_dtype.kind in ("i", "u"):
+        if sanitized_dtype.itemsize > 4:  # (u)int64 -> (u)int32
+            sanitized_dtype = np.dtype(f"<{sanitized_dtype.kind}4")
+
+    if sanitized_dtype.kind == "f":
+        if sanitized_dtype.itemsize < 4:  # float16 -> float32
+            sanitized_dtype = np.dtype("<f4")
+        elif sanitized_dtype.itemsize > 8:  # float128 -> float64
+            sanitized_dtype = np.dtype("<f8")
+
+    return sanitized_dtype
+
+
 def sanitize_array(array: Sequence[Number], copy: bool = True) -> np.ndarray:
     """Ensure array save as .npy can be read back by js-numpy-parser.
 
@@ -79,23 +105,5 @@ def sanitize_array(array: Sequence[Number], copy: bool = True) -> np.ndarray:
     :param copy: Set to False to avoid copy if possible
     :raises ValueError: For unsupported array dtype
     """
-    if not isinstance(array, np.ndarray):
-        array = np.array(array)
-
-    if array.dtype.kind not in ("f", "i", "u"):
-        raise ValueError("Unsupported array type")
-
-    # Convert to little endian
-    dtype = array.dtype.newbyteorder("little")
-
-    if dtype.kind in ("i", "u"):
-        if dtype.itemsize > 4:  # (u)int64 -> (u)int32
-            dtype = np.dtype(f"<{dtype.kind}4")
-
-    if dtype.kind == "f":
-        if dtype.itemsize < 4:  # float16 -> float32
-            dtype = np.dtype("<f4")
-        elif dtype.itemsize > 8:  # float128 -> float64
-            dtype = np.dtype("<f8")
-
-    return np.array(array, copy=copy, order="C", dtype=dtype)
+    ndarray = array if isinstance(array, np.ndarray) else np.array(array)
+    return np.array(ndarray, copy=copy, order="C", dtype=_sanitize_dtype(ndarray.dtype))
