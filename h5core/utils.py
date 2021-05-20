@@ -1,5 +1,7 @@
 import h5py
-from typing import Any, Optional, Tuple, Union
+from numbers import Number
+import numpy as np
+from typing import Any, Optional, Sequence, Tuple, Union
 from .models import H5pyEntity
 
 
@@ -7,7 +9,7 @@ def attrMetaDict(attrId):
     return {"dtype": attrId.dtype.str, "name": attrId.name, "shape": attrId.shape}
 
 
-def get_entity_from_file(h5file: h5py.File, path: Optional[str]=None) -> H5pyEntity:
+def get_entity_from_file(h5file: h5py.File, path: Optional[str] = None) -> H5pyEntity:
     if path is None:
         path = "/"
 
@@ -66,3 +68,41 @@ def parse_slice_member(slice_member: str, max_dim: int) -> Union[slice, int]:
 
 def sorted_dict(*args: Tuple[str, Any]):
     return dict(sorted(args))
+
+
+def _sanitize_dtype(dtype: np.dtype) -> np.dtype:
+    """Convert dtype to a dtype supported by js-numpy-parser.
+
+    See https://github.com/ludwigschubert/js-numpy-parser
+
+    :raises ValueError: For unsupported array dtype
+    """
+    if dtype.kind not in ("f", "i", "u"):
+        raise ValueError("Unsupported array type")
+
+    # Convert to little endian
+    result = dtype.newbyteorder("little")
+
+    if result.kind in ("i", "u") and result.itemsize > 4:
+        return np.dtype(f"<{result.kind}4")  # (u)int64 -> (u)int32
+
+    if result.kind == "f" and result.itemsize < 4:
+        return np.dtype("<f4")
+
+    if result.kind == "f" and result.itemsize > 8:
+        return np.dtype("<f8")
+
+    return result
+
+
+def sanitize_array(array: Sequence[Number], copy: bool = True) -> np.ndarray:
+    """Ensure array save as .npy can be read back by js-numpy-parser.
+
+    See https://github.com/ludwigschubert/js-numpy-parser
+
+    :param array: Array to sanitize
+    :param copy: Set to False to avoid copy if possible
+    :raises ValueError: For unsupported array dtype
+    """
+    ndarray = np.array(array, copy=False)
+    return np.array(ndarray, copy=copy, order="C", dtype=_sanitize_dtype(ndarray.dtype))
