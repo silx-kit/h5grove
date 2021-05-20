@@ -1,5 +1,12 @@
+import io
 import h5py
+<<<<<<< HEAD
 from typing import Any, Optional, Tuple, Union
+=======
+from numbers import Number
+import numpy
+from typing import Any, Generator, Optional, Sequence, Tuple, Union
+>>>>>>> add numpy to npy helpers
 from .models import H5pyEntity
 
 
@@ -66,3 +73,68 @@ def parse_slice_member(slice_member: str, max_dim: int) -> Union[slice, int]:
 
 def sorted_dict(*args: Tuple[str, Any]):
     return dict(sorted(args))
+
+
+def sanitize_array(array: Sequence[Number], copy: bool = True) -> numpy.ndarray:
+    """Ensure array save as .npy can be read back by js-numpy-parser.
+
+    See https://github.com/ludwigschubert/js-numpy-parser
+
+    :param array: Array to sanitize
+    :param copy: Set to False to avoid copy if possible
+    :raises ValueError: For unsupported array dtype
+    """
+    if not isinstance(array, numpy.ndarray):
+        array = numpy.array(array)
+
+    if array.dtype.kind not in ("f", "i", "u"):
+        raise ValueError("Unsupported array type")
+
+    # Convert to little endian
+    dtype = array.dtype.newbyteorder("little")
+
+    if dtype.kind in ("i", "u"):
+        if dtype.itemsize > 4:  # (u)int64 -> (u)int32
+            dtype = numpy.dtype("<" + dtype.kind + "4")
+
+    if dtype.kind == "f":
+        if dtype.itemsize < 4:  # float16 -> float32
+            dtype = numpy.dtype("<f4")
+        elif dtype.itemsize > 8:  # float128 -> float64
+            dtype = numpy.dtype("<f8")
+
+    # TODO ensure contiguity?
+    return numpy.array(array, copy=copy, order="C", dtype=dtype)
+
+
+def stream_array_as_npy(array: Sequence[Number]) -> Generator[bytes, None, None]:
+    """Generator to stream data as a .npy file.
+
+    :param array: Data to stream
+    """
+    # TODO adjust buffer size
+    array = sanitize_array(array)
+
+    # Stream header
+    with io.BytesIO() as buffer:
+        numpy.lib.format.write_array_header_1_0(
+            buffer,
+            numpy.lib.format.header_data_from_array_1_0(array),
+        )
+        header = buffer.getvalue()
+    yield header
+
+    # Taken from numpy.lib.format.write_array
+    if array.itemsize == 0:
+        buffersize = 0
+    else:
+        # Set buffer size to 16 MiB to hide the Python loop overhead.
+        buffersize = max(16 * 1024 ** 2 // array.itemsize, 1)
+
+    for chunk in numpy.nditer(
+        array,
+        flags=["external_loop", "buffered", "zerosize_ok"],
+        buffersize=buffersize,
+        order="C",
+    ):
+        yield chunk.tobytes("C")
