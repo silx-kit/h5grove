@@ -1,5 +1,5 @@
 import h5py
-from typing import Any, Tuple, Union
+from typing import Any, Optional, Tuple, Union
 from .models import H5pyEntity
 
 
@@ -7,7 +7,10 @@ def attrMetaDict(attrId):
     return {"dtype": attrId.dtype.str, "name": attrId.name, "shape": attrId.shape}
 
 
-def get_entity_from_file(h5file: h5py.File, path: str) -> H5pyEntity:
+def get_entity_from_file(h5file: h5py.File, path: Optional[str]=None) -> H5pyEntity:
+    if path is None:
+        path = "/"
+
     if path == "/":
         return h5file[path]
 
