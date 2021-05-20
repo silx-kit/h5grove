@@ -1,4 +1,5 @@
 from typing import Union
+
 try:
     from typing import TypedDict
 except ImportError:  # Python<3.8 support
