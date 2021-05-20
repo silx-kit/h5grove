@@ -53,7 +53,7 @@ URL_RULES = {
     "/data/<path:file_path>": data_route,
     "/meta/<path:file_path>": meta_route,
 }
-"""Mapping of Flask URL enpoints to handlers"""
+"""Mapping of Flask URL endpoints to handlers"""
 
 
 BLUEPRINT = Blueprint("h5core", __name__)
