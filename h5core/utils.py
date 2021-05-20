@@ -81,19 +81,18 @@ def _sanitize_dtype(dtype: np.dtype) -> np.dtype:
         raise ValueError("Unsupported array type")
 
     # Convert to little endian
-    sanitized_dtype = dtype.newbyteorder("little")
+    result = dtype.newbyteorder("little")
 
-    if sanitized_dtype.kind in ("i", "u"):
-        if sanitized_dtype.itemsize > 4:  # (u)int64 -> (u)int32
-            sanitized_dtype = np.dtype(f"<{sanitized_dtype.kind}4")
+    if result.kind in ("i", "u") and result.itemsize > 4:
+        return np.dtype(f"<{result.kind}4")  # (u)int64 -> (u)int32
 
-    if sanitized_dtype.kind == "f":
-        if sanitized_dtype.itemsize < 4:  # float16 -> float32
-            sanitized_dtype = np.dtype("<f4")
-        elif sanitized_dtype.itemsize > 8:  # float128 -> float64
-            sanitized_dtype = np.dtype("<f8")
+    if result.kind == "f" and result.itemsize < 4:
+        return np.dtype("<f4")
 
-    return sanitized_dtype
+    if result.kind == "f" and result.itemsize > 8:
+        return np.dtype("<f8")
+
+    return result
 
 
 def sanitize_array(array: Sequence[Number], copy: bool = True) -> np.ndarray:
