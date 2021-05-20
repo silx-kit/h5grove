@@ -105,5 +105,5 @@ def sanitize_array(array: Sequence[Number], copy: bool = True) -> np.ndarray:
     :param copy: Set to False to avoid copy if possible
     :raises ValueError: For unsupported array dtype
     """
-    ndarray = array if isinstance(array, np.ndarray) else np.array(array)
+    ndarray = np.array(array, copy=False)
     return np.array(ndarray, copy=copy, order="C", dtype=_sanitize_dtype(ndarray.dtype))
