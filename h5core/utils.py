@@ -90,7 +90,7 @@ def sanitize_array(array: Sequence[Number], copy: bool = True) -> np.ndarray:
 
     if dtype.kind in ("i", "u"):
         if dtype.itemsize > 4:  # (u)int64 -> (u)int32
-            dtype = np.dtype("<" + dtype.kind + "4")
+            dtype = np.dtype(f"<{dtype.kind}4")
 
     if dtype.kind == "f":
         if dtype.itemsize < 4:  # float16 -> float32
