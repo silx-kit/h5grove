@@ -4,7 +4,7 @@ import os.path
 import sys
 import tornado.ioloop
 from h5core.responses import DatasetResponse, ResolvedEntityResponse, create_response
-from h5core.encoders import orjson_encode
+from h5core.encoders import encode
 
 
 class BaseHandler(tornado.web.RequestHandler):
@@ -12,10 +12,23 @@ class BaseHandler(tornado.web.RequestHandler):
         self.base_dir = base_dir
 
     def get(self, file_path):
-        path = self.get_query_argument("path")
+        path = self.get_query_argument("path", None)
+        format = self.get_query_argument("format", None)
+
         with h5py.File(os.path.join(self.base_dir, file_path), "r") as h5file:
             response = self.get_response(h5file, path)
-        self.finish(orjson_encode(response))
+
+        content, headers = encode(response, format)
+
+        for key, value in headers.items():
+            self.set_header(key, value)
+
+        if isinstance(content, bytes):
+            self.write(content)
+        else:
+            for chunk in content:
+                self.write(chunk)
+        self.finish()
 
     def get_response(self, h5file, path):
         raise NotImplementedError
@@ -29,13 +42,12 @@ class AttributeHandler(BaseHandler):
 
 
 class DataHandler(BaseHandler):
-    def encode(self, response):
-        return orjson_encode(response)
-
     def get_response(self, h5file, path):
+        selection = self.get_query_argument("selection", None)
+
         response = create_response(h5file, path)
         assert isinstance(response, DatasetResponse)
-        return response.data(self.get_query_argument("selection"))
+        return response.data(selection)
 
 
 class MetadataHandler(BaseHandler):
