@@ -2,26 +2,33 @@
 from flask import Blueprint, current_app, request, Response
 import h5py
 import os
-from typing import Any, Callable, Dict
+from typing import Any, Callable, Dict, Optional
 
 from .responses import create_response, DatasetResponse, ResolvedEntityResponse
-from .encoders import orjson_encode
+from .encoders import encode
 
 
 __all__ = ["attr_route", "data_route", "meta_route", "URL_RULES", "BLUEPRINT"]
+
+
+def make_encoded_response(content, format: Optional[str]) -> Response:
+    """Prepare flask Response according to format"""
+    encoded_content, headers = encode(content, format)
+    response = Response(encoded_content)
+    response.headers.update(headers)
+    return response
 
 
 def attr_route(file_path: str):
     """`/attr/<file_path>` endpoints handler"""
     filename = os.path.join(current_app.config["H5_BASE_DIR"], file_path)
     path = request.args.get("path")
+    format = request.args.get("format")
 
     with h5py.File(filename, mode="r") as h5file:
         response = create_response(h5file, path)
         assert isinstance(response, ResolvedEntityResponse)
-        return Response(
-            orjson_encode(response.attributes()), mimetype="application/json"
-        )
+        return make_encoded_response(response.attributes(), format)
 
 
 def data_route(file_path: str):
@@ -29,23 +36,23 @@ def data_route(file_path: str):
     filename = os.path.join(current_app.config["H5_BASE_DIR"], file_path)
     path = request.args.get("path")
     selection = request.args.get("selection")
+    format = request.args.get("format")
 
     with h5py.File(filename, mode="r") as h5file:
         response = create_response(h5file, path)
         assert isinstance(response, DatasetResponse)
-        return Response(
-            orjson_encode(response.data(selection)), mimetype="application/json"
-        )
+        return make_encoded_response(response.data(selection), format)
 
 
 def meta_route(file_path: str):
     """`/meta/<file_path>` endpoints handler"""
     filename = os.path.join(current_app.config["H5_BASE_DIR"], file_path)
     path = request.args.get("path")
+    format = request.args.get("format")
 
     with h5py.File(filename, mode="r") as h5file:
         response = create_response(h5file, path)
-        return Response(orjson_encode(response.metadata()), mimetype="application/json")
+        return make_encoded_response(response.metadata(), format)
 
 
 URL_RULES = {
