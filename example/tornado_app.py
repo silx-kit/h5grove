@@ -1,83 +1,25 @@
-import tornado.web
-import h5py
+#!/usr/bin/env python
+# coding: utf-8
+"""Tornado-based server sample code"""
+import argparse
 import os.path
-import sys
+import tornado.web
 import tornado.ioloop
-from h5core.responses import DatasetResponse, ResolvedEntityResponse, create_response
-from h5core.encoders import encode
+from h5core.tornadoutils import get_handlers
 
 
-class BaseHandler(tornado.web.RequestHandler):
-    def initialize(self, base_dir) -> None:
-        self.base_dir = base_dir
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument(
+    "-p", "--port", type=int, default=8888, help="Port the server is listening on"
+)
+parser.add_argument("--ip", default="localhost", help="IP the server is listening on")
+parser.add_argument(
+    "--basedir", default=".", help="Base directory from which to retrieve HDF5 files"
+)
+options = parser.parse_args()
+base_dir = os.path.abspath(options.basedir)
 
-    def get(self, file_path):
-        path = self.get_query_argument("path", None)
-        format = self.get_query_argument("format", None)
-
-        with h5py.File(os.path.join(self.base_dir, file_path), "r") as h5file:
-            response = self.get_response(h5file, path)
-
-        encoded_content_chunks, headers = encode(response, format)
-
-        for key, value in headers.items():
-            self.set_header(key, value)
-        for chunk in encoded_content_chunks:
-            self.write(chunk)
-        self.finish()
-
-    def get_response(self, h5file, path):
-        raise NotImplementedError
-
-
-class AttributeHandler(BaseHandler):
-    def get_response(self, h5file, path):
-        response = create_response(h5file, path)
-        assert isinstance(response, ResolvedEntityResponse)
-        return response.attributes()
-
-
-class DataHandler(BaseHandler):
-    def get_response(self, h5file, path):
-        selection = self.get_query_argument("selection", None)
-
-        response = create_response(h5file, path)
-        assert isinstance(response, DatasetResponse)
-        return response.data(selection)
-
-
-class MetadataHandler(BaseHandler):
-    def get_response(self, h5file, path):
-        response = create_response(h5file, path)
-        return response.metadata()
-
-
-if __name__ == "__main__":
-    import argparse
-
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
-        "-p", "--port", type=int, default=8888, help="Port the server is listening on"
-    )
-    parser.add_argument(
-        "--ip", default="localhost", help="IP the server is listening on"
-    )
-    parser.add_argument(
-        "--basedir",
-        default=".",
-        help="Base directory from which to retrieve HDF5 files",
-    )
-    options = parser.parse_args()
-    base_dir = os.path.abspath(options.basedir)
-
-    app = tornado.web.Application(
-        [
-            (r"/attr/(.*)", AttributeHandler, {"base_dir": base_dir}),
-            (r"/data/(.*)", DataHandler, {"base_dir": base_dir}),
-            (r"/meta/(.*)", MetadataHandler, {"base_dir": base_dir}),
-        ],
-        debug=True,
-    )
-    app.listen(options.port, options.ip)
-    print(f"App is listening on {options.ip}:{options.port} serving from {base_dir}...")
-    tornado.ioloop.IOLoop.current().start()
+app = tornado.web.Application(get_handlers(base_dir), debug=True)
+app.listen(options.port, options.ip)
+print(f"App is listening on {options.ip}:{options.port} serving from {base_dir}...")
+tornado.ioloop.IOLoop.current().start()
