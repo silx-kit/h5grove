@@ -52,10 +52,24 @@ class MetadataHandler(BaseHandler):
         return response.metadata()
 
 
-PORT = 8888
-
 if __name__ == "__main__":
-    base_dir = sys.argv[1] if len(sys.argv) > 1 else "."
+    import argparse
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "-p", "--port", type=int, default=8888, help="Port the server is listening on"
+    )
+    parser.add_argument(
+        "--ip", default="localhost", help="IP the server is listening on"
+    )
+    parser.add_argument(
+        "--basedir",
+        default=".",
+        help="Base directory from which to retrieve HDF5 files",
+    )
+    options = parser.parse_args()
+    base_dir = os.path.abspath(options.basedir)
+
     app = tornado.web.Application(
         [
             (r"/attr/(.*)", AttributeHandler, {"base_dir": base_dir}),
@@ -64,6 +78,6 @@ if __name__ == "__main__":
         ],
         debug=True,
     )
-    app.listen(PORT)
-    print(f"App is listening on port {PORT} from {base_dir}...")
+    app.listen(options.port, options.ip)
+    print(f"App is listening on {options.ip}:{options.port} serving from {base_dir}...")
     tornado.ioloop.IOLoop.current().start()
