@@ -1,6 +1,6 @@
 import io
 from numbers import Number
-from typing import Generator, Sequence, Union
+from typing import Dict, Generator, NamedTuple, Optional, Sequence, Union
 import bson
 import numpy as np
 import orjson
@@ -59,3 +59,47 @@ def npy_stream(array: Sequence[Number]) -> Generator[bytes, None, None]:
         order="C",
     ):
         yield chunk.tobytes("C")
+
+
+class Response(NamedTuple):
+    content: Union[bytes, Generator[bytes, None, None]]
+    headers: Dict[str, str]
+
+
+def encode(content, encoding: Optional[str] = "json") -> Response:
+    """Encode content in given encoding.
+
+    Warning: Not all encodings supports all types of content.
+
+    :param content:
+    :param encoding:
+        - `json` (default)
+        - `bson`
+        - `npy`: Only nD array-like of numbers is supported
+    :returns: A Response object providing:
+        - encoded `content` either as bytes or a generator of bytes
+        - associated `headers`
+    :raises ValeurError:
+    """
+    if encoding in ("json", None):
+        return Response(
+            orjson_encode(content), headers={"Content-Type": "application/json"}
+        )
+    elif encoding == "bson":
+        return Response(
+            bson_encode(content),
+            headers={
+                "Content-Type": "application/bson",
+                "Content-Disposition": 'attachment; filename="data.bson"',
+            },
+        )
+    elif encoding == "npy":
+        return Response(
+            npy_stream(content),
+            headers={
+                "Content-Type": "application/octet-stream",
+                "Content-Disposition": 'attachment; filename="data.npy"',
+            },
+        )
+    else:
+        raise ValueError(f"Unsupported encoding {encoding}")
