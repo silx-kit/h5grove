@@ -18,16 +18,12 @@ class BaseHandler(tornado.web.RequestHandler):
         with h5py.File(os.path.join(self.base_dir, file_path), "r") as h5file:
             response = self.get_response(h5file, path)
 
-        content, headers = encode(response, format)
+        encoded_content_chunks, headers = encode(response, format)
 
         for key, value in headers.items():
             self.set_header(key, value)
-
-        if isinstance(content, bytes):
-            self.write(content)
-        else:
-            for chunk in content:
-                self.write(chunk)
+        for chunk in encoded_content_chunks:
+            self.write(chunk)
         self.finish()
 
     def get_response(self, h5file, path):

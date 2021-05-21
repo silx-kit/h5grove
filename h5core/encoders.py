@@ -62,7 +62,7 @@ def npy_stream(array: Sequence[Number]) -> Generator[bytes, None, None]:
 
 
 class Response(NamedTuple):
-    content: Union[bytes, Generator[bytes, None, None]]
+    content: Generator[bytes, None, None]
     headers: Dict[str, str]
 
 
@@ -83,11 +83,12 @@ def encode(content, encoding: Optional[str] = "json") -> Response:
     """
     if encoding in ("json", None):
         return Response(
-            orjson_encode(content), headers={"Content-Type": "application/json"}
+            (chunk for chunk in (orjson_encode(content),)),  # generator
+            headers={"Content-Type": "application/json"},
         )
     elif encoding == "bson":
         return Response(
-            bson_encode(content),
+            (chunk for chunk in (bson_encode(content),)),  # generator
             headers={
                 "Content-Type": "application/bson",
                 "Content-Disposition": 'attachment; filename="data.bson"',
