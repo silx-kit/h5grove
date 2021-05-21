@@ -1,4 +1,4 @@
-#!/bin/env python
+#!/usr/bin/env python
 # coding: utf-8
 """Flask-based server sample code"""
 import argparse
