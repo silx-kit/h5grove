@@ -1,6 +1,7 @@
 import io
 from numbers import Number
 from typing import Generator, Sequence, Union
+import bson
 import numpy as np
 import orjson
 import h5py
@@ -21,6 +22,12 @@ def default(o) -> Union[list, str, None]:
 
 def orjson_encode(response):
     return orjson.dumps(response, default=default, option=orjson.OPT_SERIALIZE_NUMPY)
+
+
+def bson_encode(response) -> bytes:
+    return bson.dumps(
+        response if isinstance(response, dict) else {"": response}, on_unknown=default
+    )
 
 
 def npy_stream(array: Sequence[Number]) -> Generator[bytes, None, None]:
