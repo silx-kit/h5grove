@@ -1,5 +1,6 @@
-from typing import Generic, Sequence, TypeVar
+from typing import Dict, Generic, Sequence, TypeVar
 import h5py
+import numpy as np
 import os
 from .models import EntityMetadata
 
@@ -100,6 +101,26 @@ class DatasetContent(ResolvedEntityContent[h5py.Dataset]):
 
         return self._h5py_entity[parsed_slice]
 
+    def statistics(self, selection: str = None) -> Dict[str, float]:
+        data = self.data(selection)
+        if np.issubdtype(data.dtype, np.floating):
+            data = data[np.isfinite(data)]  # Filter-out NaN and Inf
+
+        if data.size == 0:
+            return {
+                "min": None,
+                "max": None,
+                "mean": None,
+                "std": None,
+            }
+        else:
+            return {
+                "min": float(np.min(data)),
+                "max": float(np.max(data)),
+                "mean": float(np.mean(data)),
+                "std": float(np.std(data)),
+            }
+
 
 class GroupContent(ResolvedEntityContent[h5py.Group]):
     type = "group"
@@ -110,9 +131,9 @@ class GroupContent(ResolvedEntityContent[h5py.Group]):
 
     def _get_child_metadata_content(self, depth=0):
         return [
-            create_content(
-                self._h5file, os.path.join(self._path, child_path)
-            ).metadata(depth)
+            create_content(self._h5file, os.path.join(self._path, child_path)).metadata(
+                depth
+            )
             for child_path in self._h5py_entity.keys()
         ]
 

@@ -61,10 +61,20 @@ class MetadataHandler(BaseHandler):
         return content.metadata()
 
 
+class StatisticsHandler(BaseHandler):
+    def get_content(self, h5file, path):
+        selection = self.get_query_argument("selection", None)
+
+        content = create_content(h5file, path)
+        assert isinstance(content, DatasetContent)
+        return content.statistics(selection)
+
+
 def get_handlers(base_dir: Optional[str]):
     """Returns list of `Rule` arguments"""
     return [
         (r"/attr/(.*)", AttributeHandler, {"base_dir": base_dir}),
         (r"/data/(.*)", DataHandler, {"base_dir": base_dir}),
         (r"/meta/(.*)", MetadataHandler, {"base_dir": base_dir}),
+        (r"/stats/(.*)", StatisticsHandler, {"base_dir": base_dir}),
     ]
