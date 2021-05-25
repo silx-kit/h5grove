@@ -3,6 +3,7 @@
 """Flask-based server sample code"""
 import argparse
 from flask import Flask
+from flask_compress import Compress
 from flask_cors import CORS
 import os
 from h5core.flaskutils import BLUEPRINT as h5core_blueprint
@@ -14,6 +15,9 @@ parser.add_argument(
 )
 parser.add_argument("--ip", default="localhost", help="IP the server is listening on")
 parser.add_argument(
+    "--compression", action="store_true", help="Enable HTTP compression"
+)
+parser.add_argument(
     "--basedir", default=".", help="Base directory from which to retrieve HDF5 files"
 )
 options = parser.parse_args()
@@ -23,6 +27,10 @@ app = Flask(__name__)
 
 # Enable cross-origin resource sharing, see https://flask-cors.readthedocs.io
 CORS(app)
+
+# Enable compression, see https://github.com/colour-science/flask-compress
+if options.compression:
+    Compress(app)
 
 # Configure h5core default endpoints
 app.config["H5_BASE_DIR"] = os.path.abspath(options.basedir)
