@@ -1,5 +1,7 @@
-from typing import Generic, Sequence, TypeVar
+from numbers import Number
+from typing import Dict, Generic, Sequence, TypeVar, Union
 import h5py
+import numpy as np
 import os
 from .models import EntityMetadata
 
@@ -100,6 +102,39 @@ class DatasetContent(ResolvedEntityContent[h5py.Dataset]):
 
         return self._h5py_entity[parsed_slice]
 
+    def data_stats(
+        self, selection: str = None
+    ) -> Union[Dict[str, None], Dict[str, Number]]:
+        data = self._get_finite_data(selection)
+
+        if data.size == 0:
+            return {
+                "min": None,
+                "max": None,
+                "mean": None,
+                "std": None,
+            }
+
+        cast = float if np.issubdtype(data.dtype, np.floating) else int
+        return {
+            "min": cast(np.min(data)),
+            "max": cast(np.max(data)),
+            "mean": cast(np.mean(data)),
+            "std": cast(np.std(data)),
+        }
+
+    def _get_finite_data(self, selection: str) -> np.ndarray:
+        data = np.array(self.data(selection), copy=False)  # So it works with scalars
+
+        if not np.issubdtype(data.dtype, np.floating):
+            return data
+
+        mask = np.isfinite(data)
+        if np.all(mask):
+            return data
+
+        return data[mask]
+
 
 class GroupContent(ResolvedEntityContent[h5py.Group]):
     type = "group"
@@ -110,9 +145,9 @@ class GroupContent(ResolvedEntityContent[h5py.Group]):
 
     def _get_child_metadata_content(self, depth=0):
         return [
-            create_content(
-                self._h5file, os.path.join(self._path, child_path)
-            ).metadata(depth)
+            create_content(self._h5file, os.path.join(self._path, child_path)).metadata(
+                depth
+            )
             for child_path in self._h5py_entity.keys()
         ]
 
