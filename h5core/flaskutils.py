@@ -55,7 +55,7 @@ def meta_route(file_path: str):
         return make_encoded_response(content.metadata(), format)
 
 
-def statistics_route(file_path: str):
+def stats_route(file_path: str):
     """`/stats/<file_path>` endpoints handler"""
     filename = os.path.join(current_app.config["H5_BASE_DIR"], file_path)
     path = request.args.get("path")
@@ -72,7 +72,7 @@ URL_RULES = {
     "/attr/<path:file_path>": attr_route,
     "/data/<path:file_path>": data_route,
     "/meta/<path:file_path>": meta_route,
-    "/stats/<path:file_path>": statistics_route,
+    "/stats/<path:file_path>": stats_route,
 }
 """Mapping of Flask URL endpoints to handlers"""
 
