@@ -114,14 +114,14 @@ class DatasetContent(ResolvedEntityContent[h5py.Dataset]):
                 "mean": None,
                 "std": None,
             }
-        else:
-            cast = float if np.issubdtype(data.dtype, np.floating) else int
-            return {
-                "min": cast(np.min(data)),
-                "max": cast(np.max(data)),
-                "mean": cast(np.mean(data)),
-                "std": cast(np.std(data)),
-            }
+
+        cast = float if np.issubdtype(data.dtype, np.floating) else int
+        return {
+            "min": cast(np.min(data)),
+            "max": cast(np.max(data)),
+            "mean": cast(np.mean(data)),
+            "std": cast(np.std(data)),
+        }
 
     def _get_finite_data(self, selection: str) -> np.ndarray:
         data = np.array(self.data(selection), copy=False)  # So it works with scalars
