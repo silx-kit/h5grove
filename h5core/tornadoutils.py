@@ -3,7 +3,7 @@ import os
 from typing import Optional
 import h5py
 import tornado.web
-from .responses import DatasetContent, ResolvedEntityContent, create_content
+from .content import DatasetContent, ResolvedEntityContent, create_content
 from .encoders import encode
 
 

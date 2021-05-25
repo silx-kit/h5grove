@@ -4,7 +4,7 @@ import h5py
 import os
 from typing import Any, Callable, Dict, Optional
 
-from .responses import create_content, DatasetContent, ResolvedEntityContent
+from .content import create_content, DatasetContent, ResolvedEntityContent
 from .encoders import encode
 
 
