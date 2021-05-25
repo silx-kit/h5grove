@@ -79,7 +79,7 @@ def encode(content, encoding: Optional[str] = "json") -> Response:
     :returns: A Response object providing:
         - encoded `content` either as bytes or a generator of bytes
         - associated `headers`
-    :raises ValeurError:
+    :raises ValueError:
     """
     if encoding in ("json", None):
         return Response(
