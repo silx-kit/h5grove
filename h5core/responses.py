@@ -10,7 +10,7 @@ except ImportError:
 from .utils import attrMetaDict, get_entity_from_file, parse_slice, sorted_dict
 
 
-class EntityResponse:
+class EntityContent:
     type = "other"
 
     def __init__(self, path: str):
@@ -24,7 +24,7 @@ class EntityResponse:
         return self._path.split("/")[-1]
 
 
-class ExternalLinkResponse(EntityResponse):
+class ExternalLinkContent(EntityContent):
     type = "externalLink"
 
     def __init__(self, path: str, link: h5py.ExternalLink):
@@ -40,7 +40,7 @@ class ExternalLinkResponse(EntityResponse):
         )
 
 
-class SoftLinkResponse(EntityResponse):
+class SoftLinkContent(EntityContent):
     type = "softLink"
 
     def __init__(self, path: str, link: h5py.SoftLink) -> None:
@@ -56,7 +56,7 @@ class SoftLinkResponse(EntityResponse):
 T = TypeVar("T", h5py.Dataset, h5py.Datatype, h5py.Group)
 
 
-class ResolvedEntityResponse(EntityResponse, Generic[T]):
+class ResolvedEntityContent(EntityContent, Generic[T]):
     def __init__(self, path: str, h5py_entity: T):
         super().__init__(path)
         self._h5py_entity = h5py_entity
@@ -81,7 +81,7 @@ class ResolvedEntityResponse(EntityResponse, Generic[T]):
         )
 
 
-class DatasetResponse(ResolvedEntityResponse[h5py.Dataset]):
+class DatasetContent(ResolvedEntityContent[h5py.Dataset]):
     type = "dataset"
 
     def metadata(self, depth=None):
@@ -101,7 +101,7 @@ class DatasetResponse(ResolvedEntityResponse[h5py.Dataset]):
         return self._h5py_entity[parsed_slice]
 
 
-class GroupResponse(ResolvedEntityResponse[h5py.Group]):
+class GroupContent(ResolvedEntityContent[h5py.Group]):
     type = "group"
 
     def __init__(self, path: str, h5py_entity: h5py.Group, h5file: h5py.File):
@@ -130,18 +130,18 @@ def create_response(h5file: h5py.File, path: str):
     entity = get_entity_from_file(h5file, path)
 
     if isinstance(entity, h5py.ExternalLink):
-        return ExternalLinkResponse(path, entity)
+        return ExternalLinkContent(path, entity)
 
     if isinstance(entity, h5py.SoftLink):
-        return SoftLinkResponse(path, entity)
+        return SoftLinkContent(path, entity)
 
     if isinstance(entity, h5py.Dataset):
-        return DatasetResponse(path, entity)
+        return DatasetContent(path, entity)
 
     if isinstance(entity, h5py.Group):
-        return GroupResponse(path, entity, h5file)
+        return GroupContent(path, entity, h5file)
 
     if isinstance(entity, h5py.Datatype):
-        return ResolvedEntityResponse(path, entity)
+        return ResolvedEntityContent(path, entity)
 
     raise TypeError(f"h5py type {type(entity)} not supported")

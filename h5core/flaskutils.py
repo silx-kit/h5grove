@@ -4,7 +4,7 @@ import h5py
 import os
 from typing import Any, Callable, Dict, Optional
 
-from .responses import create_response, DatasetResponse, ResolvedEntityResponse
+from .responses import create_response, DatasetContent, ResolvedEntityContent
 from .encoders import encode
 
 
@@ -27,7 +27,7 @@ def attr_route(file_path: str):
 
     with h5py.File(filename, mode="r") as h5file:
         content = create_response(h5file, path)
-        assert isinstance(content, ResolvedEntityResponse)
+        assert isinstance(content, ResolvedEntityContent)
         return make_encoded_response(content.attributes(), format)
 
 
@@ -40,7 +40,7 @@ def data_route(file_path: str):
 
     with h5py.File(filename, mode="r") as h5file:
         content = create_response(h5file, path)
-        assert isinstance(content, DatasetResponse)
+        assert isinstance(content, DatasetContent)
         return make_encoded_response(content.data(selection), format)
 
 
