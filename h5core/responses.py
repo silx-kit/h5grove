@@ -108,7 +108,7 @@ class GroupContent(ResolvedEntityContent[h5py.Group]):
         super().__init__(path, h5py_entity)
         self._h5file = h5file
 
-    def _get_child_metadata_response(self, depth=0):
+    def _get_child_metadata_content(self, depth=0):
         return [
             create_content(
                 self._h5file, os.path.join(self._path, child_path)
@@ -121,7 +121,7 @@ class GroupContent(ResolvedEntityContent[h5py.Group]):
             return super().metadata()
 
         return sorted_dict(
-            ("children", self._get_child_metadata_response(depth - 1)),
+            ("children", self._get_child_metadata_content(depth - 1)),
             *super().metadata().items(),
         )
 
