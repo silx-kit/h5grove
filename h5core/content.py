@@ -1,4 +1,4 @@
-from typing import Dict, Generic, Sequence, TypeVar
+from typing import Dict, Generic, Sequence, TypeVar, Union
 import h5py
 import numpy as np
 import os
@@ -101,8 +101,8 @@ class DatasetContent(ResolvedEntityContent[h5py.Dataset]):
 
         return self._h5py_entity[parsed_slice]
 
-    def data_stats(self, selection: str = None) -> Dict[str, float]:
-        data = self.data(selection)
+    def data_stats(self, selection: str = None) -> Dict[str, Union[float, int, None]]:
+        data = np.array(self.data(selection), copy=False)  # So it works with scalars
         if np.issubdtype(data.dtype, np.floating):
             data = data[np.isfinite(data)]  # Filter-out NaN and Inf
 
@@ -114,11 +114,12 @@ class DatasetContent(ResolvedEntityContent[h5py.Dataset]):
                 "std": None,
             }
         else:
+            cast = float if np.issubdtype(data.dtype, np.floating) else int
             return {
-                "min": float(np.min(data)),
-                "max": float(np.max(data)),
-                "mean": float(np.mean(data)),
-                "std": float(np.std(data)),
+                "min": cast(np.min(data)),
+                "max": cast(np.max(data)),
+                "mean": cast(np.mean(data)),
+                "std": cast(np.std(data)),
             }
 
 
