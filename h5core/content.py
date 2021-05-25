@@ -102,12 +102,10 @@ class DatasetContent(ResolvedEntityContent[h5py.Dataset]):
 
         return self._h5py_entity[parsed_slice]
 
-    def data_stats(self, selection: str = None) -> Union[Dict[str, None], Dict[str, Number]]:
-        data = np.array(self.data(selection), copy=False)  # So it works with scalars
-        if np.issubdtype(data.dtype, np.floating):
-            mask = np.isfinite(data)
-            if not np.all(mask):
-                data = data[mask]  # Filter-out NaN and Inf
+    def data_stats(
+        self, selection: str = None
+    ) -> Union[Dict[str, None], Dict[str, Number]]:
+        data = self._get_finite_data(selection)
 
         if data.size == 0:
             return {
@@ -124,6 +122,18 @@ class DatasetContent(ResolvedEntityContent[h5py.Dataset]):
                 "mean": cast(np.mean(data)),
                 "std": cast(np.std(data)),
             }
+
+    def _get_finite_data(self, selection: str) -> np.ndarray:
+        data = np.array(self.data(selection), copy=False)  # So it works with scalars
+
+        if not np.issubdtype(data.dtype, np.floating):
+            return data
+
+        mask = np.isfinite(data)
+        if np.all(mask):
+            return data
+
+        return data[mask]
 
 
 class GroupContent(ResolvedEntityContent[h5py.Group]):
