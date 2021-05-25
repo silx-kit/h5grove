@@ -104,7 +104,9 @@ class DatasetContent(ResolvedEntityContent[h5py.Dataset]):
     def data_stats(self, selection: str = None) -> Dict[str, Union[float, int, None]]:
         data = np.array(self.data(selection), copy=False)  # So it works with scalars
         if np.issubdtype(data.dtype, np.floating):
-            data = data[np.isfinite(data)]  # Filter-out NaN and Inf
+            mask = np.isfinite(data)
+            if not np.all(mask):
+                data = data[mask]  # Filter-out NaN and Inf
 
         if data.size == 0:
             return {
