@@ -25,7 +25,7 @@ class BaseHandler(tornado.web.RequestHandler):
         format = self.get_query_argument("format", None)
 
         with h5py.File(os.path.join(self.base_dir, file_path), "r") as h5file:
-            content = self.get_response(h5file, path)
+            content = self.get_content(h5file, path)
 
         encoded_content_chunks, headers = encode(content, format)
 
@@ -35,19 +35,19 @@ class BaseHandler(tornado.web.RequestHandler):
             self.write(chunk)
         self.finish()
 
-    def get_response(self, h5file, path):
+    def get_content(self, h5file, path):
         raise NotImplementedError
 
 
 class AttributeHandler(BaseHandler):
-    def get_response(self, h5file, path):
+    def get_content(self, h5file, path):
         content = create_content(h5file, path)
         assert isinstance(content, ResolvedEntityContent)
         return content.attributes()
 
 
 class DataHandler(BaseHandler):
-    def get_response(self, h5file, path):
+    def get_content(self, h5file, path):
         selection = self.get_query_argument("selection", None)
 
         content = create_content(h5file, path)
@@ -56,7 +56,7 @@ class DataHandler(BaseHandler):
 
 
 class MetadataHandler(BaseHandler):
-    def get_response(self, h5file, path):
+    def get_content(self, h5file, path):
         content = create_content(h5file, path)
         return content.metadata()
 
