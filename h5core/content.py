@@ -1,3 +1,4 @@
+from numbers import Number
 from typing import Dict, Generic, Sequence, TypeVar, Union
 import h5py
 import numpy as np
@@ -101,7 +102,7 @@ class DatasetContent(ResolvedEntityContent[h5py.Dataset]):
 
         return self._h5py_entity[parsed_slice]
 
-    def data_stats(self, selection: str = None) -> Dict[str, Union[float, int, None]]:
+    def data_stats(self, selection: str = None) -> Union[Dict[str, None], Dict[str, Number]]:
         data = np.array(self.data(selection), copy=False)  # So it works with scalars
         if np.issubdtype(data.dtype, np.floating):
             mask = np.isfinite(data)
