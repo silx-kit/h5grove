@@ -3,7 +3,7 @@ import os
 from typing import Optional
 import h5py
 import tornado.web
-from .responses import DatasetContent, ResolvedEntityContent, create_response
+from .responses import DatasetContent, ResolvedEntityContent, create_content
 from .encoders import encode
 
 
@@ -41,7 +41,7 @@ class BaseHandler(tornado.web.RequestHandler):
 
 class AttributeHandler(BaseHandler):
     def get_response(self, h5file, path):
-        content = create_response(h5file, path)
+        content = create_content(h5file, path)
         assert isinstance(content, ResolvedEntityContent)
         return content.attributes()
 
@@ -50,14 +50,14 @@ class DataHandler(BaseHandler):
     def get_response(self, h5file, path):
         selection = self.get_query_argument("selection", None)
 
-        content = create_response(h5file, path)
+        content = create_content(h5file, path)
         assert isinstance(content, DatasetContent)
         return content.data(selection)
 
 
 class MetadataHandler(BaseHandler):
     def get_response(self, h5file, path):
-        content = create_response(h5file, path)
+        content = create_content(h5file, path)
         return content.metadata()
 
 

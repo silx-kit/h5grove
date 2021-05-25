@@ -110,7 +110,7 @@ class GroupContent(ResolvedEntityContent[h5py.Group]):
 
     def _get_child_metadata_response(self, depth=0):
         return [
-            create_response(
+            create_content(
                 self._h5file, os.path.join(self._path, child_path)
             ).metadata(depth)
             for child_path in self._h5py_entity.keys()
@@ -126,7 +126,7 @@ class GroupContent(ResolvedEntityContent[h5py.Group]):
         )
 
 
-def create_response(h5file: h5py.File, path: str):
+def create_content(h5file: h5py.File, path: str):
     entity = get_entity_from_file(h5file, path)
 
     if isinstance(entity, h5py.ExternalLink):
