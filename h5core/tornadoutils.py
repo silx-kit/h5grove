@@ -25,9 +25,9 @@ class BaseHandler(tornado.web.RequestHandler):
         format = self.get_query_argument("format", None)
 
         with h5py.File(os.path.join(self.base_dir, file_path), "r") as h5file:
-            response = self.get_response(h5file, path)
+            content = self.get_response(h5file, path)
 
-        encoded_content_chunks, headers = encode(response, format)
+        encoded_content_chunks, headers = encode(content, format)
 
         for key, value in headers.items():
             self.set_header(key, value)
@@ -41,24 +41,24 @@ class BaseHandler(tornado.web.RequestHandler):
 
 class AttributeHandler(BaseHandler):
     def get_response(self, h5file, path):
-        response = create_response(h5file, path)
-        assert isinstance(response, ResolvedEntityResponse)
-        return response.attributes()
+        content = create_response(h5file, path)
+        assert isinstance(content, ResolvedEntityResponse)
+        return content.attributes()
 
 
 class DataHandler(BaseHandler):
     def get_response(self, h5file, path):
         selection = self.get_query_argument("selection", None)
 
-        response = create_response(h5file, path)
-        assert isinstance(response, DatasetResponse)
-        return response.data(selection)
+        content = create_response(h5file, path)
+        assert isinstance(content, DatasetResponse)
+        return content.data(selection)
 
 
 class MetadataHandler(BaseHandler):
     def get_response(self, h5file, path):
-        response = create_response(h5file, path)
-        return response.metadata()
+        content = create_response(h5file, path)
+        return content.metadata()
 
 
 def get_handlers(base_dir: Optional[str]):

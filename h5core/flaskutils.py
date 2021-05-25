@@ -26,9 +26,9 @@ def attr_route(file_path: str):
     format = request.args.get("format")
 
     with h5py.File(filename, mode="r") as h5file:
-        response = create_response(h5file, path)
-        assert isinstance(response, ResolvedEntityResponse)
-        return make_encoded_response(response.attributes(), format)
+        content = create_response(h5file, path)
+        assert isinstance(content, ResolvedEntityResponse)
+        return make_encoded_response(content.attributes(), format)
 
 
 def data_route(file_path: str):
@@ -39,9 +39,9 @@ def data_route(file_path: str):
     format = request.args.get("format")
 
     with h5py.File(filename, mode="r") as h5file:
-        response = create_response(h5file, path)
-        assert isinstance(response, DatasetResponse)
-        return make_encoded_response(response.data(selection), format)
+        content = create_response(h5file, path)
+        assert isinstance(content, DatasetResponse)
+        return make_encoded_response(content.data(selection), format)
 
 
 def meta_route(file_path: str):
@@ -51,8 +51,8 @@ def meta_route(file_path: str):
     format = request.args.get("format")
 
     with h5py.File(filename, mode="r") as h5file:
-        response = create_response(h5file, path)
-        return make_encoded_response(response.metadata(), format)
+        content = create_response(h5file, path)
+        return make_encoded_response(content.metadata(), format)
 
 
 URL_RULES = {

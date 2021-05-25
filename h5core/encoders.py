@@ -20,13 +20,13 @@ def default(o) -> Union[list, str, None]:
     raise TypeError
 
 
-def orjson_encode(response):
-    return orjson.dumps(response, default=default, option=orjson.OPT_SERIALIZE_NUMPY)
+def orjson_encode(content):
+    return orjson.dumps(content, default=default, option=orjson.OPT_SERIALIZE_NUMPY)
 
 
-def bson_encode(response) -> bytes:
+def bson_encode(content) -> bytes:
     return bson.dumps(
-        response if isinstance(response, dict) else {"": response}, on_unknown=default
+        content if isinstance(content, dict) else {"": content}, on_unknown=default
     )
 
 
