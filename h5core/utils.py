@@ -1,7 +1,7 @@
 import h5py
 from numbers import Number
 import numpy as np
-from typing import Any, Optional, Sequence, Tuple, Union
+from typing import Any, Sequence, Tuple, Union
 from .models import H5pyEntity
 
 
@@ -9,10 +9,7 @@ def attrMetaDict(attrId):
     return {"dtype": attrId.dtype.str, "name": attrId.name, "shape": attrId.shape}
 
 
-def get_entity_from_file(h5file: h5py.File, path: Optional[str] = None) -> H5pyEntity:
-    if path is None:
-        path = "/"
-
+def get_entity_from_file(h5file: h5py.File, path: str) -> H5pyEntity:
     if path == "/":
         return h5file[path]
 
@@ -81,10 +78,13 @@ def _sanitize_dtype(dtype: np.dtype) -> np.dtype:
         raise ValueError("Unsupported array type")
 
     # Convert to little endian
-    result = dtype.newbyteorder("little")
+    result = dtype.newbyteorder("<")
 
-    if result.kind in ("i", "u") and result.itemsize > 4:
-        return np.dtype(f"<{result.kind}4")  # (u)int64 -> (u)int32
+    if result.kind == "i" and result.itemsize > 4:
+        return np.dtype("<i4")  # int64 -> int32
+
+    if result.kind == "u" and result.itemsize > 4:
+        return np.dtype("<u4")  # uint64 -> uint32
 
     if result.kind == "f" and result.itemsize < 4:
         return np.dtype("<f4")

@@ -2,7 +2,7 @@
 from flask import Blueprint, current_app, request, Response
 import h5py
 import os
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Callable, Mapping, Optional
 
 from .content import create_content, DatasetContent, ResolvedEntityContent
 from .encoders import encode
@@ -84,7 +84,9 @@ It relies on `H5_BASE_DIR` being defined in the app config.
 """
 
 
-def _init_blueprint(blueprint: Blueprint, url_rules: Dict[str, Callable[[str], Any]]):
+def _init_blueprint(
+    blueprint: Blueprint, url_rules: Mapping[str, Callable[[str], Any]]
+):
     for url, view_func in url_rules.items():
         blueprint.add_url_rule(url, view_func=view_func)
 
