@@ -1,10 +1,19 @@
-import tornado.web
+"""Helpers for usage with `Tornado <https://www.tornadoweb.org>`_"""
+import os
+from typing import Optional
 import h5py
-import os.path
-import sys
-import tornado.ioloop
-from h5core.responses import DatasetResponse, ResolvedEntityResponse, create_response
-from h5core.encoders import encode
+import tornado.web
+from .responses import DatasetResponse, ResolvedEntityResponse, create_response
+from .encoders import encode
+
+
+__all__ = [
+    "BaseHandler",
+    "AttributeHandler",
+    "DataHandler",
+    "MetadataHandler",
+    "get_handlers",
+]
 
 
 class BaseHandler(tornado.web.RequestHandler):
@@ -52,18 +61,10 @@ class MetadataHandler(BaseHandler):
         return response.metadata()
 
 
-PORT = 8888
-
-if __name__ == "__main__":
-    base_dir = sys.argv[1] if len(sys.argv) > 1 else "."
-    app = tornado.web.Application(
-        [
-            (r"/attr/(.*)", AttributeHandler, {"base_dir": base_dir}),
-            (r"/data/(.*)", DataHandler, {"base_dir": base_dir}),
-            (r"/meta/(.*)", MetadataHandler, {"base_dir": base_dir}),
-        ],
-        debug=True,
-    )
-    app.listen(PORT)
-    print(f"App is listening on port {PORT} from {base_dir}...")
-    tornado.ioloop.IOLoop.current().start()
+def get_handlers(base_dir: Optional[str]):
+    """Returns list of `Rule` arguments"""
+    return [
+        (r"/attr/(.*)", AttributeHandler, {"base_dir": base_dir}),
+        (r"/data/(.*)", DataHandler, {"base_dir": base_dir}),
+        (r"/meta/(.*)", MetadataHandler, {"base_dir": base_dir}),
+    ]
