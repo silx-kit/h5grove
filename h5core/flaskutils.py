@@ -4,7 +4,7 @@ import h5py
 import os
 from typing import Any, Callable, Dict, Optional
 
-from .responses import create_response, DatasetResponse, ResolvedEntityResponse
+from .content import create_content, DatasetContent, ResolvedEntityContent
 from .encoders import encode
 
 
@@ -26,9 +26,9 @@ def attr_route(file_path: str):
     format = request.args.get("format")
 
     with h5py.File(filename, mode="r") as h5file:
-        response = create_response(h5file, path)
-        assert isinstance(response, ResolvedEntityResponse)
-        return make_encoded_response(response.attributes(), format)
+        content = create_content(h5file, path)
+        assert isinstance(content, ResolvedEntityContent)
+        return make_encoded_response(content.attributes(), format)
 
 
 def data_route(file_path: str):
@@ -39,9 +39,9 @@ def data_route(file_path: str):
     format = request.args.get("format")
 
     with h5py.File(filename, mode="r") as h5file:
-        response = create_response(h5file, path)
-        assert isinstance(response, DatasetResponse)
-        return make_encoded_response(response.data(selection), format)
+        content = create_content(h5file, path)
+        assert isinstance(content, DatasetContent)
+        return make_encoded_response(content.data(selection), format)
 
 
 def meta_route(file_path: str):
@@ -51,8 +51,8 @@ def meta_route(file_path: str):
     format = request.args.get("format")
 
     with h5py.File(filename, mode="r") as h5file:
-        response = create_response(h5file, path)
-        return make_encoded_response(response.metadata(), format)
+        content = create_content(h5file, path)
+        return make_encoded_response(content.metadata(), format)
 
 
 URL_RULES = {
