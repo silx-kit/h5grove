@@ -101,7 +101,7 @@ class DatasetContent(ResolvedEntityContent[h5py.Dataset]):
 
         return self._h5py_entity[parsed_slice]
 
-    def statistics(self, selection: str = None) -> Dict[str, float]:
+    def data_stats(self, selection: str = None) -> Dict[str, float]:
         data = self.data(selection)
         if np.issubdtype(data.dtype, np.floating):
             data = data[np.isfinite(data)]  # Filter-out NaN and Inf

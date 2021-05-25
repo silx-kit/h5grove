@@ -67,7 +67,7 @@ class StatisticsHandler(BaseHandler):
 
         content = create_content(h5file, path)
         assert isinstance(content, DatasetContent)
-        return content.statistics(selection)
+        return content.data_stats(selection)
 
 
 def get_handlers(base_dir: Optional[str]):

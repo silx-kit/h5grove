@@ -65,7 +65,7 @@ def statistics_route(file_path: str):
     with h5py.File(filename, mode="r") as h5file:
         content = create_content(h5file, path)
         assert isinstance(content, DatasetContent)
-        return make_encoded_response(content.statistics(selection), format)
+        return make_encoded_response(content.data_stats(selection), format)
 
 
 URL_RULES = {
