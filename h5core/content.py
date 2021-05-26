@@ -1,9 +1,7 @@
-from numbers import Number
-from typing import Dict, Generic, Sequence, TypeVar, Union
+from typing import Dict, Generic, Optional, Sequence, TypeVar, Union
 import h5py
 import numpy as np
 import os
-from .models import EntityMetadata
 
 try:
     import hdf5plugin  # noqa: F401
@@ -18,7 +16,7 @@ class EntityContent:
     def __init__(self, path: str):
         self._path = path
 
-    def metadata(self) -> EntityMetadata:
+    def metadata(self) -> Dict[str, str]:
         return {"name": self.name, "type": self.type}
 
     @property
@@ -104,7 +102,7 @@ class DatasetContent(ResolvedEntityContent[h5py.Dataset]):
 
     def data_stats(
         self, selection: str = None
-    ) -> Union[Dict[str, None], Dict[str, Number]]:
+    ) -> Union[Dict[str, None], Dict[str, Union[float, int]]]:
         data = self._get_finite_data(selection)
 
         if data.size == 0:
@@ -123,7 +121,7 @@ class DatasetContent(ResolvedEntityContent[h5py.Dataset]):
             "std": cast(np.std(data)),
         }
 
-    def _get_finite_data(self, selection: str) -> np.ndarray:
+    def _get_finite_data(self, selection: Optional[str]) -> np.ndarray:
         data = np.array(self.data(selection), copy=False)  # So it works with scalars
 
         if not np.issubdtype(data.dtype, np.floating):
@@ -161,7 +159,10 @@ class GroupContent(ResolvedEntityContent[h5py.Group]):
         )
 
 
-def create_content(h5file: h5py.File, path: str):
+def create_content(h5file: h5py.File, path: Optional[str]):
+    if path is None:
+        path = "/"
+
     entity = get_entity_from_file(h5file, path)
 
     if isinstance(entity, h5py.ExternalLink):
