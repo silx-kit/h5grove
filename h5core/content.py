@@ -96,7 +96,6 @@ class DatasetContent(ResolvedEntityContent[h5py.Dataset]):
             return self._h5py_entity[()]
 
         parsed_slice = parse_slice(self._h5py_entity, selection)
-        print("P", parsed_slice)
 
         return self._h5py_entity[parsed_slice]
 
