@@ -1,5 +1,3 @@
-import io
-import json
 import os
 import pathlib
 import socketserver
@@ -9,7 +7,6 @@ import time
 from typing import Callable, List, NamedTuple, Optional, Tuple
 from urllib.request import urlopen
 
-import numpy as np
 import pytest
 
 
@@ -50,29 +47,6 @@ class BaseServer:
             assert len(response.content) == int(content_lengths[0])
 
         return response
-
-    def get_decoded_content(
-        self, url: str, format: str, benchmark: Optional[Callable] = None
-    ):
-        """Request url and return decoded content according to format"""
-        response = self.get(url, benchmark)
-        content_type = [h[1] for h in response.headers if h[0] == "Content-Type"][0]
-        assert content_type == self._CONTENT_TYPES[format]
-        return self._decode(response.content, format)
-
-    _CONTENT_TYPES = {
-        "json": "application/json",
-        "npy": "application/octet-stream",
-    }
-    """Mapping of format: "Content-Type" header"""
-
-    def _decode(self, content: bytes, format: str = "json"):
-        """Decode content according to Content-Type header"""
-        if format == "json":
-            return json.loads(content)
-        if format == "npy":
-            return np.load(io.BytesIO(content))
-        raise ValueError(f"Unsupported format: {format}")
 
 
 # subprocess_server fixture  ###

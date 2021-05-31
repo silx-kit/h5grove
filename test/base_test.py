@@ -1,12 +1,27 @@
 """Base class for testing with different servers"""
+import io
 from typing import Generator
 from urllib.parse import urlencode
 
 import h5py
+import json
 import numpy as np
 import pytest
 
 from conftest import BaseServer
+
+
+def decode_response(response: BaseServer.Response, format: str = "json"):
+    """Decode response content according to given format"""
+    content_type = [h[1] for h in response.headers if h[0] == "Content-Type"][0]
+
+    if format == "json":
+        assert content_type == "application/json"
+        return json.loads(response.content)
+    if format == "npy":
+        assert content_type == "application/octet-stream"
+        return np.load(io.BytesIO(response.content))
+    raise ValueError(f"Unsupported format: {format}")
 
 
 class BaseTestEndpoints:
@@ -16,15 +31,6 @@ class BaseTestEndpoints:
     def server(self) -> Generator[BaseServer, None, None]:
         """Override in subclass with a fixture providing a :class:`BaseServer`"""
         raise NotImplementedError()
-
-    def get_decoded_content(
-        self, server, endpoint: str, filename: str, path: str, format: str
-    ):
-        """Return decoded response content of request for given endpoint and args"""
-        return server.get_decoded_content(
-            f"/{endpoint}/{filename}?{urlencode({'path': path, 'format': format})}",
-            format=format,
-        )
 
     def test_attr_on_root(self, server):
         """Test /attr/ endpoint on root group"""
@@ -37,9 +43,8 @@ class BaseTestEndpoints:
             for name, value in attributes.items():
                 h5file.attrs[name] = value
 
-        retrieved_attributes = self.get_decoded_content(
-            server, "attr", filename, tested_h5entity_path, format="json"
-        )
+        response = server.get(f"/attr/{filename}?path={tested_h5entity_path}")
+        retrieved_attributes = decode_response(response)
 
         assert retrieved_attributes == attributes
 
@@ -54,8 +59,10 @@ class BaseTestEndpoints:
         with h5py.File(server.served_directory / filename, mode="w") as h5file:
             h5file[tested_h5entity_path] = data
 
-        content = self.get_decoded_content(server, "data", filename, tested_h5entity_path, format)
-        retrieved_data = np.array(content)
+        response = server.get(
+            f"/data/{filename}?{urlencode({'path': tested_h5entity_path, 'format': format})}"
+        )
+        retrieved_data = np.array(decode_response(response, format))
 
         assert np.array_equal(retrieved_data, data)
 
@@ -73,7 +80,8 @@ class BaseTestEndpoints:
             h5file.create_group("group")
             h5file["data"] = np.arange(10)
 
-        content = self.get_decoded_content(server, "meta", filename, tested_h5entity_path, format="json")
+        response = server.get(f"/meta/{filename}?path={tested_h5entity_path}")
+        content = decode_response(response)
         retrieved_attr_name = [attr["name"] for attr in content["attributes"]]
         retrieved_children_name = [child["name"] for child in content["children"]]
 
@@ -99,8 +107,6 @@ class BaseTestEndpoints:
         with h5py.File(server.served_directory / filename, mode="w") as h5file:
             h5file[tested_h5entity_path] = image
 
-        # Get from server
-        retrieved_stats = self.get_decoded_content(
-            server, "stats", filename, tested_h5entity_path, format="json"
-        )
+        response = server.get(f"/stats/{filename}?path={tested_h5entity_path}")
+        retrieved_stats = decode_response(response)
         assert retrieved_stats == expected_stats
