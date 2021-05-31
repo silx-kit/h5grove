@@ -26,8 +26,7 @@ class BaseTestEndpoints:
             format=format,
         )
 
-    @pytest.mark.parametrize("format", ("json", "bson"))
-    def test_attr_on_root(self, server, format):
+    def test_attr_on_root(self, server):
         """Test /attr/ endpoint on root group"""
         # Test condition
         tested_h5entity_path = "/"
@@ -39,12 +38,12 @@ class BaseTestEndpoints:
                 h5file.attrs[name] = value
 
         retrieved_attributes = self.get_decoded_content(
-            server, "attr", filename, tested_h5entity_path, format
+            server, "attr", filename, tested_h5entity_path, format="json"
         )
 
         assert retrieved_attributes == attributes
 
-    @pytest.mark.parametrize("format", ("json", "bson", "npy"))
+    @pytest.mark.parametrize("format", ("json", "npy"))
     def test_data_on_array(self, server, format):
         """Test /data/ endpoint on array dataset in a group"""
         # Test condition
@@ -60,8 +59,7 @@ class BaseTestEndpoints:
 
         assert np.array_equal(retrieved_data, data)
 
-    @pytest.mark.parametrize("format", ("json", "bson"))
-    def test_meta_on_group(self, server, format):
+    def test_meta_on_group(self, server):
         """Test /meta/ enpoint on a group"""
         # Test condition
         tested_h5entity_path = "/"
@@ -75,15 +73,14 @@ class BaseTestEndpoints:
             h5file.create_group("group")
             h5file["data"] = np.arange(10)
 
-        content = self.get_decoded_content(server, "meta", filename, tested_h5entity_path, format)
+        content = self.get_decoded_content(server, "meta", filename, tested_h5entity_path, format="json")
         retrieved_attr_name = [attr["name"] for attr in content["attributes"]]
         retrieved_children_name = [child["name"] for child in content["children"]]
 
         assert retrieved_attr_name == list(attributes.keys())
         assert retrieved_children_name == children
 
-    @pytest.mark.parametrize("format", ("json", "bson"))
-    def test_stats_on_array(self, server, format):
+    def test_stats_on_array(self, server):
         """Test /stats/ endpoint on an array"""
         # Test condition
         tested_h5entity_path = "/entry/image"
@@ -104,6 +101,6 @@ class BaseTestEndpoints:
 
         # Get from server
         retrieved_stats = self.get_decoded_content(
-            server, "stats", filename, tested_h5entity_path, format
+            server, "stats", filename, tested_h5entity_path, format="json"
         )
         assert retrieved_stats == expected_stats

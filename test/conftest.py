@@ -9,7 +9,6 @@ import time
 from typing import Callable, List, NamedTuple, Optional, Tuple
 from urllib.request import urlopen
 
-import bson
 import numpy as np
 import pytest
 
@@ -63,32 +62,14 @@ class BaseServer:
 
     _CONTENT_TYPES = {
         "json": "application/json",
-        "bson": "application/bson",
         "npy": "application/octet-stream",
     }
     """Mapping of format: "Content-Type" header"""
-
-    def _decode_bson(self, content):
-        """Decode bson taking care of decoding bytes to utf-8 str"""
-        if isinstance(content, dict):
-            return dict([(k, self._decode_bson(v)) for k, v in content.items()])
-        elif isinstance(content, (list, tuple)):
-            return [self._decode_bson(v) for v in content]
-        elif isinstance(content, bytes):
-            return content.decode("utf-8")
-        else:
-            return content
 
     def _decode(self, content: bytes, format: str = "json"):
         """Decode content according to Content-Type header"""
         if format == "json":
             return json.loads(content)
-        if format == "bson":
-            decoded_content = self._decode_bson(bson.loads(content))
-            # Handle specific storage of arrays with bson
-            if tuple(decoded_content.keys()) == ("",):
-                return decoded_content[""]
-            return decoded_content
         if format == "npy":
             return np.load(io.BytesIO(content))
         raise ValueError(f"Unsupported format: {format}")
