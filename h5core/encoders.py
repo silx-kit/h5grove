@@ -1,7 +1,6 @@
 import io
 from numbers import Number
 from typing import Dict, Generator, NamedTuple, Optional, Sequence, Union
-import bson
 import numpy as np
 import orjson
 import h5py
@@ -22,12 +21,6 @@ def default(o) -> Union[list, str, None]:
 
 def orjson_encode(content):
     return orjson.dumps(content, default=default, option=orjson.OPT_SERIALIZE_NUMPY)
-
-
-def bson_encode(content) -> bytes:
-    return bson.dumps(
-        content if isinstance(content, dict) else {"": content}, on_unknown=default
-    )
 
 
 def npy_stream(array: Sequence[Number]) -> Generator[bytes, None, None]:
@@ -74,7 +67,6 @@ def encode(content, encoding: Optional[str] = "json") -> Response:
     :param content:
     :param encoding:
         - `json` (default)
-        - `bson`
         - `npy`: Only nD array-like of numbers is supported
     :returns: A Response object providing:
         - encoded `content` either as bytes or a generator of bytes
@@ -85,14 +77,6 @@ def encode(content, encoding: Optional[str] = "json") -> Response:
         return Response(
             (chunk for chunk in (orjson_encode(content),)),  # generator
             headers={"Content-Type": "application/json"},
-        )
-    elif encoding == "bson":
-        return Response(
-            (chunk for chunk in (bson_encode(content),)),  # generator
-            headers={
-                "Content-Type": "application/bson",
-                "Content-Disposition": 'attachment; filename="data.bson"',
-            },
         )
     elif encoding == "npy":
         return Response(
