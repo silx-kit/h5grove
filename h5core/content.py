@@ -7,7 +7,7 @@ try:
     import hdf5plugin  # noqa: F401
 except ImportError:
     pass
-from .utils import attrMetaDict, get_entity_from_file, parse_slice, sorted_dict
+from .utils import attr_metadata, get_entity_from_file, parse_slice, sorted_dict
 
 
 class EntityContent:
@@ -73,7 +73,7 @@ class ResolvedEntityContent(EntityContent, Generic[T]):
             (
                 "attributes",
                 [
-                    attrMetaDict(self._h5py_entity.attrs.get_id(k))
+                    attr_metadata(self._h5py_entity.attrs.get_id(k))
                     for k in attribute_names
                 ],
             ),

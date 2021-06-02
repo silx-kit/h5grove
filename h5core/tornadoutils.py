@@ -17,8 +17,9 @@ __all__ = [
 
 
 class BaseHandler(tornado.web.RequestHandler):
-    def initialize(self, base_dir) -> None:
+    def initialize(self, base_dir, allow_origin=None) -> None:
         self.base_dir = base_dir
+        self.allow_origin = allow_origin
 
     def get(self, file_path):
         path = self.get_query_argument("path", None)
@@ -37,6 +38,10 @@ class BaseHandler(tornado.web.RequestHandler):
 
     def get_content(self, h5file, path):
         raise NotImplementedError
+
+    def prepare(self):
+        if self.allow_origin is not None:
+            self.set_header("Access-Control-Allow-Origin", self.allow_origin)
 
 
 class AttributeHandler(BaseHandler):
@@ -70,11 +75,12 @@ class StatisticsHandler(BaseHandler):
         return content.data_stats(selection)
 
 
-def get_handlers(base_dir: Optional[str]):
+def get_handlers(base_dir: Optional[str], allow_origin: Optional[str] = None):
     """Returns list of `Rule` arguments"""
+    init_args = {"base_dir": base_dir, "allow_origin": allow_origin}
     return [
-        (r"/attr/(.*)", AttributeHandler, {"base_dir": base_dir}),
-        (r"/data/(.*)", DataHandler, {"base_dir": base_dir}),
-        (r"/meta/(.*)", MetadataHandler, {"base_dir": base_dir}),
-        (r"/stats/(.*)", StatisticsHandler, {"base_dir": base_dir}),
+        (r"/attr/(.*)", AttributeHandler, init_args),
+        (r"/data/(.*)", DataHandler, init_args),
+        (r"/meta/(.*)", MetadataHandler, init_args),
+        (r"/stats/(.*)", StatisticsHandler, init_args),
     ]
