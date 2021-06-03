@@ -5,7 +5,7 @@ from typing import Any, Sequence, Tuple, Union
 from .models import H5pyEntity
 
 
-def attrMetaDict(attrId):
+def attr_metadata(attrId: h5py.h5a.AttrID) -> dict:
     return {"dtype": attrId.dtype.str, "name": attrId.name, "shape": attrId.shape}
 
 

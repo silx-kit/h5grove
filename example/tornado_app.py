@@ -19,7 +19,7 @@ parser.add_argument(
 options = parser.parse_args()
 base_dir = os.path.abspath(options.basedir)
 
-app = tornado.web.Application(get_handlers(base_dir), debug=True)
+app = tornado.web.Application(get_handlers(base_dir, allow_origin="*"), debug=True)
 app.listen(options.port, options.ip)
 print(f"App is listening on {options.ip}:{options.port} serving from {base_dir}...")
 tornado.ioloop.IOLoop.current().start()
