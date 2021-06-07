@@ -1,4 +1,4 @@
-name: Lint
+name: Lint & Test
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: '*'
 
 jobs:
-  lint:
+  lint_test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout 🏷️
@@ -25,10 +25,19 @@ jobs:
           pip install .[all]
 
       - name: black
-        run: black --check h5core/
+        run: black --check h5core/ example/ test/
 
       - name: flake8
         run: flake8
 
       - name: mypy
-        run: mypy h5core/
+        run: mypy h5core/ example/ test/
+
+      - name: pytest tests
+        run: |
+          pushd test/
+          pytest --cov=h5core --benchmark-skip
+          popd
+
+      - name: pytest benchmark
+        run: pytest --benchmark-only --benchmark-group-by=param:h5path --benchmark-columns=median,iqr,min,max
