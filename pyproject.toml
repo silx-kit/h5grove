@@ -1,3 +1,10 @@
 [build-system]
 requires = ["setuptools>=42.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "--benchmark-columns=median,iqr,min,max --benchmark-group-by=param:h5path --cov=h5core"
+testpaths = [
+    "test",
+]
