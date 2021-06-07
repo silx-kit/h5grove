@@ -1,0 +1,7 @@
+graft example
+graft h5core
+include LICENSE
+include pyproject.toml
+include README.md
+include setup.cfg
+include setup.py
