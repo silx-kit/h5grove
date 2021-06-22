@@ -5,7 +5,7 @@ import argparse
 import os.path
 import tornado.web
 import tornado.ioloop
-from h5core.tornadoutils import get_handlers
+from h5grove.tornadoutils import get_handlers
 
 
 parser = argparse.ArgumentParser(description=__doc__)

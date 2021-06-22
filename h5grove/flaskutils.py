@@ -77,8 +77,8 @@ URL_RULES = {
 """Mapping of Flask URL endpoints to handlers"""
 
 
-BLUEPRINT = Blueprint("h5core", __name__)
-"""Blueprint of h5core endpoints.
+BLUEPRINT = Blueprint("h5grove", __name__)
+"""Blueprint of h5grove endpoints.
 
 It relies on `H5_BASE_DIR` being defined in the app config.
 """

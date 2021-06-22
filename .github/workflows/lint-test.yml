@@ -25,18 +25,18 @@ jobs:
           pip install .[all]
 
       - name: black
-        run: black --check h5core/ example/ test/
+        run: black --check h5grove/ example/ test/
 
       - name: flake8
         run: flake8
 
       - name: mypy
-        run: mypy h5core/ example/ test/
+        run: mypy h5grove/ example/ test/
 
       - name: pytest tests
         run: |
           pushd test/
-          pytest --cov=h5core --benchmark-skip
+          pytest --cov=h5grove --benchmark-skip
           popd
 
       - name: pytest benchmark

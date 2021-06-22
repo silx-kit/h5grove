@@ -1,6 +1,6 @@
-# h5core, core utilities to serve HDF5 file contents
+# h5grove, core utilities to serve HDF5 file contents
 
-**h5core** is a Python package that provides utilities to design backends serving HDF5 file content: attributes, metadata and data. HDF5 files are accessed with [h5py](https://github.com/h5py/).
+**h5grove** is a Python package that provides utilities to design backends serving HDF5 file content: attributes, metadata and data. HDF5 files are accessed with [h5py](https://github.com/h5py/).
 
 ## Rationale
 
@@ -12,24 +12,24 @@ In addition, some problems arise constantly when designing HDF5 backends. To nam
 - Dealing with compression and slicing of datasets
 - Encoding data efficiently and consistently (looking at you, `NaN`, `Infinity` in JSON)
 
-**h5core** aims at providing building blocks that solve these common problems and can be reused in existing or new backends.
+**h5grove** aims at providing building blocks that solve these common problems and can be reused in existing or new backends.
 
 ## Installation
 
 ```bash
-pip install h5core
+pip install h5grove
 ```
 
-You can use **h5core** low-level utilities whatever the backend implementation you choose. We simply provide additional utilities for [Tornado](https://www.tornadoweb.org/en/stable/) and [Flask](https://flask.palletsprojects.com/en/) that can be installed with:
+You can use **h5grove** low-level utilities whatever the backend implementation you choose. We simply provide additional utilities for [Tornado](https://www.tornadoweb.org/en/stable/) and [Flask](https://flask.palletsprojects.com/en/) that can be installed with:
 
 ```bash
-pip install h5core[flask] # For Flask
-pip install h5core[tornado] # For Tornado
+pip install h5grove[flask] # For Flask
+pip install h5grove[tornado] # For Tornado
 ```
 
 ## Contents
 
-Example implementations using Flask and Tornado are given in the `example` folder. These are functional backends that make use of the utilities provided by the `h5core` package.
+Example implementations using Flask and Tornado are given in the `example` folder. These are functional backends that make use of the utilities provided by the `h5grove` package.
 
 For more tailored use, you can make use of the low-level utilities in your own project. The package contains the following modules:
 

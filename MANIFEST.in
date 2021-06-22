@@ -1,5 +1,5 @@
 graft example
-graft h5core
+graft h5grove
 include LICENSE
 include pyproject.toml
 include README.md
