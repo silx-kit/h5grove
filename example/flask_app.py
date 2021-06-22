@@ -3,10 +3,10 @@
 """Flask-based server sample code"""
 import argparse
 from flask import Flask
-from flask_compress import Compress
-from flask_cors import CORS
+from flask_compress import Compress  # type: ignore
+from flask_cors import CORS  # type: ignore
 import os
-from h5core.flaskutils import BLUEPRINT as h5core_blueprint
+from h5grove.flaskutils import BLUEPRINT as h5grove_blueprint
 
 
 parser = argparse.ArgumentParser(description=__doc__)
@@ -32,9 +32,9 @@ CORS(app)
 if options.compression:
     Compress(app)
 
-# Configure h5core default endpoints
+# Configure h5grove default endpoints
 app.config["H5_BASE_DIR"] = os.path.abspath(options.basedir)
-app.register_blueprint(h5core_blueprint)
+app.register_blueprint(h5grove_blueprint)
 
 # Start server
 app.run(port=options.port, host=options.ip)

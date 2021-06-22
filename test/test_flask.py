@@ -7,7 +7,7 @@ import pytest
 from conftest import BaseServer
 import base_test
 
-from h5core.flaskutils import BLUEPRINT
+from h5grove.flaskutils import BLUEPRINT
 
 # Fixtures ###
 
@@ -32,7 +32,7 @@ def flask_server(tmp_path_factory):
 
     Provides a function to fetch endpoints from the server.
     """
-    base_dir = tmp_path_factory.mktemp("h5core_flask_served").absolute()
+    base_dir = tmp_path_factory.mktemp("h5grove_flask_served").absolute()
 
     app = Flask("Test server")
     app.config["H5_BASE_DIR"] = str(base_dir)

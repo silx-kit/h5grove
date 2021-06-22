@@ -7,7 +7,7 @@ import tornado.web
 from conftest import BaseServer
 import base_test
 
-from h5core.tornadoutils import get_handlers
+from h5grove.tornadoutils import get_handlers
 
 # Fixtures ###
 
@@ -18,7 +18,7 @@ def _base_dir(tmp_path_factory):
 
     Needed to share base_dir between `app` and `server` fixtures
     """
-    yield tmp_path_factory.mktemp("h5core_tornado_served").absolute()
+    yield tmp_path_factory.mktemp("h5grove_tornado_served").absolute()
 
 
 @pytest.fixture

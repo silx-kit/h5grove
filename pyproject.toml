@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = "--benchmark-columns=median,iqr,min,max --benchmark-group-by=param:h5path --cov=h5core"
+addopts = "--benchmark-columns=median,iqr,min,max --benchmark-group-by=param:h5path --cov=h5grove"
 testpaths = [
     "test",
 ]
