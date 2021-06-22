@@ -3,8 +3,8 @@
 """Flask-based server sample code"""
 import argparse
 from flask import Flask
-from flask_compress import Compress
-from flask_cors import CORS
+from flask_compress import Compress  # type: ignore
+from flask_cors import CORS  # type: ignore
 import os
 from h5grove.flaskutils import BLUEPRINT as h5grove_blueprint
 
