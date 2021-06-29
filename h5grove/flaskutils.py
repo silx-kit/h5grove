@@ -1,5 +1,5 @@
 """Helpers for usage with `Flask <https://flask.palletsprojects.com/>`_"""
-from flask import Blueprint, current_app, request, Response
+from flask import Blueprint, current_app, request, Response, Request
 import h5py
 import os
 from typing import Any, Callable, Mapping, Optional
@@ -19,9 +19,17 @@ def make_encoded_response(content, format: Optional[str]) -> Response:
     return response
 
 
-def attr_route(file_path: str):
+def get_filename(request: Request) -> str:
+    file_path = request.args.get("file")
+    if file_path is None:
+        raise KeyError("File argument is required")
+
+    return os.path.join(current_app.config["H5_BASE_DIR"], file_path)
+
+
+def attr_route():
     """`/attr/<file_path>` endpoints handler"""
-    filename = os.path.join(current_app.config["H5_BASE_DIR"], file_path)
+    filename = get_filename(request)
     path = request.args.get("path")
     format = request.args.get("format")
 
@@ -31,9 +39,9 @@ def attr_route(file_path: str):
         return make_encoded_response(content.attributes(), format)
 
 
-def data_route(file_path: str):
+def data_route():
     """`/data/<file_path>` endpoints handler"""
-    filename = os.path.join(current_app.config["H5_BASE_DIR"], file_path)
+    filename = get_filename(request)
     path = request.args.get("path")
     selection = request.args.get("selection")
     format = request.args.get("format")
@@ -44,9 +52,9 @@ def data_route(file_path: str):
         return make_encoded_response(content.data(selection), format)
 
 
-def meta_route(file_path: str):
+def meta_route():
     """`/meta/<file_path>` endpoints handler"""
-    filename = os.path.join(current_app.config["H5_BASE_DIR"], file_path)
+    filename = get_filename(request)
     path = request.args.get("path")
     format = request.args.get("format")
 
@@ -55,9 +63,9 @@ def meta_route(file_path: str):
         return make_encoded_response(content.metadata(), format)
 
 
-def stats_route(file_path: str):
+def stats_route():
     """`/stats/<file_path>` endpoints handler"""
-    filename = os.path.join(current_app.config["H5_BASE_DIR"], file_path)
+    filename = get_filename(request)
     path = request.args.get("path")
     selection = request.args.get("selection")
     format = request.args.get("format")
@@ -69,10 +77,10 @@ def stats_route(file_path: str):
 
 
 URL_RULES = {
-    "/attr/<path:file_path>": attr_route,
-    "/data/<path:file_path>": data_route,
-    "/meta/<path:file_path>": meta_route,
-    "/stats/<path:file_path>": stats_route,
+    "/attr/": attr_route,
+    "/data/": data_route,
+    "/meta/": meta_route,
+    "/stats/": stats_route,
 }
 """Mapping of Flask URL endpoints to handlers"""
 
@@ -84,9 +92,7 @@ It relies on `H5_BASE_DIR` being defined in the app config.
 """
 
 
-def _init_blueprint(
-    blueprint: Blueprint, url_rules: Mapping[str, Callable[[str], Any]]
-):
+def _init_blueprint(blueprint: Blueprint, url_rules: Mapping[str, Callable[[], Any]]):
     for url, view_func in url_rules.items():
         blueprint.add_url_rule(url, view_func=view_func)
 
