@@ -43,7 +43,7 @@ class BaseTestEndpoints:
             for name, value in attributes.items():
                 h5file.attrs[name] = value
 
-        response = server.get(f"/attr/{filename}?path={tested_h5entity_path}")
+        response = server.get(f"/attr/?file={filename}&path={tested_h5entity_path}")
         retrieved_attributes = decode_response(response)
 
         assert retrieved_attributes == attributes
@@ -60,7 +60,7 @@ class BaseTestEndpoints:
             h5file[tested_h5entity_path] = data
 
         response = server.get(
-            f"/data/{filename}?{urlencode({'path': tested_h5entity_path, 'format': format})}"
+            f"/data/?{urlencode({'file': filename, 'path': tested_h5entity_path, 'format': format})}"
         )
         retrieved_data = np.array(decode_response(response, format))
 
@@ -80,7 +80,7 @@ class BaseTestEndpoints:
             h5file.create_group("group")
             h5file["data"] = np.arange(10)
 
-        response = server.get(f"/meta/{filename}?path={tested_h5entity_path}")
+        response = server.get(f"/meta/?file={filename}&path={tested_h5entity_path}")
         content = decode_response(response)
         retrieved_attr_name = [attr["name"] for attr in content["attributes"]]
         retrieved_children_name = [child["name"] for child in content["children"]]
@@ -107,6 +107,6 @@ class BaseTestEndpoints:
         with h5py.File(server.served_directory / filename, mode="w") as h5file:
             h5file[tested_h5entity_path] = image
 
-        response = server.get(f"/stats/{filename}?path={tested_h5entity_path}")
+        response = server.get(f"/stats/?file={filename}&path={tested_h5entity_path}")
         retrieved_stats = decode_response(response)
         assert retrieved_stats == expected_stats

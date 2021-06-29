@@ -35,6 +35,6 @@ def h5filepath(subprocess_server) -> Generator[pathlib.Path, None, None]:
 def test_benchmark_data(h5filepath, subprocess_server, benchmark, h5path, format):
     """/data/ benchmark data access"""
     subprocess_server.get(
-        f"/data/{h5filepath.name}?{urlencode({'path': h5path, 'format': format})}",
+        f"/data/?{urlencode({'file': h5filepath.name, 'path': h5path, 'format': format})}",
         benchmark,
     )

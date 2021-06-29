@@ -2,7 +2,7 @@
 import os
 from typing import Optional
 import h5py
-import tornado.web
+from tornado.web import RequestHandler, MissingArgumentError
 from .content import DatasetContent, ResolvedEntityContent, create_content
 from .encoders import encode
 
@@ -16,12 +16,16 @@ __all__ = [
 ]
 
 
-class BaseHandler(tornado.web.RequestHandler):
+class BaseHandler(RequestHandler):
     def initialize(self, base_dir, allow_origin=None) -> None:
         self.base_dir = base_dir
         self.allow_origin = allow_origin
 
-    def get(self, file_path):
+    def get(self):
+        file_path = self.get_query_argument("file")
+        if file_path is None:
+            raise MissingArgumentError("File argument is required")
+
         path = self.get_query_argument("path", None)
         format = self.get_query_argument("format", None)
 
@@ -79,8 +83,8 @@ def get_handlers(base_dir: Optional[str], allow_origin: Optional[str] = None):
     """Returns list of `Rule` arguments"""
     init_args = {"base_dir": base_dir, "allow_origin": allow_origin}
     return [
-        (r"/attr/(.*)", AttributeHandler, init_args),
-        (r"/data/(.*)", DataHandler, init_args),
-        (r"/meta/(.*)", MetadataHandler, init_args),
-        (r"/stats/(.*)", StatisticsHandler, init_args),
+        (r"/attr/.*", AttributeHandler, init_args),
+        (r"/data/.*", DataHandler, init_args),
+        (r"/meta/.*", MetadataHandler, init_args),
+        (r"/stats/.*", StatisticsHandler, init_args),
     ]
