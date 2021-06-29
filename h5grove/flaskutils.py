@@ -28,7 +28,7 @@ def get_filename(request: Request) -> str:
 
 
 def attr_route():
-    """`/attr/<file_path>` endpoints handler"""
+    """`/attr/` endpoint handler"""
     filename = get_filename(request)
     path = request.args.get("path")
     format = request.args.get("format")
@@ -40,7 +40,7 @@ def attr_route():
 
 
 def data_route():
-    """`/data/<file_path>` endpoints handler"""
+    """`/data/` endpoint handler"""
     filename = get_filename(request)
     path = request.args.get("path")
     selection = request.args.get("selection")
@@ -53,7 +53,7 @@ def data_route():
 
 
 def meta_route():
-    """`/meta/<file_path>` endpoints handler"""
+    """`/meta/` endpoint handler"""
     filename = get_filename(request)
     path = request.args.get("path")
     format = request.args.get("format")
@@ -64,7 +64,7 @@ def meta_route():
 
 
 def stats_route():
-    """`/stats/<file_path>` endpoints handler"""
+    """`/stats/` endpoint handler"""
     filename = get_filename(request)
     path = request.args.get("path")
     selection = request.args.get("selection")
