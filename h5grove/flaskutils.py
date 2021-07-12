@@ -57,9 +57,13 @@ def meta_route():
     filename = get_filename(request)
     path = request.args.get("path")
     format = request.args.get("format")
+    resolve_links_arg = request.args.get("resolve_links")
+    resolve_links = (
+        resolve_links_arg.lower() != "false" if resolve_links_arg is not None else True
+    )
 
     with h5py.File(filename, mode="r") as h5file:
-        content = create_content(h5file, path)
+        content = create_content(h5file, path, resolve_links)
         return make_encoded_response(content.metadata(), format)
 
 

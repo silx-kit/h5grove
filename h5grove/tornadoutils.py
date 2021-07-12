@@ -66,7 +66,13 @@ class DataHandler(BaseHandler):
 
 class MetadataHandler(BaseHandler):
     def get_content(self, h5file, path):
-        content = create_content(h5file, path)
+        resolve_links_arg = self.get_query_argument("resolve_links", None)
+        resolve_links = (
+            resolve_links_arg.lower() != "false"
+            if resolve_links_arg is not None
+            else True
+        )
+        content = create_content(h5file, path, resolve_links)
         return content.metadata()
 
 
