@@ -25,7 +25,7 @@ class EntityContent:
 
 
 class ExternalLinkContent(EntityContent):
-    type = "externalLink"
+    type = "external_link"
 
     def __init__(self, path: str, link: h5py.ExternalLink):
         super().__init__(path)
@@ -41,7 +41,7 @@ class ExternalLinkContent(EntityContent):
 
 
 class SoftLinkContent(EntityContent):
-    type = "softLink"
+    type = "soft_link"
 
     def __init__(self, path: str, link: h5py.SoftLink) -> None:
         super().__init__(path)
@@ -158,11 +158,11 @@ class GroupContent(ResolvedEntityContent[h5py.Group]):
         )
 
 
-def create_content(h5file: h5py.File, path: Optional[str]):
+def create_content(h5file: h5py.File, path: Optional[str], resolve_links: bool = True):
     if path is None:
         path = "/"
 
-    entity = get_entity_from_file(h5file, path)
+    entity = get_entity_from_file(h5file, path, resolve_links)
 
     if isinstance(entity, h5py.ExternalLink):
         return ExternalLinkContent(path, entity)

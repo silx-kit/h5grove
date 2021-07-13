@@ -67,7 +67,7 @@ class BaseTestEndpoints:
         assert np.array_equal(retrieved_data, data)
 
     def test_meta_on_group(self, server):
-        """Test /meta/ enpoint on a group"""
+        """Test /meta/ endpoint on a group"""
         # Test condition
         tested_h5entity_path = "/"
         attributes = {"NX_class": "NXRoot", "default": "entry"}
@@ -87,6 +87,38 @@ class BaseTestEndpoints:
 
         assert retrieved_attr_name == list(attributes.keys())
         assert retrieved_children_name == children
+
+    @pytest.mark.parametrize("resolve_links", (True, False))
+    def test_meta_on_ext_link(self, server, resolve_links):
+        source_file = "source.h5"
+        with h5py.File(server.served_directory / "source.h5", mode="w") as h5file:
+            data = np.arange(10, dtype="<f8")
+            h5file.create_dataset("data", data=data)
+
+        filename = "link.h5"
+        with h5py.File(server.served_directory / "link.h5", mode="w") as h5file:
+            h5file["ext_link"] = h5py.ExternalLink(source_file, "data")
+
+        response = server.get(
+            f"/meta/?{urlencode({'file': filename, 'path': '/ext_link', 'resolve_links': resolve_links})}"
+        )
+        content = decode_response(response)
+
+        if resolve_links:
+            assert content == {
+                "attributes": [],
+                "name": "ext_link",
+                "dtype": "<f8",
+                "shape": [10],
+                "type": "dataset",
+            }
+        else:
+            assert content == {
+                "name": "ext_link",
+                "target_file": "source.h5",
+                "target_path": "data",
+                "type": "external_link",
+            }
 
     def test_stats_on_array(self, server):
         """Test /stats/ endpoint on an array"""

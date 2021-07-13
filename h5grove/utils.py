@@ -9,15 +9,20 @@ def attr_metadata(attrId: h5py.h5a.AttrID) -> dict:
     return {"dtype": attrId.dtype.str, "name": attrId.name, "shape": attrId.shape}
 
 
-def get_entity_from_file(h5file: h5py.File, path: str) -> H5pyEntity:
+def get_entity_from_file(
+    h5file: h5py.File, path: str, resolve_links: bool = True
+) -> H5pyEntity:
     if path == "/":
         return h5file[path]
 
     link = h5file.get(path, getlink=True)
     if isinstance(link, h5py.ExternalLink) or isinstance(link, h5py.SoftLink):
-        try:
-            return h5file[path]
-        except (OSError, KeyError):
+        if resolve_links:
+            try:
+                return h5file[path]
+            except (OSError, KeyError):
+                return link
+        else:
             return link
 
     return h5file[path]
