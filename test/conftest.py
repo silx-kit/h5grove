@@ -6,6 +6,7 @@ import sys
 import time
 from typing import Callable, List, NamedTuple, Optional, Tuple
 from urllib.request import urlopen
+from urllib.error import HTTPError
 
 import pytest
 
@@ -32,7 +33,11 @@ class BaseServer:
         """Override in subclass to implement fetching response"""
         raise NotImplementedError()
 
-    def get(self, url: str, benchmark: Optional[Callable] = None) -> Response:
+    def get(
+        self,
+        url: str,
+        benchmark: Optional[Callable] = None,
+    ) -> Response:
         """Request url and return retrieved response"""
         if benchmark is None:
             response = self._get_response(url, lambda f: f())
@@ -47,6 +52,9 @@ class BaseServer:
             assert len(response.content) == int(content_lengths[0])
 
         return response
+
+    def assert_404(self, url: str):
+        raise NotImplementedError()
 
 
 # subprocess_server fixture  ###
@@ -64,6 +72,11 @@ class SubprocessServer(BaseServer):
         return BaseServer.Response(
             status=r.status, headers=r.headers.items(), content=r.read()
         )
+
+    def assert_404(self, url: str):
+        with pytest.raises(HTTPError) as e:
+            self._get_response(url, lambda f: f())
+            assert e.value.code == 404
 
 
 def get_free_tcp_port(host: str = "localhost") -> int:

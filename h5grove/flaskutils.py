@@ -1,5 +1,6 @@
 """Helpers for usage with `Flask <https://flask.palletsprojects.com/>`_"""
-from flask import Blueprint, current_app, request, Response, Request
+from h5grove.utils import PathError
+from flask import abort, Blueprint, current_app, request, Response, Request
 import h5py
 import os
 from typing import Any, Callable, Mapping, Optional
@@ -19,6 +20,14 @@ def make_encoded_response(content, format: Optional[str]) -> Response:
     return response
 
 
+def get_content(h5file: h5py.File, path: Optional[str], resolve_links: bool = True):
+    """Gets contents if path is in file. Raises 404 otherwise"""
+    try:
+        return create_content(h5file, path, resolve_links)
+    except PathError as e:
+        abort(404, str(e))
+
+
 def get_filename(request: Request) -> str:
     file_path = request.args.get("file")
     if file_path is None:
@@ -34,7 +43,7 @@ def attr_route():
     format = request.args.get("format")
 
     with h5py.File(filename, mode="r") as h5file:
-        content = create_content(h5file, path)
+        content = get_content(h5file, path)
         assert isinstance(content, ResolvedEntityContent)
         return make_encoded_response(content.attributes(), format)
 
@@ -47,7 +56,7 @@ def data_route():
     format = request.args.get("format")
 
     with h5py.File(filename, mode="r") as h5file:
-        content = create_content(h5file, path)
+        content = get_content(h5file, path)
         assert isinstance(content, DatasetContent)
         return make_encoded_response(content.data(selection), format)
 
@@ -63,7 +72,7 @@ def meta_route():
     )
 
     with h5py.File(filename, mode="r") as h5file:
-        content = create_content(h5file, path, resolve_links)
+        content = get_content(h5file, path, resolve_links)
         return make_encoded_response(content.metadata(), format)
 
 
@@ -75,7 +84,7 @@ def stats_route():
     format = request.args.get("format")
 
     with h5py.File(filename, mode="r") as h5file:
-        content = create_content(h5file, path)
+        content = get_content(h5file, path)
         assert isinstance(content, DatasetContent)
         return make_encoded_response(content.data_stats(selection), format)
 

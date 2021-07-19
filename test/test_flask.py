@@ -25,6 +25,11 @@ class _FlaskServer(BaseServer):
             status=r.status_code, headers=list(r.headers), content=r.get_data()
         )
 
+    def assert_404(self, url: str):
+        response = self._get_response(url, lambda f: f())
+        assert "Not Found" in str(response.content)
+        assert response.status == 404
+
 
 @pytest.fixture(scope="session")
 def flask_server(tmp_path_factory):

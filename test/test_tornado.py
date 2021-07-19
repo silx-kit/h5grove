@@ -2,6 +2,7 @@
 import pathlib
 from typing import Callable
 import pytest
+from tornado.httpclient import HTTPClientError
 import tornado.web
 
 from conftest import BaseServer
@@ -47,6 +48,11 @@ class _TornadoServer(BaseServer):
         return BaseServer.Response(
             status=r.code, headers=list(r.headers.get_all()), content=r.body
         )
+
+    def assert_404(self, url: str):
+        with pytest.raises(HTTPClientError) as e:
+            self._get_response(url, lambda f: f())
+            assert e.value.code == 404
 
 
 @pytest.fixture

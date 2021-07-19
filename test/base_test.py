@@ -179,3 +179,11 @@ class BaseTestEndpoints:
         response = server.get(f"/stats/?file={filename}&path={tested_h5entity_path}")
         retrieved_stats = decode_response(response)
         assert retrieved_stats == expected_stats
+
+    def test_404_on_non_existing_path(self, server):
+        filename = "test.h5"
+        not_a_path = "not_a_path"
+        with h5py.File(server.served_directory / filename, mode="w") as h5file:
+            h5file["data"] = 0
+
+        server.assert_404(f"/meta/?file={filename}&path={not_a_path}")
