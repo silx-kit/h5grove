@@ -120,24 +120,61 @@ class BaseTestEndpoints:
                 "type": "external_link",
             }
 
-    def test_stats_on_array(self, server):
-        """Test /stats/ endpoint on an array"""
-        # Test condition
-        tested_h5entity_path = "/entry/image"
-        image = np.random.random((128, 128))
-        image[0, 0] = np.nan
-        image[0, 1] = np.inf
-        finite_h5data = image[np.isfinite(image)]
+    def test_stats_on_negative_scalar(self, server):
+        tested_h5entity_path = "/entry/data"
+        h5data = -10
         expected_stats = {
-            "min": np.min(finite_h5data),
-            "max": np.max(finite_h5data),
-            "mean": np.mean(finite_h5data),
-            "std": np.std(finite_h5data),
+            "strict_positive_min": None,
+            "positive_min": None,
+            "min": -10,
+            "max": -10,
+            "mean": -10,
+            "std": 0,
         }
 
         filename = "test.h5"
         with h5py.File(server.served_directory / filename, mode="w") as h5file:
-            h5file[tested_h5entity_path] = image
+            h5file[tested_h5entity_path] = h5data
+
+        response = server.get(f"/stats/?file={filename}&path={tested_h5entity_path}")
+        retrieved_stats = decode_response(response)
+        assert retrieved_stats == expected_stats
+
+    def test_stats_on_empty_array(self, server):
+        tested_h5entity_path = "/entry/data"
+        h5data = []
+        expected_stats = {
+            "strict_positive_min": None,
+            "positive_min": None,
+            "min": None,
+            "max": None,
+            "mean": None,
+            "std": None,
+        }
+
+        filename = "test.h5"
+        with h5py.File(server.served_directory / filename, mode="w") as h5file:
+            h5file[tested_h5entity_path] = h5data
+
+        response = server.get(f"/stats/?file={filename}&path={tested_h5entity_path}")
+        retrieved_stats = decode_response(response)
+        assert retrieved_stats == expected_stats
+
+    def test_stats_on_array(self, server):
+        tested_h5entity_path = "/entry/data"
+        h5data = [-10, -5, -1, 0, 1, 5, 10, np.nan, np.inf]
+        expected_stats = {
+            "strict_positive_min": 1,
+            "positive_min": 0,
+            "min": -10,
+            "max": 10,
+            "mean": 0.0,
+            "std": 6.0,
+        }
+
+        filename = "test.h5"
+        with h5py.File(server.served_directory / filename, mode="w") as h5file:
+            h5file[tested_h5entity_path] = h5data
 
         response = server.get(f"/stats/?file={filename}&path={tested_h5entity_path}")
         retrieved_stats = decode_response(response)
