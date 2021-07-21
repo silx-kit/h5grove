@@ -1,8 +1,13 @@
 import h5py
 from numbers import Number
+from os.path import basename
 import numpy as np
 from typing import Any, Sequence, Tuple, Union
 from .models import H5pyEntity
+
+
+class PathError(Exception):
+    pass
 
 
 def attr_metadata(attrId: h5py.h5a.AttrID) -> dict:
@@ -16,6 +21,10 @@ def get_entity_from_file(
         return h5file[path]
 
     link = h5file.get(path, getlink=True)
+
+    if link is None:
+        raise PathError(f"{path} is not a valid path in {basename(h5file.filename)}")
+
     if isinstance(link, h5py.ExternalLink) or isinstance(link, h5py.SoftLink):
         if resolve_links:
             try:

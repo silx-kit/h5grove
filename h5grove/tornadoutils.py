@@ -1,8 +1,9 @@
 """Helpers for usage with `Tornado <https://www.tornadoweb.org>`_"""
+from h5grove.utils import PathError
 import os
 from typing import Optional
 import h5py
-from tornado.web import RequestHandler, MissingArgumentError
+from tornado.web import RequestHandler, MissingArgumentError, HTTPError
 from .content import DatasetContent, ResolvedEntityContent, create_content
 from .encoders import encode
 
@@ -24,13 +25,16 @@ class BaseHandler(RequestHandler):
     def get(self):
         file_path = self.get_query_argument("file")
         if file_path is None:
-            raise MissingArgumentError("File argument is required")
+            raise MissingArgumentError("file")
 
         path = self.get_query_argument("path", None)
         format = self.get_query_argument("format", None)
 
         with h5py.File(os.path.join(self.base_dir, file_path), "r") as h5file:
-            content = self.get_content(h5file, path)
+            try:
+                content = self.get_content(h5file, path)
+            except PathError as e:
+                raise HTTPError(status_code=404, reason=str(e))
 
         encoded_content_chunks, headers = encode(content, format)
 
