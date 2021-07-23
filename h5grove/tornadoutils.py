@@ -1,7 +1,7 @@
 """Helpers for usage with `Tornado <https://www.tornadoweb.org>`_"""
 from h5grove.utils import PathError
 import os
-from typing import Optional
+from typing import Any, Optional
 import h5py
 from tornado.web import RequestHandler, MissingArgumentError, HTTPError
 from .content import DatasetContent, ResolvedEntityContent, create_content
@@ -50,6 +50,10 @@ class BaseHandler(RequestHandler):
     def prepare(self):
         if self.allow_origin is not None:
             self.set_header("Access-Control-Allow-Origin", self.allow_origin)
+
+    def write_error(self, status_code: int, **kwargs: Any) -> None:
+        self.prepare()
+        return super().write_error(status_code, **kwargs)
 
 
 class AttributeHandler(BaseHandler):
