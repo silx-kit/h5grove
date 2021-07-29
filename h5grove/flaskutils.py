@@ -33,7 +33,11 @@ def get_filename(request: Request) -> str:
     if file_path is None:
         raise KeyError("File argument is required")
 
-    return os.path.join(current_app.config["H5_BASE_DIR"], file_path)
+    full_file_path = os.path.join(current_app.config["H5_BASE_DIR"], file_path)
+    if not os.path.isfile(full_file_path):
+        abort(404, "File not found!")
+
+    return full_file_path
 
 
 def attr_route():
