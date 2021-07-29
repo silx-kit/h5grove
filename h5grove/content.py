@@ -3,6 +3,8 @@ import h5py
 import numpy as np
 import os
 
+from .models import Selection
+
 try:
     import hdf5plugin  # noqa: F401
 except ImportError:
@@ -91,15 +93,18 @@ class DatasetContent(ResolvedEntityContent[h5py.Dataset]):
             *super().metadata().items(),
         )
 
-    def data(self, selection: str = None):
+    def data(self, selection: Selection = None):
         if selection is None:
             return self._h5py_entity[()]
 
-        parsed_slice = parse_slice(self._h5py_entity, selection)
+        if isinstance(selection, str):
+            return self._h5py_entity[parse_slice(self._h5py_entity, selection)]
 
-        return self._h5py_entity[parsed_slice]
+        return self._h5py_entity[selection]
 
-    def data_stats(self, selection: str = None) -> Dict[str, Union[float, int, None]]:
+    def data_stats(
+        self, selection: Selection = None
+    ) -> Dict[str, Union[float, int, None]]:
         data = self._get_finite_data(selection)
 
         if data.size == 0:
@@ -128,7 +133,7 @@ class DatasetContent(ResolvedEntityContent[h5py.Dataset]):
             "std": cast(np.std(data)),
         }
 
-    def _get_finite_data(self, selection: Optional[str]) -> np.ndarray:
+    def _get_finite_data(self, selection: Selection) -> np.ndarray:
         data = np.array(self.data(selection), copy=False)  # So it works with scalars
 
         if not np.issubdtype(data.dtype, np.floating):
