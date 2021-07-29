@@ -1,4 +1,35 @@
+from typing import List
 import setuptools
+import sys
+
+
+class Lint(setuptools.Command):
+    user_options: List[str] = []
+    description = "Lint"
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        import subprocess
+
+        lint_steps = [
+            "black --check h5grove/ example/ test/",
+            "flake8",
+            "mypy h5grove/ example/ test/",
+        ]
+
+        for step in lint_steps:
+            cmd = step.split()[0]
+            print(f"Running {cmd}...")
+            errno = subprocess.call([sys.executable, "-m", *step.split()])
+            if errno != 0:
+                raise SystemExit(errno)
+            print(f"{cmd} check passed !")
+
 
 if __name__ == "__main__":
-    setuptools.setup()
+    setuptools.setup(cmdclass={"lint": Lint})
