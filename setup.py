@@ -18,7 +18,7 @@ class Lint(setuptools.Command):
 
         lint_steps = [
             "black --check h5grove/ example/ test/",
-            "flake8",
+            "flake8 -v",
             "mypy h5grove/ example/ test/",
         ]
 
