@@ -2,7 +2,7 @@ import h5py
 from numbers import Number
 from os.path import basename
 import numpy as np
-from typing import Any, Sequence, Tuple, Union
+from typing import Any, Dict, Sequence, Tuple, Union
 from .models import H5pyEntity
 
 
@@ -120,3 +120,31 @@ def sanitize_array(array: Sequence[Number], copy: bool = True) -> np.ndarray:
     """
     ndarray = np.array(array, copy=False)
     return np.array(ndarray, copy=copy, order="C", dtype=_sanitize_dtype(ndarray.dtype))
+
+
+def get_array_stats(data: np.ndarray) -> Dict[str, Union[float, int, None]]:
+    if data.size == 0:
+        return {
+            "strict_positive_min": None,
+            "positive_min": None,
+            "min": None,
+            "max": None,
+            "mean": None,
+            "std": None,
+        }
+
+    cast = float if np.issubdtype(data.dtype, np.floating) else int
+    strict_positive_data = data[data > 0]
+    positive_data = data[data >= 0]
+    return {
+        "strict_positive_min": cast(np.min(strict_positive_data))
+        if strict_positive_data.size != 0
+        else None,
+        "positive_min": cast(np.min(positive_data))
+        if positive_data.size != 0
+        else None,
+        "min": cast(np.min(data)),
+        "max": cast(np.max(data)),
+        "mean": cast(np.mean(data)),
+        "std": cast(np.std(data)),
+    }
