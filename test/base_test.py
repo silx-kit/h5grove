@@ -186,4 +186,16 @@ class BaseTestEndpoints:
         with h5py.File(server.served_directory / filename, mode="w") as h5file:
             h5file["data"] = 0
 
+        server.assert_404(f"/attr/?file={filename}&path={not_a_path}")
+        server.assert_404(f"/data/?file={filename}&path={not_a_path}")
         server.assert_404(f"/meta/?file={filename}&path={not_a_path}")
+        server.assert_404(f"/stats/?file={filename}&path={not_a_path}")
+
+    def test_404_on_non_existing_file(self, server):
+        filename = "not_a_file.h5"
+        path = "/"
+
+        server.assert_404(f"/attr/?file={filename}&path={path}")
+        server.assert_404(f"/data/?file={filename}&path={path}")
+        server.assert_404(f"/meta/?file={filename}&path={path}")
+        server.assert_404(f"/stats/?file={filename}&path={path}")

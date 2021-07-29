@@ -30,7 +30,11 @@ class BaseHandler(RequestHandler):
         path = self.get_query_argument("path", None)
         format = self.get_query_argument("format", None)
 
-        with h5py.File(os.path.join(self.base_dir, file_path), "r") as h5file:
+        full_file_path = os.path.join(self.base_dir, file_path)
+        if not os.path.isfile(full_file_path):
+            raise HTTPError(status_code=404, reason="File not found!")
+
+        with h5py.File(full_file_path, "r") as h5file:
             try:
                 content = self.get_content(h5file, path)
             except PathError as e:

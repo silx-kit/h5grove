@@ -52,7 +52,7 @@ class _TornadoServer(BaseServer):
     def assert_404(self, url: str):
         with pytest.raises(HTTPClientError) as e:
             self._get_response(url, lambda f: f())
-            assert e.value.code == 404
+        assert e.value.code == 404
 
 
 @pytest.fixture
