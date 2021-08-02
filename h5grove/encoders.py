@@ -7,7 +7,7 @@ import h5py
 from .utils import sanitize_array
 
 
-def default(o) -> Union[list, str, None]:
+def default(o) -> Union[list, dict, str, None]:
     if isinstance(o, np.generic) or isinstance(o, np.ndarray):
         return o.tolist()
     if isinstance(o, complex):
@@ -16,6 +16,12 @@ def default(o) -> Union[list, str, None]:
         return None
     if isinstance(o, bytes):
         return o.decode()
+    if isinstance(o, slice):
+        return {
+            "start": o.start,
+            "stop": o.stop,
+            "step": o.step,
+        }
     raise TypeError
 
 
