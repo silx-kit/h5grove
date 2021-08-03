@@ -1,5 +1,5 @@
 """Helpers for usage with `Flask <https://flask.palletsprojects.com/>`_"""
-from h5grove.utils import PathError
+from h5grove.utils import NotFoundError
 from flask import abort, Blueprint, current_app, request, Response, Request
 import h5py
 import os
@@ -24,7 +24,7 @@ def get_content(h5file: h5py.File, path: Optional[str], resolve_links: bool = Tr
     """Gets contents if path is in file. Raises 404 otherwise"""
     try:
         return create_content(h5file, path, resolve_links)
-    except PathError as e:
+    except NotFoundError as e:
         abort(404, str(e))
 
 

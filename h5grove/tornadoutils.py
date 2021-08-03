@@ -1,5 +1,5 @@
 """Helpers for usage with `Tornado <https://www.tornadoweb.org>`_"""
-from h5grove.utils import PathError
+from h5grove.utils import NotFoundError
 import os
 from typing import Any, Optional
 import h5py
@@ -37,7 +37,7 @@ class BaseHandler(RequestHandler):
         with h5py.File(full_file_path, "r") as h5file:
             try:
                 content = self.get_content(h5file, path)
-            except PathError as e:
+            except NotFoundError as e:
                 raise HTTPError(status_code=404, reason=str(e))
 
         encoded_content_chunks, headers = encode(content, format)

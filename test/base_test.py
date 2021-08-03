@@ -199,3 +199,25 @@ class BaseTestEndpoints:
         server.assert_404(f"/data/?file={filename}&path={path}")
         server.assert_404(f"/meta/?file={filename}&path={path}")
         server.assert_404(f"/stats/?file={filename}&path={path}")
+
+    @pytest.mark.parametrize("resolve_links", (True, False))
+    def test_meta_on_broken_soft_link(self, server, resolve_links):
+        filename = "test.h5"
+        link_path = "link"
+        with h5py.File(server.served_directory / filename, mode="w") as h5file:
+            h5file[link_path] = h5py.SoftLink("not_an_entity")
+
+        url = f"/meta/?{urlencode({'file': filename, 'path': link_path, 'resolve_links': resolve_links})}"
+
+        # It should return 404 if trying to resolve the broken link
+        if resolve_links:
+            server.assert_404(url)
+        # It should return the link metadata when not resolving the link
+        else:
+            response = server.get(url)
+            content = decode_response(response)
+            assert content == {
+                "name": "link",
+                "target_path": "not_an_entity",
+                "type": "soft_link",
+            }
