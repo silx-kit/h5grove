@@ -1,13 +1,13 @@
 import io
 from numbers import Number
-from typing import Dict, Generator, NamedTuple, Optional, Sequence, Union
+from typing import Any, Callable, Dict, Generator, NamedTuple, Optional, Sequence, Union
 import numpy as np
 import orjson
 import h5py
 from .utils import sanitize_array
 
 
-def default(o) -> Union[list, str, None]:
+def orjson_default(o) -> Union[list, str, None]:
     if isinstance(o, np.generic) or isinstance(o, np.ndarray):
         return o.tolist()
     if isinstance(o, complex):
@@ -19,7 +19,10 @@ def default(o) -> Union[list, str, None]:
     raise TypeError
 
 
-def orjson_encode(content):
+def orjson_encode(content: Any, default: Optional[Callable] = None):
+    if default is None:
+        default = orjson_default
+
     return orjson.dumps(content, default=default, option=orjson.OPT_SERIALIZE_NUMPY)
 
 
