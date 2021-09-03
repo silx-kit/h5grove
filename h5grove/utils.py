@@ -6,7 +6,15 @@ from typing import Any, Dict, Sequence, Tuple, Union
 from .models import H5pyEntity
 
 
-class PathError(Exception):
+class NotFoundError(Exception):
+    pass
+
+
+class PathError(NotFoundError):
+    pass
+
+
+class LinkError(NotFoundError):
     pass
 
 
@@ -30,7 +38,9 @@ def get_entity_from_file(
             try:
                 return h5file[path]
             except (OSError, KeyError):
-                return link
+                raise LinkError(
+                    f"Cannot resolve {link} at {path} of {basename(h5file.filename)}"
+                )
         else:
             return link
 
