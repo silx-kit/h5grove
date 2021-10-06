@@ -8,6 +8,9 @@ from .utils import sanitize_array
 
 
 def orjson_default(o) -> Union[list, str, None]:
+    """Converts Python objects to JSON-serializable objects.
+
+    :raises TypeError: if the object is not supported."""
     if isinstance(o, np.generic) or isinstance(o, np.ndarray):
         return o.tolist()
     if isinstance(o, complex):
@@ -19,7 +22,12 @@ def orjson_default(o) -> Union[list, str, None]:
     raise TypeError
 
 
-def orjson_encode(content: Any, default: Optional[Callable] = None):
+def orjson_encode(content: Any, default: Optional[Callable] = None) -> bytes:
+    """Encode in JSON using orjson.
+
+    :param: content: Content to encode
+    :param default: orjson default (https://github.com/ijl/orjson#default)
+    """
     if default is None:
         default = orjson_default
 
@@ -59,7 +67,9 @@ def npy_stream(array: Sequence[Number]) -> Generator[bytes, None, None]:
 
 class Response(NamedTuple):
     content: Generator[bytes, None, None]
+    """ Encoded `content` as a generator of bytes """
     headers: Dict[str, str]
+    """ Associated headers """
 
 
 def encode(content, encoding: Optional[str] = "json") -> Response:
@@ -67,14 +77,12 @@ def encode(content, encoding: Optional[str] = "json") -> Response:
 
     Warning: Not all encodings supports all types of content.
 
-    :param content:
+    :param content: Content to encode
     :param encoding:
         - `json` (default)
         - `npy`: Only nD array-like of numbers is supported
-    :returns: A Response object providing:
-        - encoded `content` either as bytes or a generator of bytes
-        - associated `headers`
-    :raises ValueError:
+    :returns: A Response object containing content and headers
+    :raises ValueError: If encoding is not "json" nor "npy"
     """
     if encoding in ("json", None):
         return Response(
