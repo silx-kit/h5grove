@@ -1,0 +1,171 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>h5grove, core utilities to serve HDF5 file contents &#8212; h5grove 0.0.6 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/nature.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="h5grove reference" href="reference.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="reference.html" title="h5grove reference"
+             accesskey="N">next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">h5grove 0.0.6 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">h5grove, core utilities to serve HDF5 file contents</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section class="tex2jax_ignore mathjax_ignore" id="h5grove-core-utilities-to-serve-hdf5-file-contents">
+<h1>h5grove, core utilities to serve HDF5 file contents<a class="headerlink" href="#h5grove-core-utilities-to-serve-hdf5-file-contents" title="Permalink to this headline">¶</a></h1>
+<p><strong>h5grove</strong> is a Python package that provides utilities to design backends serving HDF5 file content: attributes, metadata and data. HDF5 files are accessed with <a class="reference external" href="https://github.com/h5py/">h5py</a>.</p>
+<section id="rationale">
+<h2>Rationale<a class="headerlink" href="#rationale" title="Permalink to this headline">¶</a></h2>
+<p>There are several packages out there that can serve HDF5 files. However, they are dedicated to their usecases and settle on one implementation, hampering reusability.</p>
+<p>In addition, some problems arise constantly when designing HDF5 backends. To name a few:</p>
+<ul class="simple">
+<li><p>Resolving external links</p></li>
+<li><p>Dealing with compression and slicing of datasets</p></li>
+<li><p>Encoding data efficiently and consistently (looking at you, <code class="docutils literal notranslate"><span class="pre">NaN</span></code>, <code class="docutils literal notranslate"><span class="pre">Infinity</span></code> in JSON)</p></li>
+</ul>
+<p><strong>h5grove</strong> aims at providing building blocks that solve these common problems and can be reused in existing or new backends.</p>
+</section>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install h5grove
+</pre></div>
+</div>
+<p>You can use <strong>h5grove</strong> low-level utilities whatever the backend implementation you choose. We simply provide additional utilities for <a class="reference external" href="https://www.tornadoweb.org/en/stable/">Tornado</a> and <a class="reference external" href="https://flask.palletsprojects.com/en/">Flask</a> that can be installed with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install h5grove<span class="o">[</span>flask<span class="o">]</span> <span class="c1"># For Flask</span>
+pip install h5grove<span class="o">[</span>tornado<span class="o">]</span> <span class="c1"># For Tornado</span>
+</pre></div>
+</div>
+</section>
+<section id="contents">
+<h2>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
+<p>Example implementations using Flask and Tornado are given in the <code class="docutils literal notranslate"><span class="pre">example</span></code> folder. These are functional backends that make use of the utilities provided by the <code class="docutils literal notranslate"><span class="pre">h5grove</span></code> package.</p>
+<p>For more tailored use, you can make use of the low-level utilities in your own project. The package contains the following modules:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">content</span></code>: A hierarchy of <code class="docutils literal notranslate"><span class="pre">Content</span></code> classes that extract the relevant information (be it attributes, metadata or data) from the file (resolving links if possible) and expose them through methods.</p></li>
+</ul>
+<p>Ideally, getting the information from a path in the file should be as simple as:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">h5file</span><span class="p">:</span>
+    <span class="n">content</span> <span class="o">=</span> <span class="n">create_content</span><span class="p">(</span><span class="n">h5file</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+    <span class="c1"># Get metadata (valid for all entities)</span>
+    <span class="n">content</span><span class="o">.</span><span class="n">metadata</span><span class="p">()</span>
+    <span class="c1"># Get data (only valid for datasets)</span>
+    <span class="n">content</span><span class="o">.</span><span class="n">data</span><span class="p">()</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">encoders</span></code>: Functions that encode data and provide the appropriate headers to build request responses. The module provides a JSON and a binary encoder.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">flaskutils</span></code>: Utilities dedicated to Flask backends. Notably provides a <a class="reference external" href="https://flask.palletsprojects.com/en/2.0.x/api/#flask.Blueprint">Blueprint</a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tornadoutils</span></code>: Utilities dedicated to Tornado backends.</p></li>
+</ul>
+<section id="for-more-info-see-the-reference">
+<h3>For more info, see the reference:<a class="headerlink" href="#for-more-info-see-the-reference" title="Permalink to this headline">¶</a></h3>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">h5grove reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="reference.html#content-module"><code class="docutils literal notranslate"><span class="pre">content</span></code> module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="reference.html#create-a-content-object">Create a content object</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference.html#content-object-reference">Content object reference</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="reference.html#encoders-module"><code class="docutils literal notranslate"><span class="pre">encoders</span></code> module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="reference.html#general">General</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference.html#orjson">orjson</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference.html#npy">npy</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">h5grove, core utilities to serve HDF5 file contents</a><ul>
+<li><a class="reference internal" href="#rationale">Rationale</a></li>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#contents">Contents</a><ul>
+<li><a class="reference internal" href="#for-more-info-see-the-reference">For more info, see the reference:</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Next topic</h4>
+  <p class="topless"><a href="reference.html"
+                        title="next chapter">h5grove reference</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.md.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="reference.html" title="h5grove reference"
+             >next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">h5grove 0.0.6 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">h5grove, core utilities to serve HDF5 file contents</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, ESRF.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.2.0.
+    </div>
+  </body>
+</html>
