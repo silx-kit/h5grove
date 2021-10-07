@@ -2,7 +2,9 @@
 
 **h5grove** is a Python package that provides utilities to design backends serving HDF5 file content: attributes, metadata and data. HDF5 files are accessed with [h5py](https://github.com/h5py/).
 
-Documentation available [here](https://silx-kit.github.io/h5grove/).
+## Documentation
+
+The documentation of the latest release is available [here](https://silx-kit.github.io/h5grove/).
 
 ## Rationale
 

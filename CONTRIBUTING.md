@@ -34,16 +34,17 @@ Configuration entries are located in `setup.cfg`.
 
 Tests are handled with [pytest](https://docs.pytest.org/en/stable/index.html). These are mostly integration tests for now that tests the responses of the endpoints of the tornado and flask example apps.
 
+Once `h5grove` is installed in editable mode, simply run the test with: `pytest`.
 ### Benchmarks
 
-TBA
+Benchmarks of different formats (`json`, `.npy`) and web server frameworks (`flask`, `tornado`) are run as part of the tests. Those benchmarks are based on [pytest-benchmark](https://pytest-benchmark.readthedocs.io/en/latest/).
 
 ## Release
 
 Versioning is handled by [bump2version](https://github.com/c4urself/bump2version) (config in `.bumpversion.cfg`). To release a new version:
 
-- Checkout `main` and ensure that it it up to date
-- Be sure that lint checks and tests are passing
+- Checkout `main` and ensure that it is up to date
+- Be sure that lint checks, tests and documentation generation are passing
 - Run `bump2version [patch|minor|major]`
 
 This will create a commit increasing the version number and tag it in `git`. To trigger the PyPI release, push the commit and the tag to GitHub:
@@ -56,10 +57,10 @@ The new tag will trigger the CI (`release.yml`) that will build and release the 
 
 ### Documentation
 
-The documentation is generated using [Sphinx](https://www.sphinx-doc.org/en/master/index.html) by parsing Markdown files with[myst-parser](https://myst-parser.readthedocs.io/en/latest/index.html).
+The documentation is generated using [Sphinx](https://www.sphinx-doc.org/en/master/index.html) by parsing Markdown files with [myst-parser](https://myst-parser.readthedocs.io/en/latest/index.html).
 
 The relevant files are in `docs/`:
 
 - `conf.py`: the Sphinx configuration file
-- `index.md`: Landing documentation page. Includes the `README.md`.
+- `index.md`: Landing documentation page. It includes the `README.md`.
 - `reference.md`: Generates API documentation for `content` and `encoders` modules using [sphinx.ext.autodoc](https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html).
