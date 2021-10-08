@@ -31,5 +31,25 @@ class Lint(setuptools.Command):
             print(f"{cmd} check passed !")
 
 
+class Doc(setuptools.Command):
+    user_options: List[str] = []
+    description = "Sphinx build"
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        import subprocess
+
+        cmd = "sphinx -W -b html docs _build"
+
+        errno = subprocess.call([sys.executable, "-m", *cmd.split()])
+        if errno != 0:
+            raise SystemExit(errno)
+
+
 if __name__ == "__main__":
-    setuptools.setup(cmdclass={"lint": Lint})
+    setuptools.setup(cmdclass={"lint": Lint, "doc": Doc})

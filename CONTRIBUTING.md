@@ -34,10 +34,13 @@ Configuration entries are located in `setup.cfg`.
 
 Tests are handled with [pytest](https://docs.pytest.org/en/stable/index.html). These are mostly integration tests for now that tests the responses of the endpoints of the tornado and flask example apps.
 
-Once `h5grove` is installed in editable mode, simply run the test with: `pytest`.
+Once `h5grove` is installed in editable mode, simply run the tests with: `pytest`.
+
 ### Benchmarks
 
 Benchmarks of different formats (`json`, `.npy`) and web server frameworks (`flask`, `tornado`) are run as part of the tests. Those benchmarks are based on [pytest-benchmark](https://pytest-benchmark.readthedocs.io/en/latest/).
+
+The test suite can be run without these benchmarks by running `pytest --benchmark-skip`.
 
 ## Release
 
@@ -64,3 +67,11 @@ The relevant files are in `docs/`:
 - `conf.py`: the Sphinx configuration file
 - `index.md`: Landing documentation page. It includes the `README.md`.
 - `reference.md`: Generates API documentation for `content` and `encoders` modules using [sphinx.ext.autodoc](https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html).
+
+The documentation can be build locally using
+
+```
+python setup.py doc
+```
+
+The HTML pages will be generated in `_build`.

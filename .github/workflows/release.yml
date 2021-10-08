@@ -24,6 +24,15 @@ jobs:
           python -m pip install --upgrade pip
           pip install .[dev] build twine
 
+      - name: Build documentation with Sphinx 🐪
+        run: python setup.py doc
+
+      - name: Deploy documentation 🚀
+        uses: JamesIves/github-pages-deploy-action@4.1.5
+        with:
+          BRANCH: gh-pages
+          FOLDER: _build
+
       - name: Build the package 📦
         run: python -m build
 
@@ -35,13 +44,3 @@ jobs:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
         run: python -m twine upload dist/*
-
-      - name: Build documentation with Sphinx 🐪
-        run: |
-          sphinx-build -b html docs _build
-
-      - name: Deploy documentation 🚀
-        uses: JamesIves/github-pages-deploy-action@4.1.5
-        with:
-          BRANCH: gh-pages
-          FOLDER: _build
