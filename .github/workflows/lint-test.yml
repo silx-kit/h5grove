@@ -13,31 +13,34 @@ jobs:
       - name: Checkout 🏷️
         uses: actions/checkout@v2
 
-      - name: Install Python
+      - name: Install Python 🐍
         uses: actions/setup-python@v2
         with:
           python-version: '3.6'
           architecture: 'x64'
 
-      - name: Install dependencies
+      - name: Install dependencies ⚙️
         run: |
           python -m pip install --upgrade pip
           pip install .[all]
 
-      - name: black
+      - name: black ◼️
         run: black --check h5grove/ example/ test/
 
-      - name: flake8
+      - name: flake8 ❄️
         run: flake8
 
-      - name: mypy
+      - name: mypy 🧐
         run: mypy h5grove/ example/ test/
 
-      - name: pytest tests
+      - name: pytest tests 👓
         run: |
           pushd test/
           pytest --cov=h5grove --benchmark-skip
           popd
 
-      - name: pytest benchmark
+      - name: pytest benchmark 📈
         run: pytest --benchmark-only --benchmark-group-by=param:h5path --benchmark-columns=median,iqr,min,max
+
+      - name: sphinx build 🐪
+        run: python setup.py doc
