@@ -13,22 +13,18 @@
 ```{eval-rst}
 .. autoclass:: h5grove.content.ExternalLinkContent
     :members:
-    :private-members:
     :inherited-members:
     :undoc-members:
 .. autoclass:: h5grove.content.SoftLinkContent
     :members:
-    :private-members:
     :inherited-members:
     :undoc-members:
 .. autoclass:: h5grove.content.DatasetContent
     :members:
-    :private-members:
     :inherited-members:
     :undoc-members:
 .. autoclass:: h5grove.content.GroupContent
     :members:
-    :private-members:
     :inherited-members:
     :undoc-members:
 ```

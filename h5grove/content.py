@@ -25,7 +25,6 @@ class EntityContent:
 
     def __init__(self, path: str):
         self._path = path
-        """ Path in the file. """
 
     def metadata(self) -> Dict[str, str]:
         """Entity metadata
@@ -39,6 +38,11 @@ class EntityContent:
         """Entity name. Last member of the path."""
         return self._path.split("/")[-1]
 
+    @property
+    def path(self) -> str:
+        """Path in the file."""
+        return self._path
+
 
 class ExternalLinkContent(EntityContent):
     type = "external_link"
@@ -46,9 +50,7 @@ class ExternalLinkContent(EntityContent):
     def __init__(self, path: str, link: h5py.ExternalLink):
         super().__init__(path)
         self._target_file = link.filename
-        """ The target file of the link """
         self._target_path = link.path
-        """ The target path of the link (in the target file) """
 
     def metadata(self, depth=None):
         """External link metadata
@@ -60,6 +62,16 @@ class ExternalLinkContent(EntityContent):
             ("target_path", self._target_path),
             *super().metadata().items(),
         )
+
+    @property
+    def target_file(self) -> str:
+        """The target file of the link"""
+        return self._target_file
+
+    @property
+    def target_path(self) -> str:
+        """The target path of the link (in the target file)"""
+        return self._target_path
 
 
 class SoftLinkContent(EntityContent):
@@ -77,6 +89,11 @@ class SoftLinkContent(EntityContent):
         return sorted_dict(
             ("target_path", self._target_path), *super().metadata().items()
         )
+
+    @property
+    def target_path(self) -> str:
+        """The target path of the link"""
+        return self._target_path
 
 
 T = TypeVar("T", h5py.Dataset, h5py.Datatype, h5py.Group)
@@ -184,7 +201,7 @@ class GroupContent(ResolvedEntityContent[h5py.Group]):
         :parameter depth: The level of child metadata resolution.
         :returns: {"attributes": AttributeMetadata, "children": ChildMetadata, "name": str, "type": str}
         """
-        if depth == 0:
+        if depth <= 0:
             return super().metadata()
 
         return sorted_dict(
@@ -194,13 +211,16 @@ class GroupContent(ResolvedEntityContent[h5py.Group]):
 
 
 def create_content(h5file: h5py.File, path: Optional[str], resolve_links: bool = True):
-    """Factory function to get entity content from a HDF5 file.
+    """
+    Factory function to get entity content from a HDF5 file.
+    This handles external/soft link resolution and dataset decompression.
 
     :param h5file: An open HDF5 file containing the entity
     :param path: Path to the entity in the file.
     :param resolve_links: Whether external and soft links should be resolved.
     :raises h5grove.utils.PathError: If the path cannot be found in the file
     :raises h5grove.utils.LinkError: If a link cannot be resolved when resolve_links is True
+    :raises TypeError: If encountering an unsupported h5py entity
     """
     if path is None:
         path = "/"
