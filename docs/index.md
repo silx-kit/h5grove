@@ -7,3 +7,7 @@
 ```{toctree} reference.md
 
 ```
+
+```{toctree} api.md
+
+```

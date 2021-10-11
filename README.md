@@ -33,23 +33,44 @@ pip install h5grove[tornado] # For Tornado
 
 ## Using h5grove
 
-Example implementations using Flask and Tornado are given in the `example` folder. These are functional backends that make use of the utilities provided by the `h5grove` package.
+### Example implementations
 
-For more tailored use, you can make use of the low-level utilities in your own project. The package contains the following modules:
+Example implementations using Flask and Tornado are given in the `example` folder. These are functional backends that make use of the utilities provided by the `h5grove` package. These can be run using
 
-- `content`: A hierarchy of `Content` classes that extract the relevant information (be it attributes, metadata or data) from the file (resolving links if possible) and expose them through methods.
+| Flask                          | Tornado                          |
+| ------------------------------ | -------------------------------- |
+| `python3 h5grove/flask_app.py` | `python3 h5grove/tornado_app.py` |
 
-Ideally, getting the information from a path in the file should be as simple as:
+Add `-h` to have a list of the supported options.
 
-```python
-with h5py.File(filepath, "r") as h5file:
-    content = create_content(h5file, path)
-    # Get metadata (valid for all entities)
-    content.metadata()
-    # Get data (only valid for datasets)
-    content.data()
-```
+### Integrating in an existing application
 
-- `encoders`: Functions that encode data and provide the appropriate headers to build request responses. The module provides a JSON and a binary encoder.
-- `flaskutils`: Utilities dedicated to Flask backends. Notably provides a [Blueprint](https://flask.palletsprojects.com/en/2.0.x/api/#flask.Blueprint).
-- `tornadoutils`: Utilities dedicated to Tornado backends.
+Integration in an existing Flask/Tornado application is possible thanks to the following modules:
+
+- `flaskutils`: Utilities dedicated to Flask backends. Provides a [Blueprint](https://flask.palletsprojects.com/en/2.0.x/api/#flask.Blueprint).
+- `tornadoutils`: Utilities dedicated to Tornado backends. Provides a `get_handlers` method to construct handlers that can directly passed to a Tornado application.
+
+By adding the blueprint/handlers, you can add HDF5 serving capabilities to an existing app.
+
+### Low-level modules
+
+For more tailored use, you can make use of the low-level utilities in your own project.
+
+#### Content
+
+The key function of this module is the [create_content](https://silx-kit.github.io/h5grove/reference.html#create-a-content-object) function.
+
+Instead of using h5py to get the desired entity using `h5file[path]`, use `create_content(h5file, path, resolve_links=True|False)` to support link resolution and dataset decompression using [hdf5plugin](https://pypi.org/project/hdf5plugin/). It will return a [Content](https://silx-kit.github.io/h5grove/reference.html#content-object-reference) object that holds handy information to design endpoints.
+
+In addition, `Content` objects form a hierarchy of classes that expose the relevant information of the entity through methods:
+
+- `attributes`: Only for non-link entities. The dict of attributes.
+- `metadata`: For all entities. Information on the entities. Includes attribute metadata for non-link entities.
+- `data`: Only for datasets. Data contained in a dataset or a slice of dataset.
+- `data_stats`: Only for datasets. Statistics computed on the data of the dataset or a slice of it.
+
+These methods are directly plugged to the endpoints from the example implementations so you can take a look at the [endpoints API]() for more information.
+
+#### Encoders
+
+The [encoders](https://silx-kit.github.io/h5grove/reference.html#encoders-module) module contain functions that encode data and provide the appropriate headers to build request responses. The module provides a JSON encoder using `orjson` and a binary encoder for NumPy arrays.
