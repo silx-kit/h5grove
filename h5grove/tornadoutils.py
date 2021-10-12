@@ -13,11 +13,14 @@ __all__ = [
     "AttributeHandler",
     "DataHandler",
     "MetadataHandler",
+    "StatisticsHandler",
     "get_handlers",
 ]
 
 
 class BaseHandler(RequestHandler):
+    """Base class for h5grove handlers"""
+
     def initialize(self, base_dir, allow_origin=None) -> None:
         self.base_dir = base_dir
         self.allow_origin = allow_origin
@@ -61,6 +64,8 @@ class BaseHandler(RequestHandler):
 
 
 class AttributeHandler(BaseHandler):
+    """/attr/ endpoint handler"""
+
     def get_content(self, h5file, path):
         content = create_content(h5file, path)
         assert isinstance(content, ResolvedEntityContent)
@@ -68,6 +73,8 @@ class AttributeHandler(BaseHandler):
 
 
 class DataHandler(BaseHandler):
+    """/data/ endpoint handler"""
+
     def get_content(self, h5file, path):
         selection = self.get_query_argument("selection", None)
 
@@ -77,6 +84,8 @@ class DataHandler(BaseHandler):
 
 
 class MetadataHandler(BaseHandler):
+    """/meta/ endpoint handler"""
+
     def get_content(self, h5file, path):
         resolve_links_arg = self.get_query_argument("resolve_links", None)
         resolve_links = (
@@ -89,6 +98,8 @@ class MetadataHandler(BaseHandler):
 
 
 class StatisticsHandler(BaseHandler):
+    """/stats/ endpoint handler"""
+
     def get_content(self, h5file, path):
         selection = self.get_query_argument("selection", None)
 
@@ -97,8 +108,14 @@ class StatisticsHandler(BaseHandler):
         return content.data_stats(selection)
 
 
+# TODO: Setting the return type raises mypy errors
 def get_handlers(base_dir: Optional[str], allow_origin: Optional[str] = None):
-    """Returns list of `Rule` arguments"""
+    """Build h5grove handlers (`/attr`, `/data`, `/meta` and `/stats`).
+
+    :param base_dir: Base directory from which the HDF5 files will be served
+    :param allow_origin: Allowed origins for CORS
+    :return type: List[Tuple[str, BaseHandler, dict]]
+    """
     init_args = {"base_dir": base_dir, "allow_origin": allow_origin}
     return [
         (r"/attr/.*", AttributeHandler, init_args),

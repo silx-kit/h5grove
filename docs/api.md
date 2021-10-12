@@ -1,4 +1,4 @@
-# ReDoc page of h5grove
+# h5grove endpoints API
 
 ```{raw} html
     <redoc spec-url="_static/api.yaml"></redoc>
@@ -6,6 +6,11 @@
     <style>
       div.body {
         max-width: none;
+      }
+
+      div.redoc-json code {
+        color: white;
+        background-color: #fff0;
       }
     </style>
 ```
