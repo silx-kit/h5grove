@@ -1,0 +1,334 @@
+openapi: 3.0.0
+info:
+  title: 'H5Grove API'
+  description: 'The API provided by h5grove example implementations.'
+  version: 0.0.6
+
+servers:
+  - url: http://{ip}:{port}/
+    description: |
+      A H5Grove server. Defaults to "localhost:8888".
+    variables:
+      ip:
+        default: localhost
+      port:
+        default: '8888'
+
+paths:
+  /attr:
+    get:
+      summary: Get attribute values from an entity
+      description: Retrieves attribute names and values
+      parameters:
+        - $ref: '#/components/parameters/file'
+        - $ref: '#/components/parameters/path'
+        - name: attr_keys
+          in: query
+          description: Names of the attributes to get
+          schema:
+            type: array
+            items:
+              type: string
+
+      responses:
+        '200':
+          description: Dictionnary where keys are attribute names and values are the associated values
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  $ref: '#/components/schemas/value'
+              examples:
+                'all attributes':
+                  description: "For an entity with attributes: a1=5, a2='this', a3=[8, 9]"
+                  value: { a1: 5, a2: 'this', a3: [8, 9] }
+                'filtered attributes':
+                  description: 'For the same entity but attr_keys was set to a1'
+                  value: { a1: 5 }
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+
+  /data:
+    get:
+      summary: Get data of a dataset
+      description: Retrieves data contained in a dataset or a slice of dataset
+      parameters:
+        - $ref: '#/components/parameters/file'
+        - $ref: '#/components/parameters/format'
+        - $ref: '#/components/parameters/path'
+
+      responses:
+        '200':
+          description: Data of the dataset. The output format is controlled by the format query parameter.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/value'
+              examples:
+                scalar_value:
+                  $ref: '#/components/examples/scalar_value'
+                2D_value:
+                  $ref: '#/components/examples/2D_value'
+            application/octet-stream:
+              schema:
+                type: string
+
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+
+  /meta:
+    get:
+      summary: Get metadata of an entity
+      description: Retrieves metadata of a h5py entity
+      parameters:
+        - $ref: '#/components/parameters/file'
+        - $ref: '#/components/parameters/path'
+      responses:
+        '200':
+          description: Metadata of the h5py entity
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/datasetMetadata'
+                  - $ref: '#/components/schemas/externalLinkMetadata'
+                  - $ref: '#/components/schemas/resolvedEntityMetadata'
+                  - $ref: '#/components/schemas/groupMetadata'
+                  - $ref: '#/components/schemas/softLinkMetadata'
+                discriminator:
+                  propertyName: type
+                  mapping:
+                    dataset: '#/components/schemas/datasetMetadata'
+                    external_link: '#/components/schemas/externalLinkMetadata'
+                    group: '#/components/schemas/groupMetadata'
+                    other: '#/components/schemas/resolvedEntityMetadata'
+                    soft_link: '#/components/schemas/softLinkMetadata'
+
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+
+  /stats:
+    get:
+      summary: Get statistics on data of a dataset
+      description: Retrieves statistics on data contained in a dataset or a slice of dataset
+      parameters:
+        - $ref: '#/components/parameters/file'
+        - $ref: '#/components/parameters/path'
+        - $ref: '#/components/parameters/selection'
+      responses:
+        '200':
+          description: Statistics of the dataset
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  strict_positive_min:
+                    $ref: '#/components/schemas/numberOrNull'
+                  positive_min:
+                    $ref: '#/components/schemas/numberOrNull'
+                  min:
+                    $ref: '#/components/schemas/numberOrNull'
+                  max:
+                    $ref: '#/components/schemas/numberOrNull'
+                  mean:
+                    $ref: '#/components/schemas/numberOrNull'
+                  std:
+                    $ref: '#/components/schemas/numberOrNull'
+                example:
+                  {
+                    strict_positive_min: 3.4,
+                    positive_min: 0,
+                    min: -5,
+                    max: 42,
+                    mean: 36,
+                    std: 7.5,
+                  }
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+
+components:
+  parameters:
+    file:
+      name: file
+      description: Location of the HDF5 file.
+      in: query
+      required: true
+      schema:
+        type: string
+        example: 'data/my_hdf_file.h5'
+    format:
+      name: format
+      description: Format in which the response should be encoded. Defaults to "json".
+      in: query
+      schema:
+        enum: ['json', 'npy']
+        type: string
+      example: 'json'
+    path:
+      name: path
+      description: Path of the entity in the HDF5 file. Default to '/' (root) if not present.
+      in: query
+      schema:
+        type: string
+      example: '/path/to/entity'
+    selection:
+      name: selection
+      in: query
+      description: NumPy-like indicing to define a selection through a slice. Providing a selection will compute stats only on the selected slice.
+      schema:
+        $ref: '#/components/schemas/selectionSchema'
+      explode: false
+      examples:
+        integers:
+          description: Gets data[0, 1, 4]
+          value: [0, 1, 4]
+        slice:
+          description: Gets data[5:10]
+          value: '5:10'
+        mixed:
+          description: Gets data[5, 0:10:2]
+          value: [5, '0:10:2']
+  schemas:
+    # Metadata schemas
+    attrMetadata:
+      type: object
+      description: Attribute metadata. Does not include the value.
+      properties:
+        dtype:
+          type: string
+          example: '>i4'
+        name:
+          type: string
+          example: 'attr1_name'
+        shape:
+          $ref: '#/components/schemas/shape'
+    entityMetadata:
+      type: object
+      properties:
+        name:
+          type: string
+          example: 'entity_name'
+        type:
+          enum: ['other']
+          type: string
+    softLinkMetadata:
+      allOf:
+        - $ref: '#/components/schemas/entityMetadata'
+        - type: object
+          properties:
+            target_path:
+              type: string
+              example: '/path/to/linked/entity'
+            type:
+              enum: ['soft_link']
+              type: string
+    externalLinkMetadata:
+      allOf:
+        - $ref: '#/components/schemas/softLinkMetadata'
+        - type: object
+          properties:
+            target_file:
+              type: string
+            type:
+              enum: ['external_link']
+              type: string
+              example: 'path/to/another/file.h5'
+    resolvedEntityMetadata:
+      allOf:
+        - $ref: '#/components/schemas/entityMetadata'
+        - type: object
+          properties:
+            attributes:
+              type: array
+              items:
+                $ref: '#/components/schemas/attrMetadata'
+    datasetMetadata:
+      allOf:
+        - $ref: '#/components/schemas/resolvedEntityMetadata'
+        - type: object
+          properties:
+            dtype:
+              type: string
+              example: '>f4'
+            shape:
+              $ref: '#/components/schemas/shape'
+            type:
+              enum: ['dataset']
+              type: string
+    groupMetadata:
+      allOf:
+        - $ref: '#/components/schemas/resolvedEntityMetadata'
+        - type: object
+          properties:
+            children:
+              type: array
+              items:
+                anyOf:
+                  - $ref: '#/components/schemas/childGroupMetadata'
+                  - $ref: '#/components/schemas/datasetMetadata'
+                  - $ref: '#/components/schemas/externalLinkMetadata'
+                  - $ref: '#/components/schemas/resolvedEntityMetadata'
+                  - $ref: '#/components/schemas/softLinkMetadata'
+            type:
+              enum: ['group']
+              type: string
+    childGroupMetadata:
+      allOf:
+        - $ref: '#/components/schemas/resolvedEntityMetadata'
+        - type: object
+          properties:
+            type:
+              enum: ['group']
+              type: string
+    # Other schemas
+    numberOrNull:
+      type: number
+      nullable: true
+    selectionItem:
+      anyOf:
+        - type: string
+        - type: integer
+    selectionSchema:
+      oneOf:
+        - $ref: '#/components/schemas/selectionItem'
+        - type: array
+          items:
+            $ref: '#/components/schemas/selectionItem'
+    shape:
+      type: array
+      items:
+        type: integer
+      nullable: true
+      example: [5, 2]
+    valueItem:
+      anyOf:
+        - type: string
+        - type: number
+      nullable: true
+    value:
+      oneOf:
+        - $ref: '#/components/schemas/valueItem'
+        - type: array
+          items:
+            $ref: '#/components/schemas/valueItem'
+  examples:
+    scalar_value:
+      value: 3.14
+    2D_value:
+      value: [[5, 4], [7, 8], [10, 5], [7, 8], [9, 12]]
+
+  responses:
+    '404':
+      description: The file was not found or the queried path does not exist in the file.
+    '500':
+      description: The h5py entity type is not supported.

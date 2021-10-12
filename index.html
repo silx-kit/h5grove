@@ -15,7 +15,7 @@
     <script src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="h5grove reference" href="reference.html" /> 
+    <link rel="next" title="h5grove endpoints API" href="api.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -24,7 +24,7 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="reference.html" title="h5grove reference"
+          <a href="api.html" title="h5grove endpoints API"
              accesskey="N">next</a> |</li>
         <li class="nav-item nav-item-0"><a href="#">h5grove 0.0.6 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">h5grove, core utilities to serve HDF5 file contents</a></li> 
@@ -39,6 +39,10 @@
   <section class="tex2jax_ignore mathjax_ignore" id="h5grove-core-utilities-to-serve-hdf5-file-contents">
 <h1>h5grove, core utilities to serve HDF5 file contents<a class="headerlink" href="#h5grove-core-utilities-to-serve-hdf5-file-contents" title="Permalink to this headline">¶</a></h1>
 <p><strong>h5grove</strong> is a Python package that provides utilities to design backends serving HDF5 file content: attributes, metadata and data. HDF5 files are accessed with <a class="reference external" href="https://github.com/h5py/">h5py</a>.</p>
+<section id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
+<p>The documentation of the latest release is available <a class="reference external" href="https://silx-kit.github.io/h5grove/">here</a>.</p>
+</section>
 <section id="rationale">
 <h2>Rationale<a class="headerlink" href="#rationale" title="Permalink to this headline">¶</a></h2>
 <p>There are several packages out there that can serve HDF5 files. However, they are dedicated to their usecases and settle on one implementation, hampering reusability.</p>
@@ -50,8 +54,8 @@
 </ul>
 <p><strong>h5grove</strong> aims at providing building blocks that solve these common problems and can be reused in existing or new backends.</p>
 </section>
-<section id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<section id="quick-install">
+<h2>Quick install<a class="headerlink" href="#quick-install" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install h5grove
 </pre></div>
 </div>
@@ -61,48 +65,37 @@ pip install h5grove<span class="o">[</span>tornado<span class="o">]</span> <span
 </pre></div>
 </div>
 </section>
-<section id="contents">
-<h2>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
-<p>Example implementations using Flask and Tornado are given in the <code class="docutils literal notranslate"><span class="pre">example</span></code> folder. These are functional backends that make use of the utilities provided by the <code class="docutils literal notranslate"><span class="pre">h5grove</span></code> package.</p>
-<p>For more tailored use, you can make use of the low-level utilities in your own project. The package contains the following modules:</p>
+<section id="using-h5grove">
+<h2>Using h5grove<a class="headerlink" href="#using-h5grove" title="Permalink to this headline">¶</a></h2>
+<p>There are several level of uses of h5grove.</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">content</span></code>: A hierarchy of <code class="docutils literal notranslate"><span class="pre">Content</span></code> classes that extract the relevant information (be it attributes, metadata or data) from the file (resolving links if possible) and expose them through methods.</p></li>
+<li><p>You can look first at the <strong><a class="reference internal" href="example.html"><span class="doc std std-doc">example implementations</span></a></strong> we provide and their <strong><a class="reference internal" href="api.html"><span class="doc std std-doc">API</span></a></strong>.</p></li>
+<li><p>You might be interested to <strong><a class="reference internal" href="integration.html"><span class="doc std std-doc">add HDF5 serving capabilities into an existing application</span></a></strong></p></li>
+<li><p>If the <a class="reference internal" href="api.html"><span class="doc std std-doc">API</span></a> does not suit you, you can make use of the <strong><a class="reference internal" href="low_level.html"><span class="doc std std-doc">low-level modules</span></a></strong> to design your own backend, letting h5grove handle low-level tasks such as link resolution and encoding.</p></li>
 </ul>
-<p>Ideally, getting the information from a path in the file should be as simple as:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">h5file</span><span class="p">:</span>
-    <span class="n">content</span> <span class="o">=</span> <span class="n">create_content</span><span class="p">(</span><span class="n">h5file</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
-    <span class="c1"># Get metadata (valid for all entities)</span>
-    <span class="n">content</span><span class="o">.</span><span class="n">metadata</span><span class="p">()</span>
-    <span class="c1"># Get data (only valid for datasets)</span>
-    <span class="n">content</span><span class="o">.</span><span class="n">data</span><span class="p">()</span>
-</pre></div>
-</div>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">encoders</span></code>: Functions that encode data and provide the appropriate headers to build request responses. The module provides a JSON and a binary encoder.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">flaskutils</span></code>: Utilities dedicated to Flask backends. Notably provides a <a class="reference external" href="https://flask.palletsprojects.com/en/2.0.x/api/#flask.Blueprint">Blueprint</a>.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">tornadoutils</span></code>: Utilities dedicated to Tornado backends.</p></li>
-</ul>
-<section id="for-more-info-see-the-reference">
-<h3>For more info, see the reference:<a class="headerlink" href="#for-more-info-see-the-reference" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="quick-access">
+<h2>Quick access<a class="headerlink" href="#quick-access" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="reference.html">h5grove reference</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="reference.html#content-module"><code class="docutils literal notranslate"><span class="pre">content</span></code> module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="reference.html#create-a-content-object">Create a content object</a></li>
-<li class="toctree-l3"><a class="reference internal" href="reference.html#content-object-reference">Content object reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">h5grove endpoints API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example.html">Example implementations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="example.html#flask">Flask</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example.html#tornado">Tornado</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="reference.html#encoders-module"><code class="docutils literal notranslate"><span class="pre">encoders</span></code> module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="reference.html#general">General</a></li>
-<li class="toctree-l3"><a class="reference internal" href="reference.html#orjson">orjson</a></li>
-<li class="toctree-l3"><a class="reference internal" href="reference.html#npy">npy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="integration.html">Integration in an existing application</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="integration.html#flask">Flask</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration.html#tornado">Tornado</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="low_level.html">h5grove reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="low_level.html#content-module"><code class="docutils literal notranslate"><span class="pre">content</span></code> module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="low_level.html#encoders-module"><code class="docutils literal notranslate"><span class="pre">encoders</span></code> module</a></li>
 </ul>
 </li>
 </ul>
 </div>
-</section>
 </section>
 </section>
 
@@ -116,19 +109,18 @@ pip install h5grove<span class="o">[</span>tornado<span class="o">]</span> <span
   <h3><a href="#">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">h5grove, core utilities to serve HDF5 file contents</a><ul>
+<li><a class="reference internal" href="#documentation">Documentation</a></li>
 <li><a class="reference internal" href="#rationale">Rationale</a></li>
-<li><a class="reference internal" href="#installation">Installation</a></li>
-<li><a class="reference internal" href="#contents">Contents</a><ul>
-<li><a class="reference internal" href="#for-more-info-see-the-reference">For more info, see the reference:</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#quick-install">Quick install</a></li>
+<li><a class="reference internal" href="#using-h5grove">Using h5grove</a></li>
+<li><a class="reference internal" href="#quick-access">Quick access</a></li>
 </ul>
 </li>
 </ul>
 
   <h4>Next topic</h4>
-  <p class="topless"><a href="reference.html"
-                        title="next chapter">h5grove reference</a></p>
+  <p class="topless"><a href="api.html"
+                        title="next chapter">h5grove endpoints API</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -157,7 +149,7 @@ pip install h5grove<span class="o">[</span>tornado<span class="o">]</span> <span
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="reference.html" title="h5grove reference"
+          <a href="api.html" title="h5grove endpoints API"
              >next</a> |</li>
         <li class="nav-item nav-item-0"><a href="#">h5grove 0.0.6 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">h5grove, core utilities to serve HDF5 file contents</a></li> 

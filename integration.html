@@ -1,0 +1,146 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Integration in an existing application &#8212; h5grove 0.0.6 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/nature.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="h5grove reference" href="low_level.html" />
+    <link rel="prev" title="Example implementations" href="example.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="low_level.html" title="h5grove reference"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="example.html" title="Example implementations"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">h5grove 0.0.6 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Integration in an existing application</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section class="tex2jax_ignore mathjax_ignore" id="integration-in-an-existing-application">
+<h1>Integration in an existing application<a class="headerlink" href="#integration-in-an-existing-application" title="Permalink to this headline">¶</a></h1>
+<p>h5grove endpoints (see <a class="reference internal" href="api.html"><span class="doc std std-doc">API here</span></a>) can be added to existing Flask/Tornado applications.</p>
+<section id="flask">
+<h2>Flask<a class="headerlink" href="#flask" title="Permalink to this headline">¶</a></h2>
+<p>The module <code class="docutils literal notranslate"><span class="pre">flaskutils</span></code> contains utilities dedicated to Flask backends. It provides a <a class="reference external" href="https://flask.palletsprojects.com/en/2.0.x/blueprints/">Blueprint</a> that can be registered to an existing Flask application:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span>
+<span class="kn">from</span> <span class="nn">h5grove.flaskutils</span> <span class="kn">import</span> <span class="n">BLUEPRINT</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="o">...</span>
+
+<span class="c1"># Configure base directory from which the HDF5 files will be served</span>
+<span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;H5_BASE_DIR&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">basedir</span><span class="p">)</span>
+
+<span class="n">app</span><span class="o">.</span><span class="n">register_blueprint</span><span class="p">(</span><span class="n">BLUEPRINT</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="tornado">
+<h2>Tornado<a class="headerlink" href="#tornado" title="Permalink to this headline">¶</a></h2>
+<p>The module <code class="docutils literal notranslate"><span class="pre">tornadoutils</span></code> contains utilities dedicated to Flask backends. It provides a <code class="docutils literal notranslate"><span class="pre">get_handlers</span></code> function to construct handlers that can directly passed to a Tornado application:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tornado.web</span>
+<span class="kn">from</span> <span class="nn">h5grove.tornadoutils</span> <span class="kn">import</span> <span class="n">get_handlers</span>
+
+<span class="c1"># The base directory from which the HDF5 files will be served is passed as argument of the function</span>
+<span class="n">h5grove_handlers</span> <span class="o">=</span> <span class="n">get_handlers</span><span class="p">(</span><span class="n">base_dir</span><span class="p">,</span> <span class="n">allow_origin</span><span class="o">=</span><span class="s2">&quot;*&quot;</span><span class="p">)</span>
+
+<span class="c1"># On construction</span>
+<span class="n">app</span> <span class="o">=</span> <span class="n">tornado</span><span class="o">.</span><span class="n">web</span><span class="o">.</span><span class="n">Application</span><span class="p">(</span><span class="n">h5grove_handlers</span><span class="p">)</span>
+
+<span class="c1"># Or using `add_handlers`</span>
+<span class="n">app</span><span class="o">.</span><span class="n">add_handlers</span><span class="p">(</span><span class="n">h5grove_handlers</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Integration in an existing application</a><ul>
+<li><a class="reference internal" href="#flask">Flask</a></li>
+<li><a class="reference internal" href="#tornado">Tornado</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="example.html"
+                        title="previous chapter">Example implementations</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="low_level.html"
+                        title="next chapter">h5grove reference</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/integration.md.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="low_level.html" title="h5grove reference"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="example.html" title="Example implementations"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">h5grove 0.0.6 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Integration in an existing application</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, ESRF.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.2.0.
+    </div>
+  </body>
+</html>
