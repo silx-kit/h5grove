@@ -1,8 +1,11 @@
-# h5grove API
+# ReDoc page of h5grove
 
 ```{raw} html
-    <div style="display: flex">
-      <iframe src="_static/redoc.html" width="100%" height="500px"></iframe>
-    </div>
-    <a href="_static/redoc.html">See full page</a>
+    <redoc spec-url="_static/api.yaml"></redoc>
+    <script src="https://cdn.jsdelivr.net/npm/redoc@latest/bundles/redoc.standalone.js"></script>
+    <style>
+      div.body {
+        max-width: none;
+      }
+    </style>
 ```

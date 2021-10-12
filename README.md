@@ -69,7 +69,7 @@ In addition, `Content` objects form a hierarchy of classes that expose the relev
 - `data`: Only for datasets. Data contained in a dataset or a slice of dataset.
 - `data_stats`: Only for datasets. Statistics computed on the data of the dataset or a slice of it.
 
-These methods are directly plugged to the endpoints from the example implementations so you can take a look at the [endpoints API]() for more information.
+These methods are directly plugged to the endpoints from the example implementations so you can take a look at the [endpoints API](https://silx-kit.github.io/h5grove/api.html) for more information.
 
 #### Encoders
 
