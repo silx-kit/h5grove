@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: 'H5Grove API'
   description: 'The API provided by h5grove example implementations.'
-  version: 0.0.6
+  version: 0.0.7
 
 servers:
   - url: http://{ip}:{port}/
@@ -59,6 +59,7 @@ paths:
         - $ref: '#/components/parameters/file'
         - $ref: '#/components/parameters/format'
         - $ref: '#/components/parameters/path'
+        - $ref: '#/components/parameters/selection'
 
       responses:
         '200':
