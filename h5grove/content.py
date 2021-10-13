@@ -145,7 +145,7 @@ class DatasetContent(ResolvedEntityContent[h5py.Dataset]):
         )
 
     def data(self, selection: Selection = None):
-        """Dataset data. Supports slicing though selection."""
+        """Dataset data. Supports slicing through selection."""
         if selection is None:
             return self._h5py_entity[()]
 
@@ -159,7 +159,7 @@ class DatasetContent(ResolvedEntityContent[h5py.Dataset]):
     ) -> Dict[str, Union[float, int, None]]:
         """Statistics on the data. Providing a selection will compute stats only on the selected slice.
 
-        :param selection: NumPy-like indicing to define a selection though a slice
+        :param selection: NumPy-like indexing to define a selection as a slice
         :returns: {"strict_positive_min": number | None, "positive_min": number | None, "min": number | None, "max": number | None, "mean": number | None, "std": number | None}
         """
         data = self._get_finite_data(selection)

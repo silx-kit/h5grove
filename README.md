@@ -30,26 +30,3 @@ You can use **h5grove** low-level utilities whatever the backend implementation 
 pip install h5grove[flask] # For Flask
 pip install h5grove[tornado] # For Tornado
 ```
-
-## Using h5grove
-
-Example implementations using Flask and Tornado are given in the `example` folder. These are functional backends that make use of the utilities provided by the `h5grove` package.
-
-For more tailored use, you can make use of the low-level utilities in your own project. The package contains the following modules:
-
-- `content`: A hierarchy of `Content` classes that extract the relevant information (be it attributes, metadata or data) from the file (resolving links if possible) and expose them through methods.
-
-Ideally, getting the information from a path in the file should be as simple as:
-
-```python
-with h5py.File(filepath, "r") as h5file:
-    content = create_content(h5file, path)
-    # Get metadata (valid for all entities)
-    content.metadata()
-    # Get data (only valid for datasets)
-    content.data()
-```
-
-- `encoders`: Functions that encode data and provide the appropriate headers to build request responses. The module provides a JSON and a binary encoder.
-- `flaskutils`: Utilities dedicated to Flask backends. Notably provides a [Blueprint](https://flask.palletsprojects.com/en/2.0.x/api/#flask.Blueprint).
-- `tornadoutils`: Utilities dedicated to Tornado backends.

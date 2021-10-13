@@ -9,7 +9,14 @@ from .content import create_content, DatasetContent, ResolvedEntityContent
 from .encoders import encode
 
 
-__all__ = ["attr_route", "data_route", "meta_route", "URL_RULES", "BLUEPRINT"]
+__all__ = [
+    "attr_route",
+    "data_route",
+    "meta_route",
+    "stats_route",
+    "URL_RULES",
+    "BLUEPRINT",
+]
 
 
 def make_encoded_response(content, format: Optional[str]) -> Response:
