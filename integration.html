@@ -25,6 +25,9 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
           <a href="low_level.html" title="h5grove reference"
              accesskey="N">next</a> |</li>
         <li class="right" >
@@ -59,6 +62,47 @@
 <span class="n">app</span><span class="o">.</span><span class="n">register_blueprint</span><span class="p">(</span><span class="n">BLUEPRINT</span><span class="p">)</span>
 </pre></div>
 </div>
+<section id="module-h5grove.flaskutils">
+<span id="flaskutils-reference"></span><h3>flaskutils reference<a class="headerlink" href="#module-h5grove.flaskutils" title="Permalink to this headline">¶</a></h3>
+<p>Helpers for usage with <a class="reference external" href="https://flask.palletsprojects.com/">Flask</a></p>
+<dl class="py data">
+<dt class="sig sig-object py" id="h5grove.flaskutils.BLUEPRINT">
+<span class="sig-prename descclassname"><span class="pre">h5grove.flaskutils.</span></span><span class="sig-name descname"><span class="pre">BLUEPRINT</span></span><em class="property"> <span class="pre">=</span> <span class="pre">&lt;Blueprint</span> <span class="pre">'h5grove'&gt;</span></em><a class="headerlink" href="#h5grove.flaskutils.BLUEPRINT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Blueprint of h5grove endpoints.</p>
+<p>It relies on <cite>H5_BASE_DIR</cite> being defined in the app config.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="h5grove.flaskutils.URL_RULES">
+<span class="sig-prename descclassname"><span class="pre">h5grove.flaskutils.</span></span><span class="sig-name descname"><span class="pre">URL_RULES</span></span><em class="property"> <span class="pre">=</span> <span class="pre">{'/attr/':</span> <span class="pre">&lt;function</span> <span class="pre">attr_route&gt;,</span> <span class="pre">'/data/':</span> <span class="pre">&lt;function</span> <span class="pre">data_route&gt;,</span> <span class="pre">'/meta/':</span> <span class="pre">&lt;function</span> <span class="pre">meta_route&gt;,</span> <span class="pre">'/stats/':</span> <span class="pre">&lt;function</span> <span class="pre">stats_route&gt;}</span></em><a class="headerlink" href="#h5grove.flaskutils.URL_RULES" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mapping of Flask URL endpoints to handlers</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="h5grove.flaskutils.attr_route">
+<span class="sig-prename descclassname"><span class="pre">h5grove.flaskutils.</span></span><span class="sig-name descname"><span class="pre">attr_route</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.flaskutils.attr_route" title="Permalink to this definition">¶</a></dt>
+<dd><p><cite>/attr/</cite> endpoint handler</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="h5grove.flaskutils.data_route">
+<span class="sig-prename descclassname"><span class="pre">h5grove.flaskutils.</span></span><span class="sig-name descname"><span class="pre">data_route</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.flaskutils.data_route" title="Permalink to this definition">¶</a></dt>
+<dd><p><cite>/data/</cite> endpoint handler</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="h5grove.flaskutils.meta_route">
+<span class="sig-prename descclassname"><span class="pre">h5grove.flaskutils.</span></span><span class="sig-name descname"><span class="pre">meta_route</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.flaskutils.meta_route" title="Permalink to this definition">¶</a></dt>
+<dd><p><cite>/meta/</cite> endpoint handler</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="h5grove.flaskutils.stats_route">
+<span class="sig-prename descclassname"><span class="pre">h5grove.flaskutils.</span></span><span class="sig-name descname"><span class="pre">stats_route</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.flaskutils.stats_route" title="Permalink to this definition">¶</a></dt>
+<dd><p><cite>/stats/</cite> endpoint handler</p>
+</dd></dl>
+
+</section>
 </section>
 <section id="tornado">
 <h2>Tornado<a class="headerlink" href="#tornado" title="Permalink to this headline">¶</a></h2>
@@ -76,6 +120,156 @@
 <span class="n">app</span><span class="o">.</span><span class="n">add_handlers</span><span class="p">(</span><span class="n">h5grove_handlers</span><span class="p">)</span>
 </pre></div>
 </div>
+<section id="module-h5grove.tornadoutils">
+<span id="tornadoutils-reference"></span><h3>tornadoutils reference<a class="headerlink" href="#module-h5grove.tornadoutils" title="Permalink to this headline">¶</a></h3>
+<p>Helpers for usage with <a class="reference external" href="https://www.tornadoweb.org">Tornado</a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="h5grove.tornadoutils.AttributeHandler">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">h5grove.tornadoutils.</span></span><span class="sig-name descname"><span class="pre">AttributeHandler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">application</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.tornadoutils.AttributeHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>/attr/ endpoint handler</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>application</strong> (<em>Application</em>) – </p></li>
+<li><p><strong>request</strong> (<em>tornado.httputil.HTTPServerRequest</em>) – </p></li>
+<li><p><strong>kwargs</strong> (<em>Any</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="h5grove.tornadoutils.BaseHandler">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">h5grove.tornadoutils.</span></span><span class="sig-name descname"><span class="pre">BaseHandler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">application</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.tornadoutils.BaseHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class for h5grove handlers</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>application</strong> (<em>Application</em>) – </p></li>
+<li><p><strong>request</strong> (<em>tornado.httputil.HTTPServerRequest</em>) – </p></li>
+<li><p><strong>kwargs</strong> (<em>Any</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="h5grove.tornadoutils.BaseHandler.prepare">
+<span class="sig-name descname"><span class="pre">prepare</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.tornadoutils.BaseHandler.prepare" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called at the beginning of a request before  <cite>get</cite>/<cite>post</cite>/etc.</p>
+<p>Override this method to perform common initialization regardless
+of the request method.</p>
+<p>Asynchronous support: Use <code class="docutils literal notranslate"><span class="pre">async</span> <span class="pre">def</span></code> or decorate this method with
+<cite>.gen.coroutine</cite> to make it asynchronous.
+If this method returns an  <code class="docutils literal notranslate"><span class="pre">Awaitable</span></code> execution will not proceed
+until the <code class="docutils literal notranslate"><span class="pre">Awaitable</span></code> is done.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 3.1: </span>Asynchronous support.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="h5grove.tornadoutils.BaseHandler.write_error">
+<span class="sig-name descname"><span class="pre">write_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">status_code</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.tornadoutils.BaseHandler.write_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override to implement custom error pages.</p>
+<p><code class="docutils literal notranslate"><span class="pre">write_error</span></code> may call <cite>write</cite>, <cite>render</cite>, <cite>set_header</cite>, etc
+to produce output as usual.</p>
+<p>If this error was caused by an uncaught exception (including
+HTTPError), an <code class="docutils literal notranslate"><span class="pre">exc_info</span></code> triple will be available as
+<code class="docutils literal notranslate"><span class="pre">kwargs[&quot;exc_info&quot;]</span></code>.  Note that this exception may not be
+the “current” exception for purposes of methods like
+<code class="docutils literal notranslate"><span class="pre">sys.exc_info()</span></code> or <code class="docutils literal notranslate"><span class="pre">traceback.format_exc</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>status_code</strong> (<em>int</em>) – </p></li>
+<li><p><strong>kwargs</strong> (<em>Any</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="h5grove.tornadoutils.DataHandler">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">h5grove.tornadoutils.</span></span><span class="sig-name descname"><span class="pre">DataHandler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">application</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.tornadoutils.DataHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>/data/ endpoint handler</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>application</strong> (<em>Application</em>) – </p></li>
+<li><p><strong>request</strong> (<em>tornado.httputil.HTTPServerRequest</em>) – </p></li>
+<li><p><strong>kwargs</strong> (<em>Any</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="h5grove.tornadoutils.MetadataHandler">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">h5grove.tornadoutils.</span></span><span class="sig-name descname"><span class="pre">MetadataHandler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">application</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.tornadoutils.MetadataHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>/meta/ endpoint handler</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>application</strong> (<em>Application</em>) – </p></li>
+<li><p><strong>request</strong> (<em>tornado.httputil.HTTPServerRequest</em>) – </p></li>
+<li><p><strong>kwargs</strong> (<em>Any</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="h5grove.tornadoutils.StatisticsHandler">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">h5grove.tornadoutils.</span></span><span class="sig-name descname"><span class="pre">StatisticsHandler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">application</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.tornadoutils.StatisticsHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>/stats/ endpoint handler</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>application</strong> (<em>Application</em>) – </p></li>
+<li><p><strong>request</strong> (<em>tornado.httputil.HTTPServerRequest</em>) – </p></li>
+<li><p><strong>kwargs</strong> (<em>Any</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="h5grove.tornadoutils.get_handlers">
+<span class="sig-prename descclassname"><span class="pre">h5grove.tornadoutils.</span></span><span class="sig-name descname"><span class="pre">get_handlers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_origin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.tornadoutils.get_handlers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build h5grove handlers (<cite>/attr</cite>, <cite>/data</cite>, <cite>/meta</cite> and <cite>/stats</cite>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base_dir</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – Base directory from which the HDF5 files will be served</p></li>
+<li><p><strong>allow_origin</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – Allowed origins for CORS</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>List[Tuple[str, BaseHandler, dict]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
 </section>
 </section>
 
@@ -89,8 +283,14 @@
   <h3><a href="index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Integration in an existing application</a><ul>
-<li><a class="reference internal" href="#flask">Flask</a></li>
-<li><a class="reference internal" href="#tornado">Tornado</a></li>
+<li><a class="reference internal" href="#flask">Flask</a><ul>
+<li><a class="reference internal" href="#module-h5grove.flaskutils">flaskutils reference</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#tornado">Tornado</a><ul>
+<li><a class="reference internal" href="#module-h5grove.tornadoutils">tornadoutils reference</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -128,6 +328,9 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li class="right" >
           <a href="low_level.html" title="h5grove reference"
              >next</a> |</li>

@@ -20,6 +20,13 @@ app.config["H5_BASE_DIR"] = os.path.abspath(options.basedir)
 app.register_blueprint(BLUEPRINT)
 ```
 
+### flaskutils reference
+
+```{eval-rst}
+.. automodule:: h5grove.flaskutils
+    :members:
+```
+
 ## Tornado
 
 The module `tornadoutils` contains utilities dedicated to Flask backends. It provides a `get_handlers` function to construct handlers that can directly passed to a Tornado application:
@@ -36,4 +43,11 @@ app = tornado.web.Application(h5grove_handlers)
 
 # Or using `add_handlers`
 app.add_handlers(h5grove_handlers)
+```
+
+### tornadoutils reference
+
+```{eval-rst}
+.. automodule:: h5grove.tornadoutils
+    :members:
 ```
