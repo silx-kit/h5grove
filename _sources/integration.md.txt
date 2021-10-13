@@ -29,7 +29,7 @@ app.register_blueprint(BLUEPRINT)
 
 ## Tornado
 
-The module `tornadoutils` contains utilities dedicated to Flask backends. It provides a `get_handlers` function to construct handlers that can directly passed to a Tornado application:
+The module `tornadoutils` contains utilities dedicated to Flask backends. It provides a `get_handlers` function to construct handlers that can be passed directly to a Tornado application:
 
 ```python
 import tornado.web

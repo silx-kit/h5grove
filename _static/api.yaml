@@ -184,7 +184,7 @@ components:
     selection:
       name: selection
       in: query
-      description: NumPy-like indicing to define a selection through a slice. Providing a selection will compute stats only on the selected slice.
+      description: NumPy-like indexing to define a selection as a slice. Providing a selection will compute stats only on the selected slice.
       schema:
         $ref: '#/components/schemas/selectionSchema'
       explode: false
