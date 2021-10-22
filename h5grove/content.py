@@ -1,7 +1,6 @@
 from typing import Dict, Generic, Optional, Sequence, TypeVar, Union
 import h5py
 import numpy as np
-import os
 
 from .models import Selection
 
@@ -13,6 +12,7 @@ from .utils import (
     attr_metadata,
     get_array_stats,
     get_entity_from_file,
+    hdf_path_join,
     parse_slice,
     sorted_dict,
 )
@@ -189,9 +189,9 @@ class GroupContent(ResolvedEntityContent[h5py.Group]):
 
     def _get_child_metadata_content(self, depth=0):
         return [
-            create_content(self._h5file, os.path.join(self._path, child_path)).metadata(
-                depth
-            )
+            create_content(
+                self._h5file, hdf_path_join(self._path, child_path)
+            ).metadata(depth)
             for child_path in self._h5py_entity.keys()
         ]
 

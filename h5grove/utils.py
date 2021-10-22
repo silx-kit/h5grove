@@ -158,3 +158,10 @@ def get_array_stats(data: np.ndarray) -> Dict[str, Union[float, int, None]]:
         "mean": cast(np.mean(data)),
         "std": cast(np.std(data)),
     }
+
+
+def hdf_path_join(prefix, suffix):
+    if prefix == "/":
+        return f"/{suffix}"
+
+    return f'{prefix.rstrip("/")}/{suffix}'
