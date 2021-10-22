@@ -7,6 +7,16 @@ import h5py
 from .utils import sanitize_array
 
 
+def bin_encode(array: Sequence[Number]) -> bytes:
+    """Sanitize an array and convert it to bytes.
+
+    :param array: Data to convert
+    """
+    sanitized_array = sanitize_array(array)
+
+    return sanitized_array.tobytes()
+
+
 def orjson_default(o) -> Union[list, str, None]:
     """Converts Python objects to JSON-serializable objects.
 
@@ -66,7 +76,7 @@ def npy_stream(array: Sequence[Number]) -> Generator[bytes, None, None]:
 
 
 class Response(NamedTuple):
-    content: Generator[bytes, None, None]
+    content: Union[Generator[bytes, None, None], bytes]
     """ Encoded `content` as a generator of bytes """
     headers: Dict[str, str]
     """ Associated headers """
@@ -86,10 +96,11 @@ def encode(content, encoding: Optional[str] = "json") -> Response:
     """
     if encoding in ("json", None):
         return Response(
-            (chunk for chunk in (orjson_encode(content),)),  # generator
+            orjson_encode(content),
             headers={"Content-Type": "application/json"},
         )
-    elif encoding == "npy":
+
+    if encoding == "npy":
         return Response(
             npy_stream(content),
             headers={
@@ -97,5 +108,13 @@ def encode(content, encoding: Optional[str] = "json") -> Response:
                 "Content-Disposition": 'attachment; filename="data.npy"',
             },
         )
-    else:
-        raise ValueError(f"Unsupported encoding {encoding}")
+
+    if encoding == "bin":
+        return Response(
+            bin_encode(content),
+            headers={
+                "Content-Type": "application/octet-stream",
+            },
+        )
+
+    raise ValueError(f"Unsupported encoding {encoding}")
