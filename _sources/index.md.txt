@@ -10,6 +10,10 @@ h5grove can be used in several ways.
 - You might be interested to **[add HDF5 serving capabilities into an existing application](integration.md)**
 - If the [API](api.md) does not suit you, you can make use of the **[low-level modules](low_level.md)** to design your own backend, letting h5grove handle low-level tasks such as link resolution and encoding.
 
+## Changelog
+
+The release history is tracked on the [Releases page](https://github.com/silx-kit/h5grove/releases).
+
 ## Quick access
 
 ```{eval-rst}
