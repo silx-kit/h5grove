@@ -52,6 +52,8 @@ git push && git push --tags
 
 The new tag will trigger the CI (`release.yml`) that will build and release the package on PyPI. If this succeeds, the job will also update the documentation at https://silx-kit.github.io/h5grove/ (more on this below).
 
+Release notes can then be written in the [Releases page](https://github.com/silx-kit/h5grove/releases).
+
 ### Documentation
 
 The documentation is generated using [Sphinx](https://www.sphinx-doc.org/en/master/index.html) by parsing Markdown files with [myst-parser](https://myst-parser.readthedocs.io/en/latest/index.html).
