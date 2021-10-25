@@ -1,7 +1,7 @@
 """Helpers for usage with `Tornado <https://www.tornadoweb.org>`_"""
 from h5grove.utils import NotFoundError
 import os
-from typing import Any, Optional
+from typing import Any, Generator, Optional
 import h5py
 from tornado.web import RequestHandler, MissingArgumentError, HTTPError
 from .content import DatasetContent, ResolvedEntityContent, create_content
@@ -31,7 +31,7 @@ class BaseHandler(RequestHandler):
             raise MissingArgumentError("file")
 
         path = self.get_query_argument("path", None)
-        format = self.get_query_argument("format", None)
+        format_arg = self.get_query_argument("format", None)
 
         full_file_path = os.path.join(self.base_dir, file_path)
         if not os.path.isfile(full_file_path):
@@ -43,12 +43,16 @@ class BaseHandler(RequestHandler):
             except NotFoundError as e:
                 raise HTTPError(status_code=404, reason=str(e))
 
-        encoded_content_chunks, headers = encode(content, format)
+        chunks, headers = encode(content, format_arg)
 
         for key, value in headers.items():
             self.set_header(key, value)
-        for chunk in encoded_content_chunks:
-            self.write(chunk)
+
+        if isinstance(chunks, Generator):
+            for chunk in chunks:
+                self.write(chunk)
+        else:
+            self.write(chunks)
         self.finish()
 
     def get_content(self, h5file, path):

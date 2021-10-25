@@ -7,7 +7,7 @@ import numpy as np
 import pytest
 
 # Benchmark conditions
-BENCHMARK_FORMAT = "json", "npy"
+BENCHMARK_FORMAT = "json", "npy", "bin"
 BENCHMARKS = dict(
     (f"/{size}square_{dtype}", (size, dtype))
     for dtype in ("float32",)
