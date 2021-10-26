@@ -73,7 +73,10 @@ class AttributeHandler(BaseHandler):
     def get_content(self, h5file, path):
         content = create_content(h5file, path)
         assert isinstance(content, ResolvedEntityContent)
-        return content.attributes()
+
+        attr_keys = self.get_query_arguments("attr_keys")
+        # get_query_arguments returns an empty list if `attr_keys` is not present
+        return content.attributes(attr_keys if len(attr_keys) > 0 else None)
 
 
 class DataHandler(BaseHandler):

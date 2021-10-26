@@ -36,7 +36,14 @@ class BaseTestEndpoints:
         """Test /attr/ endpoint on root group"""
         # Test condition
         tested_h5entity_path = "/"
-        attributes = {"NX_class": "NXRoot", "default": "entry"}
+        nx_attributes = {
+            "NX_class": "NXRoot",
+            "default": "entry",
+        }
+        attributes = {
+            **nx_attributes,
+            "HDF_VERSION": h5py.version.hdf5_version,
+        }
 
         filename = "test.h5"
         with h5py.File(server.served_directory / filename, mode="w") as h5file:
@@ -47,6 +54,13 @@ class BaseTestEndpoints:
         retrieved_attributes = decode_response(response)
 
         assert retrieved_attributes == attributes
+
+        # Test attr_keys query parameter by getting only NX attributes
+        response = server.get(
+            f"/attr/?file={filename}&path={tested_h5entity_path}{''.join(f'&attr_keys={k}' for k in nx_attributes.keys())}"
+        )
+        retrieved_attributes = decode_response(response)
+        assert retrieved_attributes == nx_attributes
 
     @pytest.mark.parametrize("format", ("json", "npy"))
     def test_data_on_array(self, server, format):
