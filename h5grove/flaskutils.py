@@ -52,11 +52,14 @@ def attr_route():
     filename = get_filename(request)
     path = request.args.get("path")
     format_arg = request.args.get("format")
+    attr_keys = (
+        request.args.getlist("attr_keys") if "attr_keys" in request.args else None
+    )
 
     with h5py.File(filename, mode="r") as h5file:
         content = get_content(h5file, path)
         assert isinstance(content, ResolvedEntityContent)
-        return make_encoded_response(content.attributes(), format_arg)
+        return make_encoded_response(content.attributes(attr_keys), format_arg)
 
 
 def data_route():
