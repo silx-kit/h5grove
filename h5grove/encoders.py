@@ -21,7 +21,7 @@ def orjson_default(o) -> Union[list, str, None]:
     """Converts Python objects to JSON-serializable objects.
 
     :raises TypeError: if the object is not supported."""
-    if isinstance(o, np.generic) or isinstance(o, np.ndarray):
+    if isinstance(o, (np.generic, np.ndarray)):
         return o.tolist()
     if isinstance(o, complex):
         return [o.real, o.imag]
@@ -29,6 +29,8 @@ def orjson_default(o) -> Union[list, str, None]:
         return None
     if isinstance(o, bytes):
         return o.decode()
+    if isinstance(o, (h5py.RegionReference, h5py.Reference)):
+        return str(o)
     raise TypeError
 
 
