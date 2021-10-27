@@ -25,22 +25,22 @@ jobs:
           pip install .[dev]
 
       - name: black ◼️
-        run: black --check h5grove/ example/ test/
+        run: invoke black
 
       - name: flake8 ❄️
-        run: flake8
+        run: invoke flake8
 
       - name: mypy 🧐
-        run: mypy h5grove/ example/ test/
+        run: invoke mypy
 
       - name: pytest tests 👓
         run: |
           pushd test/
-          pytest --cov=h5grove --benchmark-skip
+          invoke test
           popd
 
       - name: pytest benchmark 📈
-        run: pytest --benchmark-only --benchmark-group-by=param:h5path --benchmark-columns=median,iqr,min,max
+        run: invoke benchmark
 
       - name: sphinx build 🐪
-        run: python setup.py doc
+        run: invoke doc

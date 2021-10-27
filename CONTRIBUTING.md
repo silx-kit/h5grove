@@ -17,7 +17,7 @@ will install `h5grove` in editable mode with all the linting/formating/testing p
 All lint checks can be run with
 
 ```
-python setup.py lint
+invoke lint
 ```
 
 Configuration entries are located in `setup.cfg`.
@@ -28,13 +28,21 @@ Configuration entries are located in `setup.cfg`.
 
 Tests are handled with [pytest](https://docs.pytest.org/en/stable/index.html). These are mostly integration tests for now that tests the responses of the endpoints of the tornado and flask example apps.
 
-Once `h5grove` is installed in editable mode, simply run the tests with: `pytest`.
+Once `h5grove` is installed in editable mode, run the tests with
+
+```
+invoke test
+```
 
 ### Benchmarks
 
 Benchmarks of different formats (`json`, `.npy`) and web server frameworks (`flask`, `tornado`) are run as part of the tests. Those benchmarks are based on [pytest-benchmark](https://pytest-benchmark.readthedocs.io/en/latest/).
 
-The test suite can be run without these benchmarks by running `pytest --benchmark-skip`.
+Benchmarks can be run with:
+
+```
+invoke benchmark
+```
 
 ## Release
 
@@ -67,7 +75,7 @@ The relevant files are in `docs/`:
 The documentation can be build locally using
 
 ```
-python setup.py doc
+invoke doc
 ```
 
 The HTML pages will be generated in `_build`.
