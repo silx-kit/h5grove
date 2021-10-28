@@ -1,5 +1,4 @@
 """Helpers for usage with `Flask <https://flask.palletsprojects.com/>`_"""
-from h5grove.utils import NotFoundError
 from flask import abort, Blueprint, current_app, request, Response, Request
 import h5py
 import os
@@ -7,6 +6,7 @@ from typing import Any, Callable, Mapping, Optional
 
 from .content import create_content, DatasetContent, ResolvedEntityContent
 from .encoders import encode
+from .utils import NotFoundError, parse_bool_arg
 
 
 __all__ = [
@@ -68,11 +68,12 @@ def data_route():
     path = request.args.get("path")
     selection = request.args.get("selection")
     format_arg = request.args.get("format")
+    flatten = parse_bool_arg(request.args.get("flatten"), fallback=False)
 
     with h5py.File(filename, mode="r") as h5file:
         content = get_content(h5file, path)
         assert isinstance(content, DatasetContent)
-        return make_encoded_response(content.data(selection), format_arg)
+        return make_encoded_response(content.data(selection, flatten), format_arg)
 
 
 def meta_route():
@@ -80,10 +81,7 @@ def meta_route():
     filename = get_filename(request)
     path = request.args.get("path")
     format_arg = request.args.get("format")
-    resolve_links_arg = request.args.get("resolve_links")
-    resolve_links = (
-        resolve_links_arg.lower() != "false" if resolve_links_arg is not None else True
-    )
+    resolve_links = parse_bool_arg(request.args.get("resolve_links"), fallback=True)
 
     with h5py.File(filename, mode="r") as h5file:
         content = get_content(h5file, path, resolve_links)
