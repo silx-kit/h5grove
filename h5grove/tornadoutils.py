@@ -1,11 +1,12 @@
 """Helpers for usage with `Tornado <https://www.tornadoweb.org>`_"""
-from h5grove.utils import NotFoundError
 import os
 from typing import Any, Generator, Optional
 import h5py
 from tornado.web import RequestHandler, MissingArgumentError, HTTPError
+
 from .content import DatasetContent, ResolvedEntityContent, create_content
 from .encoders import encode
+from .utils import NotFoundError, parse_bool_arg
 
 
 __all__ = [
@@ -84,21 +85,21 @@ class DataHandler(BaseHandler):
 
     def get_content(self, h5file, path):
         selection = self.get_query_argument("selection", None)
+        flatten = parse_bool_arg(
+            self.get_query_argument("flatten", None), fallback=False
+        )
 
         content = create_content(h5file, path)
         assert isinstance(content, DatasetContent)
-        return content.data(selection)
+        return content.data(selection, flatten)
 
 
 class MetadataHandler(BaseHandler):
     """/meta/ endpoint handler"""
 
     def get_content(self, h5file, path):
-        resolve_links_arg = self.get_query_argument("resolve_links", None)
-        resolve_links = (
-            resolve_links_arg.lower() != "false"
-            if resolve_links_arg is not None
-            else True
+        resolve_links = parse_bool_arg(
+            self.get_query_argument("resolve_links", None), fallback=True
         )
         content = create_content(h5file, path, resolve_links)
         return content.metadata()

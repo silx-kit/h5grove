@@ -2,18 +2,18 @@ from typing import Dict, Generic, Optional, Sequence, TypeVar, Union
 import h5py
 import numpy as np
 
-from .models import Selection
-
 try:
     import hdf5plugin  # noqa: F401
 except ImportError:
     pass
+
+from .models import Selection
 from .utils import (
     attr_metadata,
     get_array_stats,
     get_entity_from_file,
     hdf_path_join,
-    parse_slice,
+    get_dataset_slice,
     sorted_dict,
 )
 
@@ -144,15 +144,15 @@ class DatasetContent(ResolvedEntityContent[h5py.Dataset]):
             *super().metadata().items(),
         )
 
-    def data(self, selection: Selection = None):
+    def data(self, selection: Selection = None, flatten: bool = False):
         """Dataset data. Supports slicing through selection."""
-        if selection is None:
-            return self._h5py_entity[()]
+        result = get_dataset_slice(self._h5py_entity, selection)
 
-        if isinstance(selection, str):
-            return self._h5py_entity[parse_slice(self._h5py_entity, selection)]
+        # Do not flatten scalars nor h5py.Empty
+        if flatten and isinstance(result, np.ndarray):
+            return result.flatten()
 
-        return self._h5py_entity[selection]
+        return result
 
     def data_stats(
         self, selection: Selection = None

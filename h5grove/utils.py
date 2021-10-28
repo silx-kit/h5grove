@@ -3,7 +3,8 @@ from numbers import Number
 from os.path import basename
 import numpy as np
 from typing import Any, Dict, Sequence, Tuple, Union
-from .models import H5pyEntity
+
+from .models import H5pyEntity, Selection
 
 
 class NotFoundError(Exception):
@@ -165,3 +166,20 @@ def hdf_path_join(prefix, suffix):
         return f"/{suffix}"
 
     return f'{prefix.rstrip("/")}/{suffix}'
+
+
+def parse_bool_arg(query_arg: Union[str, None], fallback: bool) -> bool:
+    if query_arg is None:
+        return fallback
+
+    return query_arg.lower() != "false"
+
+
+def get_dataset_slice(dataset: h5py.Dataset, selection: Selection):
+    if selection is None:
+        return dataset[()]
+
+    if isinstance(selection, str):
+        return dataset[parse_slice(dataset, selection)]
+
+    return dataset[selection]

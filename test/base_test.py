@@ -62,8 +62,9 @@ class BaseTestEndpoints:
         retrieved_attributes = decode_response(response)
         assert retrieved_attributes == nx_attributes
 
-    @pytest.mark.parametrize("format", ("json", "npy"))
-    def test_data_on_array(self, server, format):
+    @pytest.mark.parametrize("format_arg", ("json", "npy"))
+    @pytest.mark.parametrize("flatten", (False, True))
+    def test_data_on_array(self, server, format_arg, flatten):
         """Test /data/ endpoint on array dataset in a group"""
         # Test condition
         tested_h5entity_path = "/entry/image"
@@ -74,11 +75,30 @@ class BaseTestEndpoints:
             h5file[tested_h5entity_path] = data
 
         response = server.get(
-            f"/data/?{urlencode({'file': filename, 'path': tested_h5entity_path, 'format': format})}"
+            f"/data/?{urlencode({'file': filename, 'path': tested_h5entity_path, 'format': format_arg, 'flatten': flatten})}"
         )
-        retrieved_data = np.array(decode_response(response, format))
+        retrieved_data = np.array(decode_response(response, format_arg))
 
-        assert np.array_equal(retrieved_data, data)
+        assert np.array_equal(retrieved_data, data.flatten() if flatten else data)
+
+    @pytest.mark.parametrize("format_arg", ("json", "npy"))
+    @pytest.mark.parametrize("flatten", (False, True))
+    def test_data_on_slice(self, server, format_arg, flatten):
+        """Test /data/ endpoint on array dataset in a group"""
+        # Test condition
+        tested_h5entity_path = "/entry/image"
+        data = np.random.random((128, 128))
+
+        filename = "test.h5"
+        with h5py.File(server.served_directory / filename, mode="w") as h5file:
+            h5file[tested_h5entity_path] = data
+
+        response = server.get(
+            f"/data/?{urlencode({'file': filename, 'path': tested_h5entity_path, 'selection': '100,0', 'format': format_arg, 'flatten': flatten})}"
+        )
+        retrieved_data = np.array(decode_response(response, format_arg))
+
+        assert retrieved_data - data[100, 0] < 1e-8
 
     def test_meta_on_group(self, server):
         """Test /meta/ endpoint on a group"""
