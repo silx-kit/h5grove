@@ -150,7 +150,7 @@ class DatasetContent(ResolvedEntityContent[h5py.Dataset]):
 
         # Do not flatten scalars nor h5py.Empty
         if flatten and isinstance(result, np.ndarray):
-            return result.flatten()
+            return np.ravel(result)
 
         return result
 
