@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: 'H5Grove API'
   description: 'The API provided by h5grove example implementations.'
-  version: 0.0.11
+  version: 0.0.12
 
 servers:
   - url: http://{ip}:{port}/
@@ -58,6 +58,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/file'
         - $ref: '#/components/parameters/format'
+        - $ref: '#/components/parameters/flatten'
         - $ref: '#/components/parameters/path'
         - $ref: '#/components/parameters/selection'
 
@@ -73,6 +74,8 @@ paths:
                   $ref: '#/components/examples/scalar_value'
                 2D_value:
                   $ref: '#/components/examples/2D_value'
+                flattened_2D_value:
+                  $ref: '#/components/examples/flattened_2D_value'
             application/octet-stream:
               schema:
                 type: string
@@ -89,6 +92,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/file'
         - $ref: '#/components/parameters/path'
+        - $ref: '#/components/parameters/resolve_links'
       responses:
         '200':
           description: Metadata of the h5py entity
@@ -175,6 +179,12 @@ components:
         enum: ['json', 'npy']
         type: string
       example: 'json'
+    flatten:
+      name: flatten
+      description: Whether the resulting array should be flattened. Defaults to False.
+      in: query
+      schema:
+        type: boolean
     path:
       name: path
       description: Path of the entity in the HDF5 file. Default to '/' (root) if not present.
@@ -182,10 +192,16 @@ components:
       schema:
         type: string
       example: '/path/to/entity'
+    resolve_links:
+      name: resolve_links
+      description: Whether soft and external links should be resolved. Defaults to True.
+      in: query
+      schema:
+        type: boolean
     selection:
       name: selection
       in: query
-      description: NumPy-like indexing to define a selection as a slice. Providing a selection will compute stats only on the selected slice.
+      description: NumPy-like indexing to define a selection as a slice. For the stats endpoint, providing a selection will compute stats only on the selected slice.
       schema:
         $ref: '#/components/schemas/selectionSchema'
       explode: false
@@ -327,6 +343,9 @@ components:
       value: 3.14
     2D_value:
       value: [[5, 4], [7, 8], [10, 5], [7, 8], [9, 12]]
+    flattened_2D_value:
+      description: With flatten set to True
+      value: [5, 4, 7, 8, 10, 5, 7, 8, 9, 12]
 
   responses:
     '404':
