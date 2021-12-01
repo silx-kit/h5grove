@@ -31,7 +31,7 @@ class BaseHandler(RequestHandler):
         if file_path is None:
             raise MissingArgumentError("file")
 
-        path = self.get_query_argument("path", None)
+        path = self.get_query_argument("path", None, strip=False)
         format_arg = self.get_query_argument("format", None)
 
         full_file_path = os.path.join(self.base_dir, file_path)
@@ -75,7 +75,7 @@ class AttributeHandler(BaseHandler):
         content = create_content(h5file, path)
         assert isinstance(content, ResolvedEntityContent)
 
-        attr_keys = self.get_query_arguments("attr_keys")
+        attr_keys = self.get_query_arguments("attr_keys", strip=False)
         # get_query_arguments returns an empty list if `attr_keys` is not present
         return content.attributes(attr_keys if len(attr_keys) > 0 else None)
 
