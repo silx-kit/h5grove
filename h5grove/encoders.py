@@ -4,6 +4,7 @@ from typing import Any, Callable, Dict, Generator, NamedTuple, Optional, Sequenc
 import numpy as np
 import orjson
 import h5py
+import tifffile
 from .utils import sanitize_array
 
 
@@ -77,6 +78,12 @@ def npy_stream(array: Sequence[Number]) -> Generator[bytes, None, None]:
         yield chunk.tobytes("C")
 
 
+def convert_tiff(data: np.ndarray) -> bytes:
+    with io.BytesIO() as buffer:
+        tifffile.imwrite(buffer, data, photometric="minisblack")
+        return buffer.getvalue()
+
+
 class Response(NamedTuple):
     content: Union[Generator[bytes, None, None], bytes]
     """ Encoded `content` as a generator of bytes """
@@ -92,7 +99,9 @@ def encode(content, encoding: Optional[str] = "json") -> Response:
     :param content: Content to encode
     :param encoding:
         - `json` (default)
-        - `npy`: Only nD array-like of numbers is supported
+        - `npy`: nD array-like in npy files
+        - `bin`: nD array/scalars in bytes
+        - `tiff`: 2D arrays as a TIFF file
     :returns: A Response object containing content and headers
     :raises ValueError: If encoding is not "json" nor "npy"
     """
@@ -116,6 +125,15 @@ def encode(content, encoding: Optional[str] = "json") -> Response:
             bin_encode(content),
             headers={
                 "Content-Type": "application/octet-stream",
+            },
+        )
+
+    if encoding == "tiff":
+        return Response(
+            convert_tiff(content),
+            headers={
+                "Content-Type": "image/tiff",
+                "Content-Disposition": 'attachment; filename="data.tiff"',
             },
         )
 
