@@ -22,7 +22,7 @@ __all__ = [
 class BaseHandler(RequestHandler):
     """Base class for h5grove handlers"""
 
-    def initialize(self, base_dir, allow_origin=None) -> None:
+    def initialize(self, base_dir: str, allow_origin: Optional[str] = None) -> None:
         self.base_dir = base_dir
         self.allow_origin = allow_origin
 
@@ -56,7 +56,7 @@ class BaseHandler(RequestHandler):
             self.write(chunks)
         self.finish()
 
-    def get_content(self, h5file, path):
+    def get_content(self, h5file: h5py.File, path: Optional[str]):
         raise NotImplementedError
 
     def prepare(self):
@@ -71,7 +71,7 @@ class BaseHandler(RequestHandler):
 class AttributeHandler(BaseHandler):
     """/attr/ endpoint handler"""
 
-    def get_content(self, h5file, path):
+    def get_content(self, h5file: h5py.File, path: Optional[str]):
         content = create_content(h5file, path)
         assert isinstance(content, ResolvedEntityContent)
 
@@ -83,7 +83,7 @@ class AttributeHandler(BaseHandler):
 class DataHandler(BaseHandler):
     """/data/ endpoint handler"""
 
-    def get_content(self, h5file, path):
+    def get_content(self, h5file: h5py.File, path: Optional[str]):
         selection = self.get_query_argument("selection", None)
         flatten = parse_bool_arg(
             self.get_query_argument("flatten", None), fallback=False
@@ -97,7 +97,7 @@ class DataHandler(BaseHandler):
 class MetadataHandler(BaseHandler):
     """/meta/ endpoint handler"""
 
-    def get_content(self, h5file, path):
+    def get_content(self, h5file: h5py.File, path: Optional[str]):
         resolve_links = parse_bool_arg(
             self.get_query_argument("resolve_links", None), fallback=True
         )
@@ -108,7 +108,7 @@ class MetadataHandler(BaseHandler):
 class StatisticsHandler(BaseHandler):
     """/stats/ endpoint handler"""
 
-    def get_content(self, h5file, path):
+    def get_content(self, h5file: h5py.File, path: Optional[str]):
         selection = self.get_query_argument("selection", None)
 
         content = create_content(h5file, path)

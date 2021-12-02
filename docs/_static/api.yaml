@@ -176,7 +176,7 @@ components:
       description: Format in which the response should be encoded. Defaults to "json".
       in: query
       schema:
-        enum: ['json', 'npy']
+        enum: ['json', 'npy', 'bin', 'tiff']
         type: string
       example: 'json'
     flatten:
