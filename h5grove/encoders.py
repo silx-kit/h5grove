@@ -18,7 +18,7 @@ def bin_encode(array: Sequence[Number]) -> bytes:
     return sanitized_array.tobytes()
 
 
-def orjson_default(o) -> Union[list, str, None]:
+def orjson_default(o: Any) -> Union[list, str, None]:
     """Converts Python objects to JSON-serializable objects.
 
     :raises TypeError: if the object is not supported."""
@@ -47,38 +47,31 @@ def orjson_encode(content: Any, default: Optional[Callable] = None) -> bytes:
     return orjson.dumps(content, default=default, option=orjson.OPT_SERIALIZE_NUMPY)
 
 
-def npy_stream(array: Sequence[Number]) -> Generator[bytes, None, None]:
-    """Generator to stream nD array as a .npy file.
+def csv_encode(data: np.ndarray) -> bytes:
+    """Encodes a NumPy array in CSV.
 
-    :param array: Data to stream
+    :param: data: NumPy array to encode
     """
-    sanitized_array = sanitize_array(array)
-
-    # Stream header
     with io.BytesIO() as buffer:
-        np.lib.format.write_array_header_1_0(
-            buffer, np.lib.format.header_data_from_array_1_0(sanitized_array)
-        )
-        header = buffer.getvalue()
-    yield header
-
-    # Taken from numpy.lib.format.write_array
-    if sanitized_array.itemsize == 0:
-        buffersize = 0
-    else:
-        # Set buffer size to 16 MiB to hide the Python loop overhead.
-        buffersize = max(16 * 1024 ** 2 // sanitized_array.itemsize, 1)
-
-    for chunk in np.nditer(
-        sanitized_array,
-        flags=["external_loop", "buffered", "zerosize_ok"],
-        buffersize=buffersize,
-        order="C",
-    ):
-        yield chunk.tobytes("C")
+        np.savetxt(buffer, data, delimiter=",")
+        return buffer.getvalue()
 
 
-def convert_tiff(data: np.ndarray) -> bytes:
+def npy_encode(data: np.ndarray) -> bytes:
+    """Encodes a NumPy array in NPY.
+
+    :param: data: NumPy array to encode
+    """
+    with io.BytesIO() as buffer:
+        np.save(buffer, data)
+        return buffer.getvalue()
+
+
+def tiff_encode(data: np.ndarray) -> bytes:
+    """Encodes a NumPy array in TIFF. The data should be 2D.
+
+    :param: data: NumPy array to encode
+    """
     with io.BytesIO() as buffer:
         tifffile.imwrite(buffer, data, photometric="minisblack")
         return buffer.getvalue()
@@ -99,25 +92,17 @@ def encode(content, encoding: Optional[str] = "json") -> Response:
     :param content: Content to encode
     :param encoding:
         - `json` (default)
-        - `npy`: nD array-like in npy files
         - `bin`: nD array/scalars in bytes
-        - `tiff`: 2D arrays as a TIFF file
+        - `csv`: nD arrays in downloadable csv files
+        - `npy`: nD arrays in downloadable npy files
+        - `tiff`: 2D arrays in downloadable TIFF files
     :returns: A Response object containing content and headers
-    :raises ValueError: If encoding is not "json" nor "npy"
+    :raises ValueError: If encoding is not among the ones above.
     """
     if encoding in ("json", None):
         return Response(
             orjson_encode(content),
             headers={"Content-Type": "application/json"},
-        )
-
-    if encoding == "npy":
-        return Response(
-            npy_stream(content),
-            headers={
-                "Content-Type": "application/octet-stream",
-                "Content-Disposition": 'attachment; filename="data.npy"',
-            },
         )
 
     if encoding == "bin":
@@ -128,9 +113,27 @@ def encode(content, encoding: Optional[str] = "json") -> Response:
             },
         )
 
+    if encoding == "csv":
+        return Response(
+            csv_encode(content),
+            headers={
+                "Content-Type": "text/csv",
+                "Content-Disposition": 'attachment; filename="data.csv"',
+            },
+        )
+
+    if encoding == "npy":
+        return Response(
+            npy_encode(content),
+            headers={
+                "Content-Type": "application/octet-stream",
+                "Content-Disposition": 'attachment; filename="data.npy"',
+            },
+        )
+
     if encoding == "tiff":
         return Response(
-            convert_tiff(content),
+            tiff_encode(content),
             headers={
                 "Content-Type": "image/tiff",
                 "Content-Disposition": 'attachment; filename="data.tiff"',

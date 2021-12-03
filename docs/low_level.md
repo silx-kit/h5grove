@@ -44,7 +44,7 @@ These methods are directly plugged to the endpoints from the example implementat
 
 ## `encoders` module
 
-The [encoders](https://silx-kit.github.io/h5grove/reference.html#encoders-module) module contain functions that encode data and provide the appropriate headers to build request responses. The module provides a JSON encoder using `orjson` and binary encoders for NumPy arrays.
+The [encoders](https://silx-kit.github.io/h5grove/reference.html#encoders-module) module contain functions that encode data and provide the appropriate headers to build request responses. The module provides a JSON encoder using `orjson`, a binary encoder for NumPy arrays and other encoders to serve NumPy arrays as downloadable files.
 
 ### General
 
@@ -54,16 +54,23 @@ The [encoders](https://silx-kit.github.io/h5grove/reference.html#encoders-module
     :members:
 ```
 
-### orjson
+### General
 
 ```{eval-rst}
 .. autofunction:: h5grove.encoders.orjson_default
 .. autofunction:: h5grove.encoders.orjson_encode
 ```
 
-### binary
+### Binary
 
 ```{eval-rst}
 .. autofunction:: h5grove.encoders.bin_encode
-.. autofunction:: h5grove.encoders.npy_stream
+```
+
+### File formats
+
+```{eval-rst}
+.. autofunction:: h5grove.encoders.csv_encode
+.. autofunction:: h5grove.encoders.npy_encode
+.. autofunction:: h5grove.encoders.tiff_encode
 ```
