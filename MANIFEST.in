@@ -1,7 +1,16 @@
 graft example
 graft h5grove
+
 include LICENSE
 include pyproject.toml
 include README.md
 include setup.cfg
 include setup.py
+
+prune docs
+prune test
+
+global-exclude *.pyc
+exclude .bumpversion.cfg
+exclude CONTRIBUTING.md
+exclude tasks.py
