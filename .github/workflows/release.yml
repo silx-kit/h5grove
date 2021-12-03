@@ -37,7 +37,9 @@ jobs:
         run: python -m build
 
       - name: Check the package 🧐
-        run: python -m twine check dist/*
+        run: |
+          check-manifest
+          python -m twine check dist/*
 
       - name: Release on PyPI 🎉
         env:

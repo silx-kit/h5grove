@@ -46,3 +46,6 @@ jobs:
 
       - name: sphinx build 🐪
         run: invoke doc
+
+      - name: check-manifest 📰
+        run: check-manifest
