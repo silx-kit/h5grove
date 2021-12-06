@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>h5grove reference &#8212; h5grove 0.0.12 documentation</title>
+    <title>h5grove reference &#8212; h5grove 0.0.13 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/nature.css" />
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
@@ -29,7 +29,7 @@
         <li class="right" >
           <a href="integration.html" title="Integration in an existing application"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">h5grove 0.0.12 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">h5grove 0.0.13 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">h5grove reference</a></li> 
       </ul>
     </div>  
@@ -311,7 +311,7 @@ This handles external/soft link resolution and dataset decompression.</p>
 </section>
 <section id="encoders-module">
 <h2><code class="docutils literal notranslate"><span class="pre">encoders</span></code> module<a class="headerlink" href="#encoders-module" title="Permalink to this headline">¶</a></h2>
-<p>The <a class="reference external" href="https://silx-kit.github.io/h5grove/reference.html#encoders-module">encoders</a> module contain functions that encode data and provide the appropriate headers to build request responses. The module provides a JSON encoder using <code class="docutils literal notranslate"><span class="pre">orjson</span></code> and binary encoders for NumPy arrays.</p>
+<p>The <a class="reference external" href="https://silx-kit.github.io/h5grove/reference.html#encoders-module">encoders</a> module contain functions that encode data and provide the appropriate headers to build request responses. The module provides a JSON encoder using <code class="docutils literal notranslate"><span class="pre">orjson</span></code>, a binary encoder for NumPy arrays and other encoders to serve NumPy arrays as downloadable files.</p>
 <section id="general">
 <h3>General<a class="headerlink" href="#general" title="Permalink to this headline">¶</a></h3>
 <dl class="py function">
@@ -325,7 +325,10 @@ This handles external/soft link resolution and dataset decompression.</p>
 <li><p><strong>content</strong> – Content to encode</p></li>
 <li><p><strong>encoding</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – <ul>
 <li><p><cite>json</cite> (default)</p></li>
-<li><p><cite>npy</cite>: Only nD array-like of numbers is supported</p></li>
+<li><p><cite>bin</cite>: nD array/scalars in bytes</p></li>
+<li><p><cite>csv</cite>: nD arrays in downloadable csv files</p></li>
+<li><p><cite>npy</cite>: nD arrays in downloadable npy files</p></li>
+<li><p><cite>tiff</cite>: 2D arrays in downloadable TIFF files</p></li>
 </ul>
 </p></li>
 </ul>
@@ -334,7 +337,7 @@ This handles external/soft link resolution and dataset decompression.</p>
 <dd class="field-even"><p>A Response object containing content and headers</p>
 </dd>
 <dt class="field-odd">Raises</dt>
-<dd class="field-odd"><p><strong>ValueError</strong> – If encoding is not “json” nor “npy”</p>
+<dd class="field-odd"><p><strong>ValueError</strong> – If encoding is not among the ones above.</p>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p><a class="reference internal" href="#h5grove.encoders.Response" title="h5grove.encoders.Response">h5grove.encoders.Response</a></p>
@@ -368,8 +371,8 @@ This handles external/soft link resolution and dataset decompression.</p>
 </dd></dl>
 
 </section>
-<section id="orjson">
-<h3>orjson<a class="headerlink" href="#orjson" title="Permalink to this headline">¶</a></h3>
+<section id="id1">
+<h3>General<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="h5grove.encoders.orjson_default">
 <span class="sig-prename descclassname"><span class="pre">h5grove.encoders.</span></span><span class="sig-name descname"><span class="pre">orjson_default</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">o</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.encoders.orjson_default" title="Permalink to this definition">¶</a></dt>
@@ -378,8 +381,11 @@ This handles external/soft link resolution and dataset decompression.</p>
 <dt class="field-odd">Raises</dt>
 <dd class="field-odd"><p><strong>TypeError</strong> – if the object is not supported.</p>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>Optional[Union[list, str]]</p>
+<dt class="field-even">Parameters</dt>
+<dd class="field-even"><p><strong>o</strong> (<em>Any</em>) – </p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Optional[Union[list, str]]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -406,7 +412,7 @@ This handles external/soft link resolution and dataset decompression.</p>
 
 </section>
 <section id="binary">
-<h3>binary<a class="headerlink" href="#binary" title="Permalink to this headline">¶</a></h3>
+<h3>Binary<a class="headerlink" href="#binary" title="Permalink to this headline">¶</a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="h5grove.encoders.bin_encode">
 <span class="sig-prename descclassname"><span class="pre">h5grove.encoders.</span></span><span class="sig-name descname"><span class="pre">bin_encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.encoders.bin_encode" title="Permalink to this definition">¶</a></dt>
@@ -421,16 +427,56 @@ This handles external/soft link resolution and dataset decompression.</p>
 </dl>
 </dd></dl>
 
+</section>
+<section id="file-formats">
+<h3>File formats<a class="headerlink" href="#file-formats" title="Permalink to this headline">¶</a></h3>
 <dl class="py function">
-<dt class="sig sig-object py" id="h5grove.encoders.npy_stream">
-<span class="sig-prename descclassname"><span class="pre">h5grove.encoders.</span></span><span class="sig-name descname"><span class="pre">npy_stream</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.encoders.npy_stream" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generator to stream nD array as a .npy file.</p>
+<dt class="sig sig-object py" id="h5grove.encoders.csv_encode">
+<span class="sig-prename descclassname"><span class="pre">h5grove.encoders.</span></span><span class="sig-name descname"><span class="pre">csv_encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.encoders.csv_encode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encodes a NumPy array in CSV.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>array</strong> (<em>Sequence</em><em>[</em><em>numbers.Number</em><em>]</em>) – Data to stream</p>
+<dt class="field-odd">Param</dt>
+<dd class="field-odd"><p>data: NumPy array to encode</p>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>Generator[bytes, None, None]</p>
+<dt class="field-even">Parameters</dt>
+<dd class="field-even"><p><strong>data</strong> (<em>numpy.ndarray</em>) – </p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bytes</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="h5grove.encoders.npy_encode">
+<span class="sig-prename descclassname"><span class="pre">h5grove.encoders.</span></span><span class="sig-name descname"><span class="pre">npy_encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.encoders.npy_encode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encodes a NumPy array in NPY.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Param</dt>
+<dd class="field-odd"><p>data: NumPy array to encode</p>
+</dd>
+<dt class="field-even">Parameters</dt>
+<dd class="field-even"><p><strong>data</strong> (<em>numpy.ndarray</em>) – </p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bytes</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="h5grove.encoders.tiff_encode">
+<span class="sig-prename descclassname"><span class="pre">h5grove.encoders.</span></span><span class="sig-name descname"><span class="pre">tiff_encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.encoders.tiff_encode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encodes a NumPy array in TIFF. The data should be 2D.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Param</dt>
+<dd class="field-odd"><p>data: NumPy array to encode</p>
+</dd>
+<dt class="field-even">Parameters</dt>
+<dd class="field-even"><p><strong>data</strong> (<em>numpy.ndarray</em>) – </p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bytes</p>
 </dd>
 </dl>
 </dd></dl>
@@ -456,8 +502,9 @@ This handles external/soft link resolution and dataset decompression.</p>
 </li>
 <li><a class="reference internal" href="#encoders-module"><code class="docutils literal notranslate"><span class="pre">encoders</span></code> module</a><ul>
 <li><a class="reference internal" href="#general">General</a></li>
-<li><a class="reference internal" href="#orjson">orjson</a></li>
-<li><a class="reference internal" href="#binary">binary</a></li>
+<li><a class="reference internal" href="#id1">General</a></li>
+<li><a class="reference internal" href="#binary">Binary</a></li>
+<li><a class="reference internal" href="#file-formats">File formats</a></li>
 </ul>
 </li>
 </ul>
@@ -500,7 +547,7 @@ This handles external/soft link resolution and dataset decompression.</p>
         <li class="right" >
           <a href="integration.html" title="Integration in an existing application"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">h5grove 0.0.12 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">h5grove 0.0.13 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">h5grove reference</a></li> 
       </ul>
     </div>
