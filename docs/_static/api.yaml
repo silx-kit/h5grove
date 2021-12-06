@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: 'H5Grove API'
   description: 'The API provided by h5grove example implementations.'
-  version: 0.0.12
+  version: 0.0.13
 
 servers:
   - url: http://{ip}:{port}/
