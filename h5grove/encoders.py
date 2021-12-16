@@ -1,10 +1,11 @@
 import io
 from numbers import Number
-from typing import Any, Callable, Dict, Generator, NamedTuple, Optional, Sequence, Union
+from typing import Any, Callable, Dict, Optional, Sequence, Union
 import numpy as np
 import orjson
 import h5py
 import tifffile
+
 from .utils import sanitize_array
 
 
@@ -77,11 +78,15 @@ def tiff_encode(data: np.ndarray) -> bytes:
         return buffer.getvalue()
 
 
-class Response(NamedTuple):
-    content: Union[Generator[bytes, None, None], bytes]
-    """ Encoded `content` as a generator of bytes """
+class Response:
+    content: bytes
+    """ Encoded `content` as bytes """
     headers: Dict[str, str]
     """ Associated headers """
+
+    def __init__(self, content: bytes, headers: Dict[str, str]):
+        self.content = content
+        self.headers = {**headers, "Content-Length": str(len(content))}
 
 
 def encode(content, encoding: Optional[str] = "json") -> Response:

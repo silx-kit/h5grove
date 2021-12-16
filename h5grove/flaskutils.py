@@ -21,9 +21,9 @@ __all__ = [
 
 def make_encoded_response(content, format_arg: Optional[str]) -> Response:
     """Prepare flask Response according to format"""
-    encoded_content, headers = encode(content, format_arg)
-    response = Response(encoded_content)
-    response.headers.update(headers)
+    h5grove_response = encode(content, format_arg)
+    response = Response(h5grove_response.content)
+    response.headers.update(h5grove_response.headers)
     return response
 
 
