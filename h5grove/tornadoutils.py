@@ -6,7 +6,8 @@ from tornado.web import RequestHandler, MissingArgumentError, HTTPError
 
 from .content import DatasetContent, ResolvedEntityContent, create_content
 from .encoders import encode
-from .utils import NotFoundError, parse_bool_arg
+from .models import LinkResolution
+from .utils import NotFoundError, parse_bool_arg, parse_link_resolution_arg
 
 
 __all__ = [
@@ -94,8 +95,9 @@ class MetadataHandler(BaseHandler):
     """/meta/ endpoint handler"""
 
     def get_content(self, h5file: h5py.File, path: Optional[str]):
-        resolve_links = parse_bool_arg(
-            self.get_query_argument("resolve_links", None), fallback=True
+        resolve_links = parse_link_resolution_arg(
+            self.get_query_argument("resolve_links", None),
+            fallback=LinkResolution.ONLY_VALID,
         )
         content = create_content(h5file, path, resolve_links)
         return content.metadata()
