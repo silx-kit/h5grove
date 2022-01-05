@@ -4,9 +4,11 @@ import h5py
 import os
 from typing import Any, Callable, Mapping, Optional
 
+
 from .content import create_content, DatasetContent, ResolvedEntityContent
 from .encoders import encode
-from .utils import NotFoundError, parse_bool_arg
+from .models import LinkResolution
+from .utils import NotFoundError, parse_bool_arg, parse_link_resolution_arg
 
 
 __all__ = [
@@ -27,7 +29,11 @@ def make_encoded_response(content, format_arg: Optional[str]) -> Response:
     return response
 
 
-def get_content(h5file: h5py.File, path: Optional[str], resolve_links: bool = True):
+def get_content(
+    h5file: h5py.File,
+    path: Optional[str],
+    resolve_links: LinkResolution = LinkResolution.ONLY_VALID,
+):
     """Gets contents if path is in file. Raises 404 otherwise"""
     try:
         return create_content(h5file, path, resolve_links)
@@ -81,7 +87,10 @@ def meta_route():
     filename = get_filename(request)
     path = request.args.get("path")
     format_arg = request.args.get("format")
-    resolve_links = parse_bool_arg(request.args.get("resolve_links"), fallback=True)
+    resolve_links = parse_link_resolution_arg(
+        request.args.get("resolve_links", None),
+        fallback=LinkResolution.ONLY_VALID,
+    )
 
     with h5py.File(filename, mode="r") as h5file:
         content = get_content(h5file, path, resolve_links)

@@ -9,6 +9,7 @@ import numpy as np
 import pytest
 
 from conftest import BaseServer
+from h5grove.models import LinkResolution
 
 
 def decode_response(response: BaseServer.Response, format: str = "json"):
@@ -122,8 +123,11 @@ class BaseTestEndpoints:
         assert retrieved_attr_name == list(attributes.keys())
         assert retrieved_children_name == children
 
-    @pytest.mark.parametrize("resolve_links", (True, False))
-    def test_meta_on_ext_link(self, server, resolve_links):
+    @pytest.mark.parametrize(
+        "resolve_links",
+        (LinkResolution.NONE, LinkResolution.ONLY_VALID, LinkResolution.ALL),
+    )
+    def test_meta_on_valid_ext_link(self, server, resolve_links):
         source_file = "source.h5"
         with h5py.File(server.served_directory / "source.h5", mode="w") as h5file:
             data = np.arange(10, dtype="<f8")
@@ -134,24 +138,25 @@ class BaseTestEndpoints:
             h5file["ext_link"] = h5py.ExternalLink(source_file, "data")
 
         response = server.get(
-            f"/meta/?{urlencode({'file': filename, 'path': '/ext_link', 'resolve_links': resolve_links})}"
+            f"/meta/?{urlencode({'file': filename, 'path': '/ext_link', 'resolve_links': f'{resolve_links}'})}"
         )
         content = decode_response(response)
 
-        if resolve_links:
+        # Valid link is not resolved only if link resolution is 'none'.
+        if resolve_links == LinkResolution.NONE:
+            assert content == {
+                "name": "ext_link",
+                "target_file": "source.h5",
+                "target_path": "data",
+                "type": "external_link",
+            }
+        else:
             assert content == {
                 "attributes": [],
                 "name": "ext_link",
                 "dtype": "<f8",
                 "shape": [10],
                 "type": "dataset",
-            }
-        else:
-            assert content == {
-                "name": "ext_link",
-                "target_file": "source.h5",
-                "target_path": "data",
-                "type": "external_link",
             }
 
     def test_stats_on_negative_scalar(self, server):
@@ -234,19 +239,22 @@ class BaseTestEndpoints:
         server.assert_404(f"/meta/?file={filename}&path={path}")
         server.assert_404(f"/stats/?file={filename}&path={path}")
 
-    @pytest.mark.parametrize("resolve_links", (True, False))
+    @pytest.mark.parametrize(
+        "resolve_links",
+        (LinkResolution.NONE, LinkResolution.ONLY_VALID, LinkResolution.ALL),
+    )
     def test_meta_on_broken_soft_link(self, server, resolve_links):
         filename = "test.h5"
         link_path = "link"
         with h5py.File(server.served_directory / filename, mode="w") as h5file:
             h5file[link_path] = h5py.SoftLink("not_an_entity")
 
-        url = f"/meta/?{urlencode({'file': filename, 'path': link_path, 'resolve_links': resolve_links})}"
+        url = f"/meta/?{urlencode({'file': filename, 'path': link_path, 'resolve_links': f'{resolve_links}'})}"
 
         # It should return 404 if trying to resolve the broken link
-        if resolve_links:
+        if resolve_links == LinkResolution.ALL:
             server.assert_404(url)
-        # It should return the link metadata when not resolving the link
+        # It should return the link metadata when not resolving the link (resolve_links set to NONE or ONLY_VALID)
         else:
             response = server.get(url)
             content = decode_response(response)

@@ -4,7 +4,7 @@ from os.path import basename
 import numpy as np
 from typing import Any, Dict, Sequence, Tuple, Union
 
-from .models import H5pyEntity, Selection
+from .models import H5pyEntity, LinkResolution, Selection
 
 
 class NotFoundError(Exception):
@@ -24,7 +24,9 @@ def attr_metadata(attrId: h5py.h5a.AttrID) -> dict:
 
 
 def get_entity_from_file(
-    h5file: h5py.File, path: str, resolve_links: bool = True
+    h5file: h5py.File,
+    path: str,
+    resolve_links: LinkResolution = LinkResolution.ONLY_VALID,
 ) -> H5pyEntity:
     if path == "/":
         return h5file[path]
@@ -35,15 +37,18 @@ def get_entity_from_file(
         raise PathError(f"{path} is not a valid path in {basename(h5file.filename)}")
 
     if isinstance(link, h5py.ExternalLink) or isinstance(link, h5py.SoftLink):
-        if resolve_links:
-            try:
-                return h5file[path]
-            except (OSError, KeyError):
-                raise LinkError(
-                    f"Cannot resolve {link} at {path} of {basename(h5file.filename)}"
-                )
-        else:
+        if resolve_links == LinkResolution.NONE:
             return link
+
+        try:
+            return h5file[path]
+        except (OSError, KeyError):
+            if resolve_links == LinkResolution.ONLY_VALID:
+                return link
+
+            raise LinkError(
+                f"Cannot resolve {link} at {path} of {basename(h5file.filename)}"
+            )
 
     return h5file[path]
 
@@ -173,6 +178,29 @@ def parse_bool_arg(query_arg: Union[str, None], fallback: bool) -> bool:
         return fallback
 
     return query_arg.lower() != "false"
+
+
+def parse_link_resolution_arg(
+    raw_query_arg: Union[str, None], fallback: LinkResolution
+) -> LinkResolution:
+    if raw_query_arg is None:
+        return fallback
+
+    query_arg = raw_query_arg.lower()
+
+    # Checking for "true"/"false" to keep the same behaviour as when the arg was a boolean
+    if query_arg in ("true", LinkResolution.ALL):
+        return LinkResolution.ALL
+
+    if query_arg in ("false", LinkResolution.NONE):
+        return LinkResolution.NONE
+
+    if query_arg == LinkResolution.ONLY_VALID:
+        return LinkResolution.ONLY_VALID
+
+    raise ValueError(
+        f"{raw_query_arg} is not a valid value for link resolution. Accepted values are: {LinkResolution.ALL}, f{LinkResolution.NONE} or {LinkResolution.ONLY_VALID}"
+    )
 
 
 def get_dataset_slice(dataset: h5py.Dataset, selection: Selection):

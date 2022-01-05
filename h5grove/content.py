@@ -7,7 +7,7 @@ try:
 except ImportError:
     pass
 
-from .models import Selection
+from .models import LinkResolution, Selection
 from .utils import (
     attr_metadata,
     get_array_stats,
@@ -210,16 +210,20 @@ class GroupContent(ResolvedEntityContent[h5py.Group]):
         )
 
 
-def create_content(h5file: h5py.File, path: Optional[str], resolve_links: bool = True):
+def create_content(
+    h5file: h5py.File,
+    path: Optional[str],
+    resolve_links: LinkResolution = LinkResolution.ONLY_VALID,
+):
     """
     Factory function to get entity content from a HDF5 file.
     This handles external/soft link resolution and dataset decompression.
 
     :param h5file: An open HDF5 file containing the entity
     :param path: Path to the entity in the file.
-    :param resolve_links: Whether external and soft links should be resolved.
+    :param resolve_links: Tells which external and soft links should be resolved. Defaults to resolving only valid links.
     :raises h5grove.utils.PathError: If the path cannot be found in the file
-    :raises h5grove.utils.LinkError: If a link cannot be resolved when resolve_links is True
+    :raises h5grove.utils.LinkError: If a link cannot be resolved when resolve_links is set to LinkResolution.ALL.
     :raises TypeError: If encountering an unsupported h5py entity
     """
     if path is None:
