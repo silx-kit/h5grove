@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: 'H5Grove API'
   description: 'The API provided by h5grove example implementations.'
-  version: 0.0.13
+  version: 0.0.14
 
 servers:
   - url: http://{ip}:{port}/
@@ -194,10 +194,11 @@ components:
       example: '/path/to/entity'
     resolve_links:
       name: resolve_links
-      description: Whether soft and external links should be resolved. Defaults to True.
+      description: Tells which soft and external links should be resolved. Defaults to only_valid. Broken links will not be resolved with 'only_valid' and will raise an error with 'all'.
       in: query
       schema:
-        type: boolean
+        enum: ['none', 'only_valid', 'all']
+        type: string
     selection:
       name: selection
       in: query

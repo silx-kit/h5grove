@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>h5grove reference &#8212; h5grove 0.0.13 documentation</title>
+    <title>h5grove reference &#8212; h5grove 0.0.14 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/nature.css" />
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
@@ -29,7 +29,7 @@
         <li class="right" >
           <a href="integration.html" title="Integration in an existing application"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">h5grove 0.0.13 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">h5grove 0.0.14 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">h5grove reference</a></li> 
       </ul>
     </div>  
@@ -48,7 +48,7 @@
 <p>h5grove provides the <a class="reference external" href="https://silx-kit.github.io/h5grove/reference.html#create-a-content-object">create_content</a> that is a h5py wrapper to get a desired h5py entity. The function handles support link resolution and dataset decompression using <a class="reference external" href="https://pypi.org/project/hdf5plugin/">hdf5plugin</a></p>
 <dl class="py function">
 <dt class="sig sig-object py" id="h5grove.content.create_content">
-<span class="sig-prename descclassname"><span class="pre">h5grove.content.</span></span><span class="sig-name descname"><span class="pre">create_content</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">h5file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolve_links</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.content.create_content" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">h5grove.content.</span></span><span class="sig-name descname"><span class="pre">create_content</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">h5file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolve_links</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">LinkResolution.ONLY_VALID</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.content.create_content" title="Permalink to this definition">¶</a></dt>
 <dd><p>Factory function to get entity content from a HDF5 file.
 This handles external/soft link resolution and dataset decompression.</p>
 <dl class="field-list simple">
@@ -56,13 +56,13 @@ This handles external/soft link resolution and dataset decompression.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>h5file</strong> (<em>h5py._hl.files.File</em>) – An open HDF5 file containing the entity</p></li>
 <li><p><strong>path</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – Path to the entity in the file.</p></li>
-<li><p><strong>resolve_links</strong> (<em>bool</em>) – Whether external and soft links should be resolved.</p></li>
+<li><p><strong>resolve_links</strong> (<em>h5grove.models.LinkResolution</em>) – Tells which external and soft links should be resolved. Defaults to resolving only valid links.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises</dt>
 <dd class="field-even"><ul class="simple">
 <li><p><strong>h5grove.utils.PathError</strong> – If the path cannot be found in the file</p></li>
-<li><p><strong>h5grove.utils.LinkError</strong> – If a link cannot be resolved when resolve_links is True</p></li>
+<li><p><strong>h5grove.utils.LinkError</strong> – If a link cannot be resolved when resolve_links is set to LinkResolution.ALL.</p></li>
 <li><p><strong>TypeError</strong> – If encountering an unsupported h5py entity</p></li>
 </ul>
 </dd>
@@ -351,20 +351,20 @@ This handles external/soft link resolution and dataset decompression.</p>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>content</strong> (<em>Union</em><em>[</em><em>Generator</em><em>[</em><em>bytes</em><em>, </em><em>None</em><em>, </em><em>None</em><em>]</em><em>, </em><em>bytes</em><em>]</em>) – </p></li>
+<li><p><strong>content</strong> (<em>bytes</em>) – </p></li>
 <li><p><strong>headers</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>str</em><em>]</em>) – </p></li>
 </ul>
 </dd>
 </dl>
-<dl class="py property">
+<dl class="py attribute">
 <dt class="sig sig-object py" id="h5grove.encoders.Response.content">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">content</span></span><a class="headerlink" href="#h5grove.encoders.Response.content" title="Permalink to this definition">¶</a></dt>
-<dd><p>Encoded <cite>content</cite> as a generator of bytes</p>
+<span class="sig-name descname"><span class="pre">content</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bytes</span></em><a class="headerlink" href="#h5grove.encoders.Response.content" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encoded <cite>content</cite> as bytes</p>
 </dd></dl>
 
-<dl class="py property">
+<dl class="py attribute">
 <dt class="sig sig-object py" id="h5grove.encoders.Response.headers">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">headers</span></span><a class="headerlink" href="#h5grove.encoders.Response.headers" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">headers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#h5grove.encoders.Response.headers" title="Permalink to this definition">¶</a></dt>
 <dd><p>Associated headers</p>
 </dd></dl>
 
@@ -547,13 +547,13 @@ This handles external/soft link resolution and dataset decompression.</p>
         <li class="right" >
           <a href="integration.html" title="Integration in an existing application"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">h5grove 0.0.13 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">h5grove 0.0.14 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">h5grove reference</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, ESRF.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.2.
     </div>
   </body>
 </html>
