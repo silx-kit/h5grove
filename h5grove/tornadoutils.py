@@ -1,6 +1,6 @@
 """Helpers for usage with `Tornado <https://www.tornadoweb.org>`_"""
 import os
-from typing import Any, Generator, Optional
+from typing import Any, Optional
 import h5py
 from tornado.web import RequestHandler, MissingArgumentError, HTTPError
 
@@ -44,16 +44,12 @@ class BaseHandler(RequestHandler):
             except NotFoundError as e:
                 raise HTTPError(status_code=404, reason=str(e))
 
-        chunks, headers = encode(content, format_arg)
+        response = encode(content, format_arg)
 
-        for key, value in headers.items():
+        for key, value in response.headers.items():
             self.set_header(key, value)
 
-        if isinstance(chunks, Generator):
-            for chunk in chunks:
-                self.write(chunk)
-        else:
-            self.write(chunks)
+        self.write(response.content)
         self.finish()
 
     def get_content(self, h5file: h5py.File, path: Optional[str]):
