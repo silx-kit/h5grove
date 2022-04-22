@@ -23,8 +23,8 @@ def orjson_default(o: Any) -> Union[list, float, str, None]:
     """Converts Python objects to JSON-serializable objects.
 
     :raises TypeError: if the object is not supported."""
-    if isinstance(o, np.float128):
-        # float128 is not converted to native float by NumPy so we need to force it even if it means loosing precision
+    if hasattr(np, 'float128') and isinstance(o, np.float128):
+        # float128 is not converted to native float by NumPy so we need to force it even if it means losing precision
         return float(o)
     if isinstance(o, (np.generic, np.ndarray)):
         return o.tolist()
