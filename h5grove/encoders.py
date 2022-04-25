@@ -23,7 +23,7 @@ def orjson_default(o: Any) -> Union[list, float, str, None]:
     """Converts Python objects to JSON-serializable objects.
 
     :raises TypeError: if the object is not supported."""
-    if isinstance(o, np.number) and o.dtype.kind == 'f' and o.itemsize > 8:
+    if isinstance(o, np.number) and o.dtype.kind == "f" and o.itemsize > 8:
         # Force conversion of float >64bits to native float even if it means losing precision
         return float(o)
     if isinstance(o, (np.generic, np.ndarray)):
