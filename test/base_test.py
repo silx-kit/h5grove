@@ -101,6 +101,34 @@ class BaseTestEndpoints:
 
         assert retrieved_data - data[100, 0] < 1e-8
 
+    def test_meta_on_chunked_compressed_dataset(self, server):
+        """Test /meta/ endpoint on a chunked and compressed dataset"""
+        filename = "test.h5"
+        tested_h5entity_path = "/data"
+
+        with h5py.File(server.served_directory / filename, mode="w") as h5file:
+            h5file.create_dataset(
+                tested_h5entity_path,
+                data=np.arange(100).reshape(10, 10),
+                compression="gzip",
+                shuffle=True,
+                dtype="<f8",
+                chunks=(5, 5),
+            )
+
+        response = server.get(f"/meta/?file={filename}&path={tested_h5entity_path}")
+        content = decode_response(response)
+
+        assert content == {
+            "attributes": [],
+            "filters": [{"id": 2, "name": "shuffle"}, {"id": 1, "name": "deflate"}],
+            "chunks": [5, 5],
+            "name": "data",
+            "dtype": "<f8",
+            "shape": [10, 10],
+            "type": "dataset",
+        }
+
     def test_meta_on_group(self, server):
         """Test /meta/ endpoint on a group"""
         # Test condition
@@ -153,8 +181,10 @@ class BaseTestEndpoints:
         else:
             assert content == {
                 "attributes": [],
-                "name": "ext_link",
+                "chunks": None,
                 "dtype": "<f8",
+                "filters": None,
+                "name": "ext_link",
                 "shape": [10],
                 "type": "dataset",
             }

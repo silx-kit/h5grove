@@ -11,6 +11,7 @@ from .models import LinkResolution, Selection
 from .utils import (
     attr_metadata,
     get_array_stats,
+    get_filters,
     get_entity_from_file,
     hdf_path_join,
     get_dataset_slice,
@@ -107,7 +108,7 @@ class ResolvedEntityContent(EntityContent, Generic[T]):
         self._h5py_entity = h5py_entity
         """ Resolved h5py entity """
 
-    def attributes(self, attr_keys: Sequence[str] = None):
+    def attributes(self, attr_keys: Optional[Sequence[str]] = None):
         """Attributes of the h5py entity. Can be filtered by keys."""
         if attr_keys is None:
             return dict((*self._h5py_entity.attrs.items(),))
@@ -136,10 +137,12 @@ class DatasetContent(ResolvedEntityContent[h5py.Dataset]):
 
     def metadata(self, depth=None):
         """
-        :returns: {"attributes": AttributeMetadata, "dtype": str, "shape": tuple, "name": str, "type": str}
+        :returns: {"attributes": AttributeMetadata, chunks": tuple, "dtype": str, "filters": tuple, "shape": tuple, "name": str, "type": str}
         """
         return sorted_dict(
+            ("chunks", self._h5py_entity.chunks),
             ("dtype", self._h5py_entity.dtype.str),
+            ("filters", get_filters(self._h5py_entity)),
             ("shape", self._h5py_entity.shape),
             *super().metadata().items(),
         )
