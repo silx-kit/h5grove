@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: 'H5Grove API'
   description: 'The API provided by h5grove example implementations.'
-  version: 0.0.15
+  version: 0.0.16
 
 servers:
   - url: http://{ip}:{port}/
@@ -275,9 +275,16 @@ components:
         - $ref: '#/components/schemas/resolvedEntityMetadata'
         - type: object
           properties:
+            chunks:
+              $ref: '#/components/schemas/shape'
             dtype:
               type: string
               example: '>f4'
+            filters:
+              type: array
+              items:
+                $ref: '#/components/schemas/filterInfo'
+              nullable: true
             shape:
               $ref: '#/components/schemas/shape'
             type:
@@ -309,6 +316,15 @@ components:
               enum: ['group']
               type: string
     # Other schemas
+    filterInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 4
+        name:
+          type: string
+          example: szip
     numberOrNull:
       type: number
       nullable: true
