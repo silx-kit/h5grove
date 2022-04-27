@@ -2,7 +2,7 @@ import h5py
 from numbers import Number
 from os.path import basename
 import numpy as np
-from typing import Any, Dict, Sequence, Tuple, Union
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 from .models import H5pyEntity, LinkResolution, Selection
 
@@ -211,3 +211,24 @@ def get_dataset_slice(dataset: h5py.Dataset, selection: Selection):
         return dataset[parse_slice(dataset, selection)]
 
     return dataset[selection]
+
+
+def get_filters(
+    dataset: h5py.Dataset,
+) -> Optional[List[Dict[str, Union[int, str]]]]:
+    property_list = dataset.id.get_create_plist()
+
+    n_filters = property_list.get_nfilters()
+    if n_filters <= 0:
+        return None
+
+    return [get_filter_info(property_list.get_filter(i)) for i in range(n_filters)]
+
+
+def get_filter_info(
+    filter: Tuple[int, int, Tuple[int, ...], str]
+) -> Dict[str, Union[int, str]]:
+    # https://api.h5py.org/h5p.html#h5py.h5p.PropDCID.get_filter
+    (filter_id, _, _, name) = filter
+
+    return {"id": filter_id, "name": name}
