@@ -1,6 +1,5 @@
 import io
-from numbers import Number
-from typing import Any, Callable, Dict, Optional, Sequence, Union
+from typing import Any, Callable, Dict, Optional, Union
 import numpy as np
 import orjson
 import h5py
@@ -9,14 +8,15 @@ import tifffile
 from .utils import sanitize_array
 
 
-def bin_encode(array: Sequence[Number]) -> bytes:
-    """Sanitize an array and convert it to bytes.
+def bin_encode(array: np.ndarray, sanitize: bool = True) -> bytes:
+    """Convert array to bytes.
 
     :param array: Data to convert
+    :param sanitize: Whether to use a sanitized dtype or not
     """
-    sanitized_array = sanitize_array(array)
+    sent_array = sanitize_array(array) if sanitize else array
 
-    return sanitized_array.tobytes()
+    return sent_array.tobytes()
 
 
 def orjson_default(o: Any) -> Union[list, float, str, None]:
