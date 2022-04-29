@@ -34,9 +34,8 @@ def decode_array_response(
     """Decode data array response content according to given information"""
     content_type = [h[1] for h in response.headers if h[0] == "Content-Type"][0]
 
-    if format == "npy":
-        assert content_type == "application/octet-stream"
-        return np.load(io.BytesIO(response.content))
+    if format in ("json", "npy"):
+        return np.array(decode_response(response, format), copy=False)
     if format == "bin":
         assert content_type == "application/octet-stream"
         return np.frombuffer(response.content, dtype=dtype).reshape(shape)
@@ -100,7 +99,7 @@ class BaseTestEndpoints:
 
         assert np.array_equal(retrieved_data, data.flatten() if flatten else data)
 
-    @pytest.mark.parametrize("format_arg", ("npy", "bin"))
+    @pytest.mark.parametrize("format_arg", ("json", "npy", "bin"))
     @pytest.mark.parametrize("dtype", ("int", "<f2"))
     def test_data_on_array_with_dtype(self, server, format_arg, dtype):
         """Test /data/ endpoint on array dataset with dtype"""

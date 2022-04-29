@@ -107,17 +107,22 @@ def encode(
         - `npy`: nD arrays in downloadable npy files
         - `tiff`: 2D arrays in downloadable TIFF files
     :param dtype: Data type to convert content to before encoding
-        Only supported for nD array/scalars, ignored if `format='json'`.
+        Only supported for nD array/scalars.
     :returns: A Response object containing content and headers
     :raises ValueError: If encoding is not among the ones above.
     """
+    if dtype is not None:
+        typed_content = np.array(content, dtype=dtype, order="C", copy=False)
+    else:
+        typed_content = content
+
     if encoding in ("json", None):
         return Response(
-            orjson_encode(content),
+            orjson_encode(typed_content),
             headers={"Content-Type": "application/json"},
         )
 
-    array_content = np.array(content, dtype=dtype, order="C", copy=False)
+    array_content = np.array(typed_content, order="C", copy=False)
 
     if encoding == "bin":
         return Response(

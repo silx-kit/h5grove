@@ -166,7 +166,7 @@ components:
   parameters:
     dtype:
       name: dtype
-      description: Data type of the response. Ignored if format is 'json'. Defaults to dataset dtype (sanitized for 'bin' format).
+      description: Data type of the response. Defaults to dataset dtype (sanitized for 'bin' format).
       in: query
       schema:
         type: string
