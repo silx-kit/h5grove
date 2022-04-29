@@ -34,6 +34,7 @@ class BaseHandler(RequestHandler):
 
         path = self.get_query_argument("path", None, strip=False)
         format_arg = self.get_query_argument("format", None)
+        dtype_arg = self.get_query_argument("dtype", None)
 
         full_file_path = os.path.join(self.base_dir, file_path)
         if not os.path.isfile(full_file_path):
@@ -45,7 +46,7 @@ class BaseHandler(RequestHandler):
             except NotFoundError as e:
                 raise HTTPError(status_code=404, reason=str(e))
 
-        response = encode(content, format_arg)
+        response = encode(content, format_arg, dtype_arg)
 
         for key, value in response.headers.items():
             self.set_header(key, value)

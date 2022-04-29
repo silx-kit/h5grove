@@ -21,9 +21,11 @@ __all__ = [
 ]
 
 
-def make_encoded_response(content, format_arg: Optional[str]) -> Response:
+def make_encoded_response(
+    content, format_arg: Optional[str], dtype_arg: Optional[str] = None
+) -> Response:
     """Prepare flask Response according to format"""
-    h5grove_response = encode(content, format_arg)
+    h5grove_response = encode(content, format_arg, dtype_arg)
     response = Response(h5grove_response.content)
     response.headers.update(h5grove_response.headers)
     return response
@@ -74,12 +76,15 @@ def data_route():
     path = request.args.get("path")
     selection = request.args.get("selection")
     format_arg = request.args.get("format")
+    dtype_arg = request.args.get("dtype", None)
     flatten = parse_bool_arg(request.args.get("flatten"), fallback=False)
 
     with h5py.File(filename, mode="r") as h5file:
         content = get_content(h5file, path)
         assert isinstance(content, DatasetContent)
-        return make_encoded_response(content.data(selection, flatten), format_arg)
+        return make_encoded_response(
+            content.data(selection, flatten), format_arg, dtype_arg
+        )
 
 
 def meta_route():
