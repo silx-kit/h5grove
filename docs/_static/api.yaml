@@ -56,6 +56,7 @@ paths:
       summary: Get data of a dataset
       description: Retrieves data contained in a dataset or a slice of dataset
       parameters:
+        - $ref: '#/components/parameters/dtype'
         - $ref: '#/components/parameters/file'
         - $ref: '#/components/parameters/format'
         - $ref: '#/components/parameters/flatten'
@@ -163,6 +164,13 @@ paths:
 
 components:
   parameters:
+    dtype:
+      name: dtype
+      description: Data type of the response. Ignored if format is 'json'. Defaults to dataset dtype (sanitized for 'bin' format).
+      in: query
+      schema:
+        type: string
+      example: 'float32', '<f4'
     file:
       name: file
       description: Location of the HDF5 file.
