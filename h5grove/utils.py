@@ -126,9 +126,9 @@ def _sanitize_dtype(dtype: np.dtype) -> np.dtype:
 
 
 def sanitize_array(array: Sequence[Number], copy: bool = True) -> np.ndarray:
-    """Ensure array save as .npy can be read back by js-numpy-parser.
+    """Ensure array can be converted to a typedarray.
 
-    See https://github.com/ludwigschubert/js-numpy-parser
+    This is compatible with js-numpy-parser, see https://github.com/ludwigschubert/js-numpy-parser
 
     :param array: Array to sanitize
     :param copy: Set to False to avoid copy if possible

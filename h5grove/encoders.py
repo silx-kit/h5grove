@@ -8,15 +8,12 @@ import tifffile
 from .utils import sanitize_array
 
 
-def bin_encode(array: np.ndarray, sanitize: bool = True) -> bytes:
+def bin_encode(array: np.ndarray) -> bytes:
     """Convert array to bytes.
 
     :param array: Data to convert
-    :param sanitize: Whether to use a sanitized dtype or not
     """
-    sent_array = sanitize_array(array) if sanitize else array
-
-    return sent_array.tobytes()
+    return array.tobytes()
 
 
 def orjson_default(o: Any) -> Union[list, float, str, None]:
@@ -93,7 +90,7 @@ class Response:
 
 
 def encode(
-    content: Any, encoding: Optional[str] = "json", dtype: Optional[str] = None
+    content: Any, encoding: Optional[str] = "json", dtype: Optional[str] = "origin"
 ) -> Response:
     """Encode content in given encoding.
 
@@ -106,27 +103,31 @@ def encode(
         - `csv`: nD arrays in downloadable csv files
         - `npy`: nD arrays in downloadable npy files
         - `tiff`: 2D arrays in downloadable TIFF files
-    :param dtype: Data type to convert content to before encoding
+    :param dtype: Data type conversion
+        - `origin` (default): No conversion
+        - `safe`: Convert to a type supported by JS typedarray
         Only supported for nD array/scalars.
     :returns: A Response object containing content and headers
     :raises ValueError: If encoding is not among the ones above.
     """
-    if dtype is not None:
-        typed_content = np.array(content, dtype=dtype, order="C", copy=False)
+    if dtype in ("origin", None):
+        cast_content = content
+    elif dtype == "safe":
+        cast_content = sanitize_array(content, copy=False)
     else:
-        typed_content = content
+        raise ValueError(f"Unsupported dtype {dtype}")
 
     if encoding in ("json", None):
         return Response(
-            orjson_encode(typed_content),
+            orjson_encode(cast_content),
             headers={"Content-Type": "application/json"},
         )
 
-    array_content = np.array(typed_content, order="C", copy=False)
+    content_array = np.array(cast_content, copy=False)
 
     if encoding == "bin":
         return Response(
-            bin_encode(array_content, sanitize=dtype is None),
+            bin_encode(content_array),
             headers={
                 "Content-Type": "application/octet-stream",
             },
@@ -134,7 +135,7 @@ def encode(
 
     if encoding == "csv":
         return Response(
-            csv_encode(array_content),
+            csv_encode(content_array),
             headers={
                 "Content-Type": "text/csv",
                 "Content-Disposition": 'attachment; filename="data.csv"',
@@ -143,7 +144,7 @@ def encode(
 
     if encoding == "npy":
         return Response(
-            npy_encode(array_content),
+            npy_encode(content_array),
             headers={
                 "Content-Type": "application/octet-stream",
                 "Content-Disposition": 'attachment; filename="data.npy"',
@@ -152,7 +153,7 @@ def encode(
 
     if encoding == "tiff":
         return Response(
-            tiff_encode(array_content),
+            tiff_encode(content_array),
             headers={
                 "Content-Type": "image/tiff",
                 "Content-Disposition": 'attachment; filename="data.tiff"',
