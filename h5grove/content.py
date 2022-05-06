@@ -10,6 +10,7 @@ except ImportError:
 from .models import LinkResolution, Selection
 from .utils import (
     attr_metadata,
+    convert,
     get_array_stats,
     get_filters,
     get_entity_from_file,
@@ -147,9 +148,21 @@ class DatasetContent(ResolvedEntityContent[h5py.Dataset]):
             *super().metadata().items(),
         )
 
-    def data(self, selection: Selection = None, flatten: bool = False):
-        """Dataset data. Supports slicing through selection."""
-        result = get_dataset_slice(self._h5py_entity, selection)
+    def data(
+        self,
+        selection: Selection = None,
+        flatten: bool = False,
+        dtype: Optional[str] = "origin",
+    ):
+        """Dataset data.
+
+        :param selection: Slicing information
+        :param flatten: True to flatten the returned array
+        :param dtype: Data type conversion query parameter
+          - `origin` (default): No conversion
+          - `safe`: Convert to a type supported by JS typedarray (https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/TypedArray)
+        """
+        result = convert(get_dataset_slice(self._h5py_entity, selection), dtype)
 
         # Do not flatten scalars nor h5py.Empty
         if flatten and isinstance(result, np.ndarray):

@@ -21,11 +21,9 @@ __all__ = [
 ]
 
 
-def make_encoded_response(
-    content, format_arg: Optional[str], dtype_arg: Optional[str] = None
-) -> Response:
+def make_encoded_response(content, format_arg: Optional[str] = "json") -> Response:
     """Prepare flask Response according to format"""
-    h5grove_response = encode(content, format_arg, dtype_arg)
+    h5grove_response = encode(content, format_arg)
     response = Response(h5grove_response.content)
     response.headers.update(h5grove_response.headers)
     return response
@@ -59,7 +57,6 @@ def attr_route():
     """`/attr/` endpoint handler"""
     filename = get_filename(request)
     path = request.args.get("path")
-    format_arg = request.args.get("format")
     attr_keys = (
         request.args.getlist("attr_keys") if "attr_keys" in request.args else None
     )
@@ -67,7 +64,7 @@ def attr_route():
     with h5py.File(filename, mode="r") as h5file:
         content = get_content(h5file, path)
         assert isinstance(content, ResolvedEntityContent)
-        return make_encoded_response(content.attributes(attr_keys), format_arg)
+        return make_encoded_response(content.attributes(attr_keys))
 
 
 def data_route():
@@ -76,22 +73,20 @@ def data_route():
     path = request.args.get("path")
     selection = request.args.get("selection")
     format_arg = request.args.get("format")
-    dtype_arg = request.args.get("dtype", None)
+    dtype = request.args.get("dtype", None)
     flatten = parse_bool_arg(request.args.get("flatten"), fallback=False)
 
     with h5py.File(filename, mode="r") as h5file:
         content = get_content(h5file, path)
         assert isinstance(content, DatasetContent)
-        return make_encoded_response(
-            content.data(selection, flatten), format_arg, dtype_arg
-        )
+        data = content.data(selection, flatten, dtype)
+        return make_encoded_response(data, format_arg)
 
 
 def meta_route():
     """`/meta/` endpoint handler"""
     filename = get_filename(request)
     path = request.args.get("path")
-    format_arg = request.args.get("format")
     resolve_links = parse_link_resolution_arg(
         request.args.get("resolve_links", None),
         fallback=LinkResolution.ONLY_VALID,
@@ -99,7 +94,7 @@ def meta_route():
 
     with h5py.File(filename, mode="r") as h5file:
         content = get_content(h5file, path, resolve_links)
-        return make_encoded_response(content.metadata(), format_arg)
+        return make_encoded_response(content.metadata())
 
 
 def stats_route():
@@ -107,12 +102,11 @@ def stats_route():
     filename = get_filename(request)
     path = request.args.get("path")
     selection = request.args.get("selection")
-    format_arg = request.args.get("format")
 
     with h5py.File(filename, mode="r") as h5file:
         content = get_content(h5file, path)
         assert isinstance(content, DatasetContent)
-        return make_encoded_response(content.data_stats(selection), format_arg)
+        return make_encoded_response(content.data_stats(selection))
 
 
 URL_RULES = {

@@ -1,8 +1,7 @@
 import h5py
-from numbers import Number
 from os.path import basename
 import numpy as np
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from .models import H5pyEntity, LinkResolution, Selection
 
@@ -125,19 +124,29 @@ def _sanitize_dtype(dtype: np.dtype) -> np.dtype:
     return result
 
 
-def sanitize_array(array: Sequence[Number], copy: bool = True) -> np.ndarray:
-    """Ensure array can be converted to a JS TypedArray (https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/TypedArray).
+def convert(
+    data: Union[np.ndarray, np.number, np.bool_], dtype: Optional[str] = "origin"
+) -> Union[np.ndarray, np.number, np.bool_]:
+    """Convert array or numpy scalar to given dtype query param
 
-    :param array: Array to sanitize
-    :param copy: Set to False to avoid copy if possible
-    :raises ValueError: For unsupported array dtype
+    :param data: nD array or scalar to convert
+    :param dtype: Data type conversion query parameter
+        - `origin` (default): No conversion
+        - `safe`: Convert to a type supported by JS typedarray (https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/TypedArray)
     """
-    ndarray = np.array(array, copy=False)
-    return np.array(ndarray, copy=copy, order="C", dtype=_sanitize_dtype(ndarray.dtype))
+    if dtype in ("origin", None):
+        return data
+
+    if dtype == "safe":
+        if not is_numeric_data(data):
+            raise ValueError(f"Unsupported dtype {dtype} for non-numeric content")
+        return data.astype(_sanitize_dtype(data.dtype), order="C", copy=False)
+
+    raise ValueError(f"Unsupported dtype {dtype}")
 
 
-def is_numeric_array(array: np.ndarray) -> bool:
-    return np.issubdtype(array.dtype, np.number) or np.issubdtype(array.dtype, np.bool_)
+def is_numeric_data(data: np.ndarray) -> bool:
+    return np.issubdtype(data.dtype, np.number) or np.issubdtype(data.dtype, np.bool_)
 
 
 def get_array_stats(data: np.ndarray) -> Dict[str, Union[float, int, None]]:

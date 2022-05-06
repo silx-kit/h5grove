@@ -5,7 +5,7 @@ import orjson
 import h5py
 import tifffile
 
-from .utils import is_numeric_array, sanitize_array
+from .utils import is_numeric_data
 
 
 def bin_encode(array: np.ndarray) -> bytes:
@@ -89,9 +89,7 @@ class Response:
         self.headers = {**headers, "Content-Length": str(len(content))}
 
 
-def encode(
-    content: Any, encoding: Optional[str] = "json", dtype: Optional[str] = "origin"
-) -> Response:
+def encode(content: Any, encoding: Optional[str] = "json") -> Response:
     """Encode content in given encoding.
 
     Warning: Not all encodings supports all types of content.
@@ -103,32 +101,17 @@ def encode(
         - `csv`: nD arrays in downloadable csv files
         - `npy`: nD arrays in downloadable npy files
         - `tiff`: 2D arrays in downloadable TIFF files
-    :param dtype: Data type conversion
-        - `origin` (default): No conversion
-        - `safe`: Convert to a type supported by JS typedarray
-        Only supported for nD array/scalars.
     :returns: A Response object containing content and headers
     :raises ValueError: If encoding is not among the ones above.
     """
-    if dtype in ("origin", None):
-        cast_content = content
-    elif dtype == "safe":
-        cast_content = np.array(content, copy=False)
-        if not is_numeric_array(cast_content):
-            raise ValueError(f"Unsupported dtype {dtype} for non-numeric content")
-        cast_content = sanitize_array(cast_content, copy=False)
-
-    else:
-        raise ValueError(f"Unsupported dtype {dtype}")
-
     if encoding in ("json", None):
         return Response(
-            orjson_encode(cast_content),
+            orjson_encode(content),
             headers={"Content-Type": "application/json"},
         )
 
-    content_array = np.array(cast_content, copy=False)
-    if not is_numeric_array(content_array):
+    content_array = np.array(content, copy=False)
+    if not is_numeric_data(content_array):
         raise ValueError(f"Unsupported encoding {encoding} for non-numeric content")
 
     if encoding == "bin":
