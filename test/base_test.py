@@ -32,7 +32,7 @@ def decode_array_response(
     shape: Tuple[int],
 ) -> np.ndarray:
     """Decode data array response content according to given information"""
-    content_type = [h[1] for h in response.headers if h[0] == "Content-Type"][0]
+    content_type = {h[0]: h[1] for h in response.headers}["Content-Type"]
 
     if format == "bin":
         assert content_type == "application/octet-stream"
@@ -105,7 +105,8 @@ class BaseTestEndpoints:
         # Test condition
         tested_h5entity_path = "/entry/image"
         data = np.random.random((128, 128)).astype(">f2")
-        ref_dtype = data.dtype if dtype_arg == "origin" else "<f4"
+        # No Float16Array in JS => converted to float32
+        ref_dtype = "<f4" if dtype_arg == "safe" else ">f2"
 
         filename = "test.h5"
         with h5py.File(server.served_directory / filename, mode="w") as h5file:

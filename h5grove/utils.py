@@ -126,9 +126,8 @@ def _sanitize_dtype(dtype: np.dtype) -> np.dtype:
 
 
 def sanitize_array(array: Sequence[Number], copy: bool = True) -> np.ndarray:
-    """Ensure array can be converted to a typedarray.
+    """Ensure array can be converted to a JS TypedArray (https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/TypedArray).
 
-    This is compatible with js-numpy-parser, see https://github.com/ludwigschubert/js-numpy-parser
 
     :param array: Array to sanitize
     :param copy: Set to False to avoid copy if possible
