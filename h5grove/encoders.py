@@ -5,7 +5,7 @@ import orjson
 import h5py
 import tifffile
 
-from .utils import is_numeric_content, sanitize_array
+from .utils import is_numeric_array, sanitize_array
 
 
 def bin_encode(array: np.ndarray) -> bytes:
@@ -113,9 +113,11 @@ def encode(
     if dtype in ("origin", None):
         cast_content = content
     elif dtype == "safe":
-        if not is_numeric_content(content):
+        cast_content = np.array(content, copy=False)
+        if not is_numeric_array(cast_content):
             raise ValueError(f"Unsupported dtype {dtype} for non-numeric content")
-        cast_content = sanitize_array(content, copy=False)
+        cast_content = sanitize_array(cast_content, copy=False)
+
     else:
         raise ValueError(f"Unsupported dtype {dtype}")
 
@@ -125,10 +127,9 @@ def encode(
             headers={"Content-Type": "application/json"},
         )
 
-    if not is_numeric_content(cast_content):
-        raise ValueError(f"Unsupported encoding {encoding} for non-numeric content")
-
     content_array = np.array(cast_content, copy=False)
+    if not is_numeric_array(content_array):
+        raise ValueError(f"Unsupported encoding {encoding} for non-numeric content")
 
     if encoding == "bin":
         return Response(

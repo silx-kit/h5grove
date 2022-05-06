@@ -136,9 +136,8 @@ def sanitize_array(array: Sequence[Number], copy: bool = True) -> np.ndarray:
     return np.array(ndarray, copy=copy, order="C", dtype=_sanitize_dtype(ndarray.dtype))
 
 
-def is_numeric_content(content: Any) -> bool:
-    """Checks if content is a number or an array of numbers"""
-    return isinstance(content, (np.ndarray, Number))
+def is_numeric_array(array: np.ndarray) -> bool:
+    return np.issubdtype(array.dtype, np.number) or np.issubdtype(array.dtype, np.bool_)
 
 
 def get_array_stats(data: np.ndarray) -> Dict[str, Union[float, int, None]]:
