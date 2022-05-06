@@ -128,13 +128,17 @@ def _sanitize_dtype(dtype: np.dtype) -> np.dtype:
 def sanitize_array(array: Sequence[Number], copy: bool = True) -> np.ndarray:
     """Ensure array can be converted to a JS TypedArray (https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/TypedArray).
 
-
     :param array: Array to sanitize
     :param copy: Set to False to avoid copy if possible
     :raises ValueError: For unsupported array dtype
     """
     ndarray = np.array(array, copy=False)
     return np.array(ndarray, copy=copy, order="C", dtype=_sanitize_dtype(ndarray.dtype))
+
+
+def is_numeric_content(content: Any) -> bool:
+    """Checks if content is a number or an array of numbers"""
+    return isinstance(content, (np.ndarray, Number))
 
 
 def get_array_stats(data: np.ndarray) -> Dict[str, Union[float, int, None]]:
