@@ -145,7 +145,7 @@ def convert(
     raise ValueError(f"Unsupported dtype {dtype}")
 
 
-def is_numeric_data(data: np.ndarray) -> bool:
+def is_numeric_data(data: Union[np.ndarray, np.number, np.bool_]) -> bool:
     return np.issubdtype(data.dtype, np.number) or np.issubdtype(data.dtype, np.bool_)
 
 
