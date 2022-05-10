@@ -56,6 +56,7 @@ paths:
       summary: Get data of a dataset
       description: Retrieves data contained in a dataset or a slice of dataset
       parameters:
+        - $ref: '#/components/parameters/dtype'
         - $ref: '#/components/parameters/file'
         - $ref: '#/components/parameters/format'
         - $ref: '#/components/parameters/flatten'
@@ -163,6 +164,14 @@ paths:
 
 components:
   parameters:
+    dtype:
+      name: dtype
+      description: Data type conversion. Only for arrays and scalars. Defaults to "origin".
+      in: query
+      schema:
+        enum: ['origin', 'safe']
+        type: string
+      example: 'safe'
     file:
       name: file
       description: Location of the HDF5 file.

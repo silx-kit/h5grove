@@ -1,22 +1,19 @@
 import io
-from numbers import Number
-from typing import Any, Callable, Dict, Optional, Sequence, Union
+from typing import Any, Callable, Dict, Optional, Union
 import numpy as np
 import orjson
 import h5py
 import tifffile
 
-from .utils import sanitize_array
+from .utils import is_numeric_data
 
 
-def bin_encode(array: Sequence[Number]) -> bytes:
-    """Sanitize an array and convert it to bytes.
+def bin_encode(array: np.ndarray) -> bytes:
+    """Convert array to bytes.
 
     :param array: Data to convert
     """
-    sanitized_array = sanitize_array(array)
-
-    return sanitized_array.tobytes()
+    return array.tobytes()
 
 
 def orjson_default(o: Any) -> Union[list, float, str, None]:
@@ -92,7 +89,7 @@ class Response:
         self.headers = {**headers, "Content-Length": str(len(content))}
 
 
-def encode(content, encoding: Optional[str] = "json") -> Response:
+def encode(content: Any, encoding: Optional[str] = "json") -> Response:
     """Encode content in given encoding.
 
     Warning: Not all encodings supports all types of content.
@@ -113,9 +110,13 @@ def encode(content, encoding: Optional[str] = "json") -> Response:
             headers={"Content-Type": "application/json"},
         )
 
+    content_array = np.array(content, copy=False)
+    if not is_numeric_data(content_array):
+        raise ValueError(f"Unsupported encoding {encoding} for non-numeric content")
+
     if encoding == "bin":
         return Response(
-            bin_encode(content),
+            bin_encode(content_array),
             headers={
                 "Content-Type": "application/octet-stream",
             },
@@ -123,7 +124,7 @@ def encode(content, encoding: Optional[str] = "json") -> Response:
 
     if encoding == "csv":
         return Response(
-            csv_encode(content),
+            csv_encode(content_array),
             headers={
                 "Content-Type": "text/csv",
                 "Content-Disposition": 'attachment; filename="data.csv"',
@@ -132,7 +133,7 @@ def encode(content, encoding: Optional[str] = "json") -> Response:
 
     if encoding == "npy":
         return Response(
-            npy_encode(content),
+            npy_encode(content_array),
             headers={
                 "Content-Type": "application/octet-stream",
                 "Content-Disposition": 'attachment; filename="data.npy"',
@@ -141,7 +142,7 @@ def encode(content, encoding: Optional[str] = "json") -> Response:
 
     if encoding == "tiff":
         return Response(
-            tiff_encode(content),
+            tiff_encode(content_array),
             headers={
                 "Content-Type": "image/tiff",
                 "Content-Disposition": 'attachment; filename="data.tiff"',

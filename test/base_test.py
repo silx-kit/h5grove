@@ -1,6 +1,6 @@
 """Base class for testing with different servers"""
 import io
-from typing import Generator
+from typing import Generator, Tuple
 from urllib.parse import urlencode
 
 import h5py
@@ -23,6 +23,22 @@ def decode_response(response: BaseServer.Response, format: str = "json"):
         assert content_type == "application/octet-stream"
         return np.load(io.BytesIO(response.content))
     raise ValueError(f"Unsupported format: {format}")
+
+
+def decode_array_response(
+    response: BaseServer.Response,
+    format: str,
+    dtype: str,
+    shape: Tuple[int],
+) -> np.ndarray:
+    """Decode data array response content according to given information"""
+    content_type = {h[0]: h[1] for h in response.headers}["Content-Type"]
+
+    if format == "bin":
+        assert content_type == "application/octet-stream"
+        return np.frombuffer(response.content, dtype=dtype).reshape(shape)
+
+    return np.array(decode_response(response, format), copy=False)
 
 
 class BaseTestEndpoints:
@@ -81,6 +97,30 @@ class BaseTestEndpoints:
         retrieved_data = np.array(decode_response(response, format_arg))
 
         assert np.array_equal(retrieved_data, data.flatten() if flatten else data)
+
+    @pytest.mark.parametrize("format_arg", ("npy", "bin"))
+    @pytest.mark.parametrize("dtype_arg", ("origin", "safe"))
+    def test_data_on_array_with_dtype(self, server, format_arg, dtype_arg):
+        """Test /data/ endpoint on array dataset with dtype"""
+        # Test condition
+        tested_h5entity_path = "/entry/image"
+        data = np.random.random((128, 128)).astype(">f2")
+        # No Float16Array in JS => converted to float32
+        ref_dtype = "<f4" if dtype_arg == "safe" else ">f2"
+
+        filename = "test.h5"
+        with h5py.File(server.served_directory / filename, mode="w") as h5file:
+            h5file[tested_h5entity_path] = data
+
+        response = server.get(
+            f"/data/?{urlencode({ 'file': filename, 'path': tested_h5entity_path, 'format': format_arg, 'dtype': dtype_arg })}"
+        )
+
+        retrieved_data = decode_array_response(
+            response, format_arg, ref_dtype, data.shape
+        )
+
+        assert np.array_equal(retrieved_data, data)
 
     @pytest.mark.parametrize("format_arg", ("json", "npy"))
     @pytest.mark.parametrize("flatten", (False, True))

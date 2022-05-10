@@ -5,7 +5,7 @@ import h5py
 from tornado.web import RequestHandler, MissingArgumentError, HTTPError
 
 from .content import DatasetContent, ResolvedEntityContent, create_content
-from .encoders import encode
+from .encoders import encode, Response
 from .models import LinkResolution
 from .utils import NotFoundError, parse_bool_arg, parse_link_resolution_arg
 
@@ -33,7 +33,6 @@ class BaseHandler(RequestHandler):
             raise MissingArgumentError("file")
 
         path = self.get_query_argument("path", None, strip=False)
-        format_arg = self.get_query_argument("format", None)
 
         full_file_path = os.path.join(self.base_dir, file_path)
         if not os.path.isfile(full_file_path):
@@ -41,11 +40,9 @@ class BaseHandler(RequestHandler):
 
         with h5py.File(full_file_path, "r") as h5file:
             try:
-                content = self.get_content(h5file, path)
+                response = self.get_response(h5file, path)
             except NotFoundError as e:
                 raise HTTPError(status_code=404, reason=str(e))
-
-        response = encode(content, format_arg)
 
         for key, value in response.headers.items():
             self.set_header(key, value)
@@ -53,7 +50,7 @@ class BaseHandler(RequestHandler):
         self.write(response.content)
         self.finish()
 
-    def get_content(self, h5file: h5py.File, path: Optional[str]):
+    def get_response(self, h5file: h5py.File, path: Optional[str]) -> Response:
         raise NotImplementedError
 
     def prepare(self):
@@ -68,19 +65,21 @@ class BaseHandler(RequestHandler):
 class AttributeHandler(BaseHandler):
     """/attr/ endpoint handler"""
 
-    def get_content(self, h5file: h5py.File, path: Optional[str]):
+    def get_response(self, h5file: h5py.File, path: Optional[str]) -> Response:
         content = create_content(h5file, path)
         assert isinstance(content, ResolvedEntityContent)
 
         attr_keys = self.get_query_arguments("attr_keys", strip=False)
         # get_query_arguments returns an empty list if `attr_keys` is not present
-        return content.attributes(attr_keys if len(attr_keys) > 0 else None)
+        return encode(content.attributes(attr_keys if len(attr_keys) > 0 else None))
 
 
 class DataHandler(BaseHandler):
     """/data/ endpoint handler"""
 
-    def get_content(self, h5file: h5py.File, path: Optional[str]):
+    def get_response(self, h5file: h5py.File, path: Optional[str]) -> Response:
+        dtype = self.get_query_argument("dtype", None)
+        format_arg = self.get_query_argument("format", None)
         selection = self.get_query_argument("selection", None)
         flatten = parse_bool_arg(
             self.get_query_argument("flatten", None), fallback=False
@@ -88,30 +87,31 @@ class DataHandler(BaseHandler):
 
         content = create_content(h5file, path)
         assert isinstance(content, DatasetContent)
-        return content.data(selection, flatten)
+        data = content.data(selection, flatten, dtype)
+        return encode(data, format_arg)
 
 
 class MetadataHandler(BaseHandler):
     """/meta/ endpoint handler"""
 
-    def get_content(self, h5file: h5py.File, path: Optional[str]):
+    def get_response(self, h5file: h5py.File, path: Optional[str]) -> Response:
         resolve_links = parse_link_resolution_arg(
             self.get_query_argument("resolve_links", None),
             fallback=LinkResolution.ONLY_VALID,
         )
         content = create_content(h5file, path, resolve_links)
-        return content.metadata()
+        return encode(content.metadata())
 
 
 class StatisticsHandler(BaseHandler):
     """/stats/ endpoint handler"""
 
-    def get_content(self, h5file: h5py.File, path: Optional[str]):
+    def get_response(self, h5file: h5py.File, path: Optional[str]) -> Response:
         selection = self.get_query_argument("selection", None)
 
         content = create_content(h5file, path)
         assert isinstance(content, DatasetContent)
-        return content.data_stats(selection)
+        return encode(content.data_stats(selection))
 
 
 # TODO: Setting the return type raises mypy errors
