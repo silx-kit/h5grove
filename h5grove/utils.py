@@ -1,7 +1,7 @@
 import h5py
 from os.path import basename
 import numpy as np
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, TypeVar, Union
 
 from .models import H5pyEntity, LinkResolution, Selection
 
@@ -124,9 +124,10 @@ def _sanitize_dtype(dtype: np.dtype) -> np.dtype:
     return result
 
 
-def convert(
-    data: Union[np.ndarray, np.number, np.bool_], dtype: Optional[str] = "origin"
-) -> Union[np.ndarray, np.number, np.bool_]:
+T = TypeVar("T", np.ndarray, np.number, np.bool_)
+
+
+def convert(data: T, dtype: Optional[str] = "origin") -> T:
     """Convert array or numpy scalar to given dtype query param
 
     :param data: nD array or scalar to convert
