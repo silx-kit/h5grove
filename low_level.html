@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>h5grove reference &#8212; h5grove 0.0.16 documentation</title>
+    <title>h5grove reference &#8212; h5grove 0.0.17b0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/nature.css" />
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
@@ -29,7 +29,7 @@
         <li class="right" >
           <a href="integration.html" title="Integration in an existing application"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">h5grove 0.0.16 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">h5grove 0.0.17b0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">h5grove reference</a></li> 
       </ul>
     </div>  
@@ -199,13 +199,16 @@ This handles external/soft link resolution and dataset decompression.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="h5grove.content.DatasetContent.data">
-<span class="sig-name descname"><span class="pre">data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flatten</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.content.DatasetContent.data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Dataset data. Supports slicing through selection.</p>
+<span class="sig-name descname"><span class="pre">data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flatten</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'origin'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.content.DatasetContent.data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dataset data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>selection</strong> (<em>Optional</em><em>[</em><em>Union</em><em>[</em><em>str</em><em>, </em><em>int</em><em>, </em><em>slice</em><em>, </em><em>Tuple</em><em>[</em><em>Union</em><em>[</em><em>slice</em><em>, </em><em>int</em><em>]</em><em>, </em><em>...</em><em>]</em><em>]</em><em>]</em>) – </p></li>
-<li><p><strong>flatten</strong> (<em>bool</em>) – </p></li>
+<li><p><strong>selection</strong> (<em>Optional</em><em>[</em><em>Union</em><em>[</em><em>str</em><em>, </em><em>int</em><em>, </em><em>slice</em><em>, </em><em>Tuple</em><em>[</em><em>Union</em><em>[</em><em>slice</em><em>, </em><em>int</em><em>]</em><em>, </em><em>...</em><em>]</em><em>]</em><em>]</em>) – Slicing information</p></li>
+<li><p><strong>flatten</strong> (<em>bool</em>) – True to flatten the returned array</p></li>
+<li><p><strong>dtype</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – Data type conversion query parameter
+- <cite>origin</cite> (default): No conversion
+- <cite>safe</cite>: Convert to a type supported by JS typedarray (<a class="reference external" href="https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/TypedArray">https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/TypedArray</a>)</p></li>
 </ul>
 </dd>
 </dl>
@@ -322,7 +325,7 @@ This handles external/soft link resolution and dataset decompression.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>content</strong> – Content to encode</p></li>
+<li><p><strong>content</strong> (<em>Any</em>) – Content to encode</p></li>
 <li><p><strong>encoding</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – <ul>
 <li><p><cite>json</cite> (default)</p></li>
 <li><p><cite>bin</cite>: nD array/scalars in bytes</p></li>
@@ -416,10 +419,10 @@ This handles external/soft link resolution and dataset decompression.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="h5grove.encoders.bin_encode">
 <span class="sig-prename descclassname"><span class="pre">h5grove.encoders.</span></span><span class="sig-name descname"><span class="pre">bin_encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.encoders.bin_encode" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sanitize an array and convert it to bytes.</p>
+<dd><p>Convert array to bytes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>array</strong> (<em>Sequence</em><em>[</em><em>numbers.Number</em><em>]</em>) – Data to convert</p>
+<dd class="field-odd"><p><strong>array</strong> (<em>numpy.ndarray</em>) – Data to convert</p>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p>bytes</p>
@@ -547,7 +550,7 @@ This handles external/soft link resolution and dataset decompression.</p>
         <li class="right" >
           <a href="integration.html" title="Integration in an existing application"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">h5grove 0.0.16 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">h5grove 0.0.17b0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">h5grove reference</a></li> 
       </ul>
     </div>
