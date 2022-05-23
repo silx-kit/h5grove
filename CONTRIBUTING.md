@@ -62,6 +62,13 @@ The new tag will trigger the CI (`release.yml`) that will build and release the 
 
 Release notes can then be written in the [Releases page](https://github.com/silx-kit/h5grove/releases).
 
+### Pre-releases
+
+The following commands can be used to handle the pre-release cycle:
+- To tag the first pre-release, run `bump2version --new-version <X.Y.Zb0> [patch|minor|major]` where `X.Y.Z` is the version number of the next release
+- To bump the pre-release number, run `bump2version pre`
+- To bump to the release, run `bump2version prerelease`
+
 ### Documentation
 
 The documentation is generated using [Sphinx](https://www.sphinx-doc.org/en/master/index.html) by parsing Markdown files with [myst-parser](https://myst-parser.readthedocs.io/en/latest/index.html).
