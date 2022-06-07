@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Depends, Response
+from fastapi import APIRouter, Depends, Response, Query
 import h5py
-from typing import List
+from typing import List, Optional
 
 from .content import DatasetContent, ResolvedEntityContent, create_content
 from .models import LinkResolution
@@ -21,7 +21,9 @@ async def get_h5file(file: str = Depends(add_base_path)):
 
 @router.get("/attr/")
 async def get_attr(
-    file: h5py.File = Depends(get_h5file), path: str = "/", attr_keys: List[str] = []
+    file: h5py.File = Depends(get_h5file),
+    path: str = "/",
+    attr_keys: Optional[List[str]] = Query(default=None),
 ):
     content = create_content(file, path)
     assert isinstance(content, ResolvedEntityContent)
