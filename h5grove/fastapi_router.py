@@ -58,8 +58,8 @@ async def get_meta(
         fallback=LinkResolution.ONLY_VALID,
     )
     with h5py.File(file, "r") as h5file:
-        con = create_content(h5file, path)
-        return con.metadata()
+        content = create_content(h5file, path, resolve_links=resolve_links)
+        return content.metadata()
 
 
 @router.get("/stats/")
