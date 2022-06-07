@@ -28,7 +28,6 @@ class _FastApiServer(BaseServer):
 
     def assert_404(self, url: str):
         response = self._get_response(url, lambda f: f())
-        assert "Not Found" in str(response.content)
         assert response.status == 404
 
 
