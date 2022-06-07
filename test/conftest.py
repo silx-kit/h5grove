@@ -21,6 +21,10 @@ class BaseServer:
         headers: List[Tuple[str, str]]
         content: bytes
 
+        def find_header_value(self, key: str):
+            """Find header value by key (case-insensitive)"""
+            return {h[0].lower(): h[1] for h in self.headers}[key.lower()]
+
     def __init__(self, served_dir: pathlib.Path):
         self.__served_dir = served_dir
 
@@ -45,11 +49,9 @@ class BaseServer:
             response = self._get_response(url, benchmark)
 
         assert response.status == 200
-        content_lengths = [
-            header[1] for header in response.headers if header[0] == "Content-Length"
-        ]
+        content_lengths = response.find_header_value("content-length")
         if content_lengths:
-            assert len(response.content) == int(content_lengths[0])
+            assert len(response.content) == int(content_lengths)
 
         return response
 
