@@ -8,7 +8,7 @@ import pytest
 from conftest import BaseServer
 import base_test
 
-from h5grove import fastapi_router
+from h5grove.fastapi_router import router, settings
 
 # Fixtures ###
 
@@ -40,8 +40,8 @@ def fastapi_server(tmp_path_factory):
     base_dir = tmp_path_factory.mktemp("h5grove_fastapi_served").absolute()
 
     app = FastAPI()
-    fastapi_router.base_path = str(base_dir)
-    app.include_router(fastapi_router.router)
+    settings.base_dir = str(base_dir)
+    app.include_router(router)
 
     with TestClient(app) as client:
         yield _FastApiServer(base_dir, client)

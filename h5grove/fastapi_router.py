@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, Response, Query, HTTPException
+from pydantic import BaseSettings
 import h5py
 import os
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from .content import DatasetContent, ResolvedEntityContent, create_content
 from .models import LinkResolution
@@ -9,7 +10,12 @@ from .utils import NotFoundError, parse_link_resolution_arg
 
 router = APIRouter()
 
-base_path = None
+
+class Settings(BaseSettings):
+    base_dir: Union[str, None] = None
+
+
+settings = Settings()
 
 
 def get_content(
@@ -25,7 +31,7 @@ def get_content(
 
 
 async def add_base_path(file):
-    filepath = f"{base_path}/{file}" if base_path else file
+    filepath = f"{settings.base_dir}/{file}" if settings.base_dir else file
     if not os.path.isfile(filepath):
         raise HTTPException(status_code=404, detail="File not found!")
     return filepath
