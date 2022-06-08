@@ -14,7 +14,7 @@ from h5grove.models import LinkResolution
 
 def decode_response(response: BaseServer.Response, format: str = "json"):
     """Decode response content according to given format"""
-    content_type = [h[1] for h in response.headers if h[0] == "Content-Type"][0]
+    content_type = response.find_header_value("content-type")
 
     if format == "json":
         assert content_type == "application/json"
@@ -32,7 +32,7 @@ def decode_array_response(
     shape: Tuple[int],
 ) -> np.ndarray:
     """Decode data array response content according to given information"""
-    content_type = {h[0]: h[1] for h in response.headers}["Content-Type"]
+    content_type = response.find_header_value("content-type")
 
     if format == "bin":
         assert content_type == "application/octet-stream"
