@@ -10,7 +10,7 @@ import tornado.ioloop
 # This needs to be done before any import of h5py, so before h5grove import
 os.environ["HDF5_USE_FILE_LOCKING"] = "FALSE"
 
-from h5grove.tornadoutils import get_handlers  # noqa
+from h5grove.tornado_utils import get_handlers  # noqa
 
 
 def parser_fn():

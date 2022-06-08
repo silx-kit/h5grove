@@ -1,3 +1,4 @@
+"""Helpers for usage with `FastAPI <https://fastapi.tiangolo.com/>`_"""
 from fastapi import APIRouter, Depends, Response, Query, HTTPException
 from pydantic import BaseSettings
 import h5py
@@ -9,7 +10,21 @@ from .encoders import encode
 from .models import LinkResolution
 from .utils import NotFoundError, parse_link_resolution_arg
 
+__all__ = [
+    "router",
+    "settings",
+    "get_attr",
+    "get_data",
+    "get_meta",
+    "get_stats",
+]
+
 router = APIRouter()
+"""
+FastAPI router with h5grove endpoints.
+
+The directory from which files are served can be defined in `settings`.
+"""
 
 
 class Settings(BaseSettings):
@@ -17,6 +32,7 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+""" Settings where base_dir can be defined """
 
 
 def get_content(
@@ -44,6 +60,7 @@ async def get_attr(
     path: str = "/",
     attr_keys: Optional[List[str]] = Query(default=None),
 ):
+    """`/attr/` endpoint handler"""
     with h5py.File(file, "r") as h5file:
         content = get_content(h5file, path)
         assert isinstance(content, ResolvedEntityContent)
@@ -62,6 +79,7 @@ async def get_data(
     flatten: bool = False,
     selection=None,
 ):
+    """`/data/` endpoint handler"""
     with h5py.File(file, "r") as h5file:
         content = get_content(h5file, path)
         assert isinstance(content, DatasetContent)
@@ -78,6 +96,7 @@ async def get_meta(
     path: str = "/",
     resolve_links: str = "only_valid",
 ):
+    """`/meta/` endpoint handler"""
     resolve_links = parse_link_resolution_arg(
         resolve_links,
         fallback=LinkResolution.ONLY_VALID,
@@ -94,6 +113,7 @@ async def get_meta(
 async def get_stats(
     file: str = Depends(add_base_path), path: str = "/", selection=None
 ):
+    """`/stats/` endpoint handler"""
     with h5py.File(file, "r") as h5file:
         content = get_content(h5file, path)
         assert isinstance(content, DatasetContent)

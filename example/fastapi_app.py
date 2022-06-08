@@ -11,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 # This needs to be done before any import of h5py, so before h5grove import
 os.environ["HDF5_USE_FILE_LOCKING"] = "FALSE"
 
-from h5grove.fastapi_router import router, settings  # noqa
+from h5grove.fastapi_utils import router, settings  # noqa
 
 
 def parser_fn():

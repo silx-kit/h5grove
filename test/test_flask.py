@@ -1,4 +1,4 @@
-"""Test flaskutils blueprint with Flask testing"""
+"""Test flask_utils blueprint with Flask testing"""
 import pathlib
 from typing import Callable
 from flask import Flask
@@ -7,7 +7,7 @@ import pytest
 from conftest import BaseServer
 import base_test
 
-from h5grove.flaskutils import BLUEPRINT
+from h5grove.flask_utils import BLUEPRINT
 
 # Fixtures ###
 

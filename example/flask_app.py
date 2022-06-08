@@ -11,7 +11,7 @@ import os
 # This needs to be done before any import of h5py, so before h5grove import
 os.environ["HDF5_USE_FILE_LOCKING"] = "FALSE"
 
-from h5grove.flaskutils import BLUEPRINT as h5grove_blueprint  # noqa
+from h5grove.flask_utils import BLUEPRINT as h5grove_blueprint  # noqa
 
 
 def parser_fn():

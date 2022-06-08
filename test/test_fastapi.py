@@ -1,4 +1,4 @@
-"""Test fastapi router with fatapi testing"""
+"""Test fastapi_utils with fastapi testing"""
 import pathlib
 from typing import Callable
 from fastapi import FastAPI
@@ -8,7 +8,7 @@ import pytest
 from conftest import BaseServer
 import base_test
 
-from h5grove.fastapi_router import router, settings
+from h5grove.fastapi_utils import router, settings
 
 # Fixtures ###
 
