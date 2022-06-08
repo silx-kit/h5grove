@@ -5,6 +5,7 @@ import os
 from typing import List, Optional, Union
 
 from .content import DatasetContent, ResolvedEntityContent, create_content
+from .encoders import encode
 from .models import LinkResolution
 from .utils import NotFoundError, parse_link_resolution_arg
 
@@ -46,7 +47,10 @@ async def get_attr(
     with h5py.File(file, "r") as h5file:
         content = get_content(h5file, path)
         assert isinstance(content, ResolvedEntityContent)
-        return content.attributes(attr_keys)
+        h5grove_response = encode(content.attributes(attr_keys), "json")
+        return Response(
+            content=h5grove_response.content, headers=h5grove_response.headers
+        )
 
 
 @router.get("/data/")
@@ -62,10 +66,9 @@ async def get_data(
         content = get_content(h5file, path)
         assert isinstance(content, DatasetContent)
         data = content.data(selection, flatten, dtype)
-        return (
-            data
-            if format != "bin"
-            else Response(data.tobytes(), media_type="application/octet-stream")
+        h5grove_response = encode(data, format)
+        return Response(
+            content=h5grove_response.content, headers=h5grove_response.headers
         )
 
 
@@ -81,7 +84,10 @@ async def get_meta(
     )
     with h5py.File(file, "r") as h5file:
         content = get_content(h5file, path, resolve_links=resolve_links)
-        return content.metadata()
+        h5grove_response = encode(content.metadata(), "json")
+        return Response(
+            content=h5grove_response.content, headers=h5grove_response.headers
+        )
 
 
 @router.get("/stats/")
@@ -91,4 +97,7 @@ async def get_stats(
     with h5py.File(file, "r") as h5file:
         content = get_content(h5file, path)
         assert isinstance(content, DatasetContent)
-        return content.data_stats(selection)
+        h5grove_response = encode(content.data_stats(selection), "json")
+        return Response(
+            content=h5grove_response.content, headers=h5grove_response.headers
+        )
