@@ -24,9 +24,22 @@ In addition, some problems arise constantly when designing HDF5 backends. To nam
 pip install h5grove
 ```
 
-You can use **h5grove** low-level utilities whatever the backend implementation you choose. We simply provide additional utilities for [Tornado](https://www.tornadoweb.org/en/stable/) and [Flask](https://flask.palletsprojects.com/en/) that can be installed with:
+You can use **h5grove** low-level utilities whatever the backend implementation you choose. Additional utilities are provided for several Python web frameworks but require additional packages that can be installed the following way:
+
+- [FastAPI](https://fastapi.tiangolo.com/)
 
 ```bash
-pip install h5grove[flask] # For Flask
-pip install h5grove[tornado] # For Tornado
+pip install h5grove[fastapi]
+```
+
+- [Flask](https://flask.palletsprojects.com/en/)
+
+```bash
+pip install h5grove[flask]
+```
+
+- [Tornado](https://www.tornadoweb.org/en/stable/)
+
+```bash
+pip install h5grove[tornado]
 ```

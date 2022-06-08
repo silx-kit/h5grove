@@ -1,4 +1,4 @@
-"""Test tornadoutils using pytest-tornado"""
+"""Test tornado_utils using pytest-tornado"""
 import pathlib
 from typing import Callable
 import pytest
@@ -8,7 +8,7 @@ import tornado.web
 from conftest import BaseServer
 import base_test
 
-from h5grove.tornadoutils import get_handlers
+from h5grove.tornado_utils import get_handlers
 
 # Fixtures ###
 

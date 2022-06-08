@@ -1,8 +1,17 @@
 # Example implementations
 
-Example implementations using Flask and Tornado are given in the `example` folder. These are functional backends that make use of the utilities provided by the `h5grove` package.
+Example implementations using FastAPI, Flask and Tornado are given in the `example` folder. These are functional backends that make use of the utilities provided by the `h5grove` package.
 
 The endpoints API is described [here](api.md).
+
+## FastAPI
+
+```{eval-rst}
+.. argparse::
+   :filename: example/fastapi_app.py
+   :func: parser_fn
+   :prog: fastapi_app.py
+```
 
 ## Flask
 
