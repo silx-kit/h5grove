@@ -3,7 +3,7 @@ from os.path import basename
 import numpy as np
 from typing import Any, Dict, List, Optional, Tuple, TypeVar, Union
 
-from .models import H5pyEntity, LinkResolution, Selection
+from .models import H5pyEntity, LinkResolution, Selection, StrDtype
 
 
 class NotFoundError(Exception):
@@ -19,7 +19,11 @@ class LinkError(NotFoundError):
 
 
 def attr_metadata(attrId: h5py.h5a.AttrID) -> dict:
-    return {"dtype": attrId.dtype.str, "name": attrId.name, "shape": attrId.shape}
+    return {
+        "dtype": stringify_dtype(attrId.dtype),
+        "name": attrId.name,
+        "shape": attrId.shape,
+    }
 
 
 def get_entity_from_file(
@@ -244,3 +248,12 @@ def get_filter_info(
     (filter_id, _, _, name) = filter
 
     return {"id": filter_id, "name": name}
+
+
+def stringify_dtype(dtype: np.dtype) -> StrDtype:
+    if dtype.fields is None:
+        return dtype.str
+
+    return {
+        k: stringify_dtype(dtype_tuple[0]) for k, dtype_tuple in dtype.fields.items()
+    }
