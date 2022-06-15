@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: 'H5Grove API'
   description: 'The API provided by h5grove example implementations.'
-  version: 1.0.0
+  version: 1.1.0b0
 
 servers:
   - url: http://{ip}:{port}/
@@ -232,8 +232,7 @@ components:
       description: Attribute metadata. Does not include the value.
       properties:
         dtype:
-          type: string
-          example: '>i4'
+          $ref: '#/components/schemas/dtype'
         name:
           type: string
           example: 'attr1_name'
@@ -287,8 +286,7 @@ components:
             chunks:
               $ref: '#/components/schemas/shape'
             dtype:
-              type: string
-              example: '>f4'
+              $ref: '#/components/schemas/dtype'
             filters:
               type: array
               items:
@@ -325,6 +323,14 @@ components:
               enum: ['group']
               type: string
     # Other schemas
+    dtype:
+      oneOf:
+        - type: 'string'
+          example: '<f4'
+        - type: object
+          additionalProperties:
+            type: string
+          example: { 'name': '|S10', 'age': '<i4' }
     filterInfo:
       type: object
       properties:
