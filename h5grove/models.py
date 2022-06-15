@@ -17,4 +17,5 @@ class LinkResolution(str, Enum):
     ALL = "all"  # Links are resolved no matter their status. The resolution of broken links raises LinkError
 
 
+# Recursive types not supported by mypy: https://github.com/python/mypy/issues/731
 StrDtype = Union[str, Dict[str, "StrDtype"]]  # type: ignore
