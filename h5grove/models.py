@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Tuple, Union
+from typing import Dict, Tuple, Union
 import h5py
 
 H5pyEntity = Union[
@@ -15,3 +15,6 @@ class LinkResolution(str, Enum):
         "only_valid"  # Links are only resolved if valid and unresolved if broken
     )
     ALL = "all"  # Links are resolved no matter their status. The resolution of broken links raises LinkError
+
+
+StrDtype = Union[str, Dict[str, "StrDtype"]]  # type: ignore

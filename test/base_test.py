@@ -169,6 +169,33 @@ class BaseTestEndpoints:
             "type": "dataset",
         }
 
+    def test_meta_on_compound_dataset(self, server):
+        """Test /meta/ endpoint on a chunked and compressed dataset"""
+        filename = "test.h5"
+        tested_h5entity_path = "/dogs"
+
+        with h5py.File(server.served_directory / filename, mode="w") as h5file:
+            h5file.create_dataset(
+                tested_h5entity_path,
+                data=np.array(
+                    [("Rex", 9, 81.0), ("Fido", 3, 27.0)],
+                    dtype=[("name", "S10"), ("age", "i4"), ("weight", "f4")],
+                ),
+            )
+
+        response = server.get(f"/meta/?file={filename}&path={tested_h5entity_path}")
+        content = decode_response(response)
+
+        assert content == {
+            "attributes": [],
+            "chunks": None,
+            "dtype": {"name": "|S10", "age": "<i4", "weight": "<f4"},
+            "filters": None,
+            "name": "dogs",
+            "shape": [2],
+            "type": "dataset",
+        }
+
     def test_meta_on_group(self, server):
         """Test /meta/ endpoint on a group"""
         # Test condition

@@ -12,6 +12,7 @@ from .utils import (
     attr_metadata,
     convert,
     get_array_stats,
+    stringify_dtype,
     get_filters,
     get_entity_from_file,
     hdf_path_join,
@@ -142,7 +143,7 @@ class DatasetContent(ResolvedEntityContent[h5py.Dataset]):
         """
         return sorted_dict(
             ("chunks", self._h5py_entity.chunks),
-            ("dtype", self._h5py_entity.dtype.str),
+            ("dtype", stringify_dtype(self._h5py_entity.dtype)),
             ("filters", get_filters(self._h5py_entity)),
             ("shape", self._h5py_entity.shape),
             *super().metadata().items(),
