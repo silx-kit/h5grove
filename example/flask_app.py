@@ -33,9 +33,7 @@ def parser_fn():
     return parser
 
 
-if __name__ == "__main__":
-    parser = parser_fn()
-    options = parser.parse_args()
+def main(*args, compression=False, basedir="."):
     # Create Flask application
     app = Flask(__name__)
 
@@ -43,12 +41,20 @@ if __name__ == "__main__":
     CORS(app)
 
     # Enable compression, see https://github.com/colour-science/flask-compress
-    if options.compression:
+    if compression:
         Compress(app)
 
     # Configure h5grove default endpoints
-    app.config["H5_BASE_DIR"] = os.path.abspath(options.basedir)
+    app.config["H5_BASE_DIR"] = os.path.abspath(basedir)
     app.register_blueprint(h5grove_blueprint)
 
+    return app
+
+
+if __name__ == "__main__":
+    parser = parser_fn()
+    options = parser.parse_args()
+    main(compression=options.compression, basedir=ptions.basedir)
+
     # Start server
-    app.run(port=options.port, host=options.ip)
+    app.run(port=port, host=ip)
