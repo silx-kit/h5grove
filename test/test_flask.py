@@ -30,6 +30,10 @@ class _FlaskServer(BaseServer):
         assert "Not Found" in str(response.content)
         assert response.status == 404
 
+    def assert_403(self, url: str):
+        response = self._get_response(url, lambda f: f())
+        assert response.status == 403
+
 
 @pytest.fixture(scope="session")
 def flask_server(tmp_path_factory):

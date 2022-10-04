@@ -1,5 +1,7 @@
 """Base class for testing with different servers"""
 import io
+import os
+import stat
 from typing import Generator, Tuple
 from urllib.parse import urlencode
 
@@ -360,3 +362,20 @@ class BaseTestEndpoints:
                 "target_path": "not_an_entity",
                 "type": "soft_link",
             }
+
+    def test_403_on_file_without_read_permission(self, server):
+        filename = "test.h5"
+        path = "/"
+
+        with h5py.File(server.served_directory / filename, mode="w") as h5file:
+            h5file["dset"] = 10
+
+        os.chmod(
+            server.served_directory / filename,
+            mode=stat.S_IWUSR,
+        )
+
+        server.assert_403(f"/attr/?file={filename}&path={path}")
+        server.assert_403(f"/data/?file={filename}&path={path}")
+        server.assert_403(f"/meta/?file={filename}&path={path}")
+        server.assert_403(f"/stats/?file={filename}&path={path}")

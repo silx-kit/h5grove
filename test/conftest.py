@@ -58,6 +58,9 @@ class BaseServer:
     def assert_404(self, url: str):
         raise NotImplementedError()
 
+    def assert_403(self, url: str):
+        raise NotImplementedError()
+
 
 # subprocess_server fixture  ###
 
@@ -79,6 +82,11 @@ class SubprocessServer(BaseServer):
         with pytest.raises(HTTPError) as e:
             self._get_response(url, lambda f: f())
             assert e.value.code == 404
+
+    def assert_403(self, url: str):
+        with pytest.raises(HTTPError) as e:
+            self._get_response(url, lambda f: f())
+            assert e.value.code == 403
 
 
 def get_free_tcp_port(host: str = "localhost") -> int:
