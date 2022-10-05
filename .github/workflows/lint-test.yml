@@ -18,13 +18,17 @@ jobs:
       - name: Install Python 🐍
         uses: actions/setup-python@v2
         with:
-          python-version: '3.6'
+          python-version: '3.7'
           architecture: 'x64'
 
       - name: Install dependencies ⚙️
         run: |
           python -m pip install --upgrade pip
           pip install .[dev]
+
+      - name: Log Python environment ✏️
+        run: |
+          pip freeze
 
       - name: black ◼️
         run: invoke black
