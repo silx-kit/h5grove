@@ -51,6 +51,10 @@ async def add_base_path(file):
     filepath = f"{settings.base_dir}/{file}" if settings.base_dir else file
     if not os.path.isfile(filepath):
         raise HTTPException(status_code=404, detail="File not found!")
+    if not os.access(filepath, mode=os.R_OK):
+        raise HTTPException(
+            status_code=403, detail="Cannot read file: Permission denied"
+        )
     return filepath
 
 

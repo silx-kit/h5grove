@@ -35,14 +35,22 @@ class BaseHandler(RequestHandler):
         path = self.get_query_argument("path", None, strip=False)
 
         full_file_path = os.path.join(self.base_dir, file_path)
-        if not os.path.isfile(full_file_path):
-            raise HTTPError(status_code=404, reason="File not found!")
 
-        with h5py.File(full_file_path, "r") as h5file:
-            try:
-                response = self.get_response(h5file, path)
-            except NotFoundError as e:
-                raise HTTPError(status_code=404, reason=str(e))
+        try:
+            h5file = h5py.File(full_file_path, "r")
+        except FileNotFoundError:
+            raise HTTPError(status_code=404, reason="File not found!")
+        except PermissionError:
+            raise HTTPError(
+                status_code=403, reason="Cannot read file: Permission denied"
+            )
+
+        try:
+            response = self.get_response(h5file, path)
+        except NotFoundError as e:
+            raise HTTPError(status_code=404, reason=str(e))
+        finally:
+            h5file.close()
 
         for key, value in response.headers.items():
             self.set_header(key, value)

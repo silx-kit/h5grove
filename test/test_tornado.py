@@ -54,6 +54,11 @@ class _TornadoServer(BaseServer):
             self._get_response(url, lambda f: f())
         assert e.value.code == 404
 
+    def assert_403(self, url: str):
+        with pytest.raises(HTTPClientError) as e:
+            self._get_response(url, lambda f: f())
+        assert e.value.code == 403
+
 
 @pytest.fixture
 def tornado_server(_base_dir, io_loop, http_client, base_url):

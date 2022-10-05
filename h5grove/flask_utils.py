@@ -50,6 +50,9 @@ def get_filename(a_request: Request) -> str:
     if not os.path.isfile(full_file_path):
         abort(404, "File not found!")
 
+    if not os.access(full_file_path, mode=os.R_OK):
+        abort(403, "Cannot read file: Permission denied")
+
     return full_file_path
 
 
