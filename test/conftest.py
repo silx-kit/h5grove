@@ -4,26 +4,16 @@ import socketserver
 import subprocess
 import sys
 import time
-from typing import Callable, List, NamedTuple, Optional, Tuple
+from typing import Callable, Optional
 from urllib.request import urlopen
 from urllib.error import HTTPError
 
 import pytest
+from test_utils import Response, decode_response
 
 
 class BaseServer:
     """Base class for object provided through `server` fixture"""
-
-    class Response(NamedTuple):
-        """Return type of :meth:`get`"""
-
-        status: int
-        headers: List[Tuple[str, str]]
-        content: bytes
-
-        def find_header_value(self, key: str):
-            """Find header value by key (case-insensitive)"""
-            return {h[0].lower(): h[1] for h in self.headers}[key.lower()]
 
     def __init__(self, served_dir: pathlib.Path):
         self.__served_dir = served_dir
@@ -56,10 +46,16 @@ class BaseServer:
         return response
 
     def assert_404(self, url: str):
-        raise NotImplementedError()
+        response = self._get_response(url, lambda f: f())
+        assert response.status == 404
+        content = decode_response(response)
+        assert isinstance(content, dict) and isinstance(content["message"], str)
 
     def assert_403(self, url: str):
-        raise NotImplementedError()
+        response = self._get_response(url, lambda f: f())
+        assert response.status == 403
+        content = decode_response(response)
+        assert isinstance(content, dict) and isinstance(content["message"], str)
 
 
 # subprocess_server fixture  ###
@@ -72,11 +68,9 @@ class SubprocessServer(BaseServer):
         super().__init__(served_dir)
         self.__base_url = base_url
 
-    def _get_response(self, url: str, benchmark: Callable) -> BaseServer.Response:
+    def _get_response(self, url: str, benchmark: Callable) -> Response:
         r = benchmark(lambda: urlopen(self.__base_url + url))
-        return BaseServer.Response(
-            status=r.status, headers=r.headers.items(), content=r.read()
-        )
+        return Response(status=r.status, headers=r.headers.items(), content=r.read())
 
     def assert_404(self, url: str):
         with pytest.raises(HTTPError) as e:
@@ -95,7 +89,9 @@ def get_free_tcp_port(host: str = "localhost") -> int:
         return s.server_address[1]
 
 
-@pytest.fixture(scope="module", params=("flask_app.py", "tornado_app.py"))
+@pytest.fixture(
+    scope="module", params=("fastapi_app.py", "flask_app.py", "tornado_app.py")
+)
 def subprocess_server(tmp_path_factory, request):
     """Fixture running server as a subprocess.
 

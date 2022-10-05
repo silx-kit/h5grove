@@ -1,14 +1,14 @@
 """Helpers for usage with `Flask <https://flask.palletsprojects.com/>`_"""
-from flask import abort, Blueprint, current_app, request, Response, Request
-import h5py
+from werkzeug.exceptions import HTTPException
+from flask import Blueprint, current_app, request, Response, Request
 import os
 from typing import Any, Callable, Mapping, Optional
 
 
-from .content import create_content, DatasetContent, ResolvedEntityContent
+from .content import DatasetContent, ResolvedEntityContent, get_content_from_file
 from .encoders import encode
 from .models import LinkResolution
-from .utils import NotFoundError, parse_bool_arg, parse_link_resolution_arg
+from .utils import parse_bool_arg, parse_link_resolution_arg
 
 
 __all__ = [
@@ -21,24 +21,14 @@ __all__ = [
 ]
 
 
-def make_encoded_response(content, format_arg: Optional[str] = "json") -> Response:
+def make_encoded_response(
+    content, format_arg: Optional[str] = "json", status: Optional[int] = None
+) -> Response:
     """Prepare flask Response according to format"""
     h5grove_response = encode(content, format_arg)
-    response = Response(h5grove_response.content)
+    response = Response(h5grove_response.content, status=status)
     response.headers.update(h5grove_response.headers)
     return response
-
-
-def get_content(
-    h5file: h5py.File,
-    path: Optional[str],
-    resolve_links: LinkResolution = LinkResolution.ONLY_VALID,
-):
-    """Gets contents if path is in file. Raises 404 otherwise"""
-    try:
-        return create_content(h5file, path, resolve_links)
-    except NotFoundError as e:
-        abort(404, str(e))
 
 
 def get_filename(a_request: Request) -> str:
@@ -46,14 +36,13 @@ def get_filename(a_request: Request) -> str:
     if file_path is None:
         raise KeyError("File argument is required")
 
-    full_file_path = os.path.join(current_app.config["H5_BASE_DIR"], file_path)
-    if not os.path.isfile(full_file_path):
-        abort(404, "File not found!")
+    return os.path.join(current_app.config["H5_BASE_DIR"], file_path)
 
-    if not os.access(full_file_path, mode=os.R_OK):
-        abort(403, "Cannot read file: Permission denied")
 
-    return full_file_path
+def create_error(status_code: int, message: str):
+    return HTTPException(
+        response=make_encoded_response({"message": message}, status=status_code)
+    )
 
 
 def attr_route():
@@ -64,8 +53,7 @@ def attr_route():
         request.args.getlist("attr_keys") if "attr_keys" in request.args else None
     )
 
-    with h5py.File(filename, mode="r") as h5file:
-        content = get_content(h5file, path)
+    with get_content_from_file(filename, path, create_error) as content:
         assert isinstance(content, ResolvedEntityContent)
         return make_encoded_response(content.attributes(attr_keys))
 
@@ -79,8 +67,7 @@ def data_route():
     dtype = request.args.get("dtype", None)
     flatten = parse_bool_arg(request.args.get("flatten"), fallback=False)
 
-    with h5py.File(filename, mode="r") as h5file:
-        content = get_content(h5file, path)
+    with get_content_from_file(filename, path, create_error) as content:
         assert isinstance(content, DatasetContent)
         data = content.data(selection, flatten, dtype)
         return make_encoded_response(data, format_arg)
@@ -95,8 +82,7 @@ def meta_route():
         fallback=LinkResolution.ONLY_VALID,
     )
 
-    with h5py.File(filename, mode="r") as h5file:
-        content = get_content(h5file, path, resolve_links)
+    with get_content_from_file(filename, path, create_error, resolve_links) as content:
         return make_encoded_response(content.metadata())
 
 
@@ -106,8 +92,7 @@ def stats_route():
     path = request.args.get("path")
     selection = request.args.get("selection")
 
-    with h5py.File(filename, mode="r") as h5file:
-        content = get_content(h5file, path)
+    with get_content_from_file(filename, path, create_error) as content:
         assert isinstance(content, DatasetContent)
         return make_encoded_response(content.data_stats(selection))
 
