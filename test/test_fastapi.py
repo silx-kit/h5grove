@@ -7,6 +7,7 @@ import pytest
 
 from conftest import BaseServer
 import base_test
+from test_utils import Response
 
 from h5grove.fastapi_utils import router, settings
 
@@ -18,21 +19,13 @@ class _FastApiServer(BaseServer):
         super().__init__(served_dir)
         self.__client = client
 
-    def _get_response(self, url: str, benchmark: Callable) -> BaseServer.Response:
+    def _get_response(self, url: str, benchmark: Callable) -> Response:
         r = benchmark(lambda: self.__client.get(url))
-        return BaseServer.Response(
+        return Response(
             status=r.status_code,
             headers=r.headers.items(),
             content=r.content,
         )
-
-    def assert_404(self, url: str):
-        response = self._get_response(url, lambda f: f())
-        assert response.status == 404
-
-    def assert_403(self, url: str):
-        response = self._get_response(url, lambda f: f())
-        assert response.status == 403
 
 
 @pytest.fixture(scope="session")

@@ -1,4 +1,5 @@
-from typing import Dict, Generic, Optional, Sequence, TypeVar, Union
+import contextlib
+from typing import Any, Callable, Dict, Generic, Optional, Sequence, TypeVar, Union
 import h5py
 import numpy as np
 
@@ -9,6 +10,7 @@ except ImportError:
 
 from .models import LinkResolution, Selection
 from .utils import (
+    NotFoundError,
     attr_metadata,
     convert,
     get_array_stats,
@@ -264,3 +266,26 @@ def create_content(
         return ResolvedEntityContent(path, entity)
 
     raise TypeError(f"h5py type {type(entity)} not supported")
+
+
+@contextlib.contextmanager
+def get_content_from_file(
+    filepath: str,
+    path: Optional[str],
+    create_error: Callable[[int, str], Exception],
+    resolve_links: LinkResolution = LinkResolution.ONLY_VALID,
+    h5py_options: Dict[str, Any] = {},
+):
+    try:
+        f = h5py.File(filepath, "r", **h5py_options)
+    except FileNotFoundError:
+        raise create_error(404, "File not found!")
+    except PermissionError:
+        raise create_error(403, "Cannot read file: Permission denied!")
+
+    try:
+        yield create_content(f, path, resolve_links)
+    except NotFoundError as e:
+        raise create_error(404, str(e))
+    finally:
+        f.close()

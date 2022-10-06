@@ -1,14 +1,18 @@
 """Helpers for usage with `Tornado <https://www.tornadoweb.org>`_"""
 import os
 from typing import Any, Optional
-import h5py
-from tornado.web import RequestHandler, MissingArgumentError, HTTPError
 
-from .content import DatasetContent, ResolvedEntityContent, create_content
-from .encoders import encode, Response
+from tornado.web import HTTPError, MissingArgumentError, RequestHandler
+
+from .content import (
+    DatasetContent,
+    EntityContent,
+    ResolvedEntityContent,
+    get_content_from_file,
+)
+from .encoders import Response, encode
 from .models import LinkResolution
-from .utils import NotFoundError, parse_bool_arg, parse_link_resolution_arg
-
+from .utils import parse_bool_arg, parse_link_resolution_arg
 
 __all__ = [
     "BaseHandler",
@@ -18,6 +22,10 @@ __all__ = [
     "StatisticsHandler",
     "get_handlers",
 ]
+
+
+def create_error(status_code: int, message: str):
+    return HTTPError(status_code=status_code, reason=message)
 
 
 class BaseHandler(RequestHandler):
@@ -35,22 +43,15 @@ class BaseHandler(RequestHandler):
         path = self.get_query_argument("path", None, strip=False)
 
         full_file_path = os.path.join(self.base_dir, file_path)
+        resolve_links = parse_link_resolution_arg(
+            self.get_query_argument("resolve_links", None),
+            fallback=LinkResolution.ONLY_VALID,
+        )
 
-        try:
-            h5file = h5py.File(full_file_path, "r")
-        except FileNotFoundError:
-            raise HTTPError(status_code=404, reason="File not found!")
-        except PermissionError:
-            raise HTTPError(
-                status_code=403, reason="Cannot read file: Permission denied"
-            )
-
-        try:
-            response = self.get_response(h5file, path)
-        except NotFoundError as e:
-            raise HTTPError(status_code=404, reason=str(e))
-        finally:
-            h5file.close()
+        with get_content_from_file(
+            full_file_path, path, create_error, resolve_links
+        ) as content:
+            response = self.get_response(content)
 
         for key, value in response.headers.items():
             self.set_header(key, value)
@@ -58,7 +59,7 @@ class BaseHandler(RequestHandler):
         self.write(response.content)
         self.finish()
 
-    def get_response(self, h5file: h5py.File, path: Optional[str]) -> Response:
+    def get_response(self, content: EntityContent) -> Response:
         raise NotImplementedError
 
     def prepare(self):
@@ -67,14 +68,13 @@ class BaseHandler(RequestHandler):
 
     def write_error(self, status_code: int, **kwargs: Any) -> None:
         self.prepare()
-        return super().write_error(status_code, **kwargs)
+        self.finish({"message": self._reason})
 
 
 class AttributeHandler(BaseHandler):
     """/attr/ endpoint handler"""
 
-    def get_response(self, h5file: h5py.File, path: Optional[str]) -> Response:
-        content = create_content(h5file, path)
+    def get_response(self, content: EntityContent) -> Response:
         assert isinstance(content, ResolvedEntityContent)
 
         attr_keys = self.get_query_arguments("attr_keys", strip=False)
@@ -85,7 +85,7 @@ class AttributeHandler(BaseHandler):
 class DataHandler(BaseHandler):
     """/data/ endpoint handler"""
 
-    def get_response(self, h5file: h5py.File, path: Optional[str]) -> Response:
+    def get_response(self, content: EntityContent) -> Response:
         dtype = self.get_query_argument("dtype", None)
         format_arg = self.get_query_argument("format", None)
         selection = self.get_query_argument("selection", None)
@@ -93,7 +93,6 @@ class DataHandler(BaseHandler):
             self.get_query_argument("flatten", None), fallback=False
         )
 
-        content = create_content(h5file, path)
         assert isinstance(content, DatasetContent)
         data = content.data(selection, flatten, dtype)
         return encode(data, format_arg)
@@ -102,22 +101,16 @@ class DataHandler(BaseHandler):
 class MetadataHandler(BaseHandler):
     """/meta/ endpoint handler"""
 
-    def get_response(self, h5file: h5py.File, path: Optional[str]) -> Response:
-        resolve_links = parse_link_resolution_arg(
-            self.get_query_argument("resolve_links", None),
-            fallback=LinkResolution.ONLY_VALID,
-        )
-        content = create_content(h5file, path, resolve_links)
+    def get_response(self, content: EntityContent) -> Response:
         return encode(content.metadata())
 
 
 class StatisticsHandler(BaseHandler):
     """/stats/ endpoint handler"""
 
-    def get_response(self, h5file: h5py.File, path: Optional[str]) -> Response:
+    def get_response(self, content: EntityContent) -> Response:
         selection = self.get_query_argument("selection", None)
 
-        content = create_content(h5file, path)
         assert isinstance(content, DatasetContent)
         return encode(content.data_stats(selection))
 

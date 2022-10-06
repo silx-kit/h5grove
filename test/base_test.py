@@ -1,46 +1,16 @@
 """Base class for testing with different servers"""
-import io
 import os
 import stat
-from typing import Generator, Tuple
+from typing import Generator
 from urllib.parse import urlencode
 
 import h5py
-import json
 import numpy as np
 import pytest
 
 from conftest import BaseServer
 from h5grove.models import LinkResolution
-
-
-def decode_response(response: BaseServer.Response, format: str = "json"):
-    """Decode response content according to given format"""
-    content_type = response.find_header_value("content-type")
-
-    if format == "json":
-        assert content_type == "application/json"
-        return json.loads(response.content)
-    if format == "npy":
-        assert content_type == "application/octet-stream"
-        return np.load(io.BytesIO(response.content))
-    raise ValueError(f"Unsupported format: {format}")
-
-
-def decode_array_response(
-    response: BaseServer.Response,
-    format: str,
-    dtype: str,
-    shape: Tuple[int],
-) -> np.ndarray:
-    """Decode data array response content according to given information"""
-    content_type = response.find_header_value("content-type")
-
-    if format == "bin":
-        assert content_type == "application/octet-stream"
-        return np.frombuffer(response.content, dtype=dtype).reshape(shape)
-
-    return np.array(decode_response(response, format), copy=False)
+from test_utils import decode_response, decode_array_response
 
 
 class BaseTestEndpoints:
