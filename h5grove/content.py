@@ -1,4 +1,5 @@
 import contextlib
+from pathlib import Path
 from typing import Any, Callable, Dict, Generic, Optional, Sequence, TypeVar, Union
 import h5py
 import numpy as np
@@ -270,7 +271,7 @@ def create_content(
 
 @contextlib.contextmanager
 def get_content_from_file(
-    filepath: str,
+    filepath: Union[str, Path],
     path: Optional[str],
     create_error: Callable[[int, str], Exception],
     resolve_links: LinkResolution = LinkResolution.ONLY_VALID,
