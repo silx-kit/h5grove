@@ -1,4 +1,5 @@
 import h5py
+from h5py.version import version_tuple as h5py_version
 from os.path import basename
 import numpy as np
 from typing import Any, Dict, List, Optional, Tuple, TypeVar, Union
@@ -18,10 +19,27 @@ class LinkError(NotFoundError):
     pass
 
 
-def attr_metadata(attrId: h5py.h5a.AttrID) -> dict:
+def _get_attr_id(entity_attrs: h5py.AttributeManager, attr_name: str):
+    return entity_attrs.get_id(attr_name)
+
+
+def _legacy_get_attr_id(entity_attrs: h5py.AttributeManager, attr_name: str):
+    return h5py.h5a.open(entity_attrs._id, entity_attrs._e(attr_name))
+
+
+get_attr_id = (
+    _legacy_get_attr_id
+    if h5py_version.major <= 2 and h5py_version.minor <= 9
+    else _get_attr_id
+)
+
+
+def attr_metadata(entity_attrs: h5py.AttributeManager, attr_name: str) -> dict:
+    attrId = get_attr_id(entity_attrs, attr_name)
+
     return {
         "dtype": stringify_dtype(attrId.dtype),
-        "name": attrId.name,
+        "name": attr_name,
         "shape": attrId.shape,
     }
 
