@@ -129,8 +129,8 @@ class ResolvedEntityContent(EntityContent, Generic[T]):
             (
                 "attributes",
                 [
-                    attr_metadata(self._h5py_entity.attrs.get_id(k))
-                    for k in attribute_names
+                    attr_metadata(self._h5py_entity.attrs, name)
+                    for name in attribute_names
                 ],
             ),
             *super().metadata().items(),
@@ -279,10 +279,12 @@ def get_content_from_file(
 ):
     try:
         f = h5py.File(filepath, "r", **h5py_options)
-    except FileNotFoundError:
-        raise create_error(404, "File not found!")
-    except PermissionError:
-        raise create_error(403, "Cannot read file: Permission denied!")
+    except OSError as e:
+        if isinstance(e, FileNotFoundError) or "No such file or directory" in str(e):
+            raise create_error(404, "File not found!")
+        if isinstance(e, PermissionError) or "Permission denied" in str(e):
+            raise create_error(403, "Cannot read file: Permission denied!")
+        raise e
 
     try:
         yield create_content(f, path, resolve_links)
