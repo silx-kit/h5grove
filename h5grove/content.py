@@ -292,3 +292,39 @@ def get_content_from_file(
         raise create_error(404, str(e))
     finally:
         f.close()
+
+
+@contextlib.contextmanager
+def get_list_of_paths(
+    filepath: Union[str, Path],
+    base_path: Optional[str],
+    create_error: Callable[[int, str], Exception],
+    resolve_links: LinkResolution = LinkResolution.ONLY_VALID,
+    h5py_options: Dict[str, Any] = {},
+):
+    try:
+        f = h5py.File(filepath, "r", **h5py_options)
+    except OSError as e:
+        if isinstance(e, FileNotFoundError) or "No such file or directory" in str(e):
+            raise create_error(404, "File not found!")
+        if isinstance(e, PermissionError) or "Permission denied" in str(e):
+            raise create_error(403, "Cannot read file: Permission denied!")
+        raise e
+
+    names = []
+
+    def get_path(name: str):
+        full_path = hdf_path_join(base_path, name)
+        content = create_content(f, full_path, resolve_links)
+        names.append(content.path)
+
+    try:
+        base_content = create_content(f, base_path, resolve_links)
+        assert isinstance(base_content, GroupContent)
+        names.append(base_content.path)
+        base_content._h5py_entity.visit(get_path)
+        yield names
+    except NotFoundError as e:
+        raise create_error(404, str(e))
+    finally:
+        f.close()

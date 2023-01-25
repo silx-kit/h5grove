@@ -120,6 +120,31 @@ paths:
         '500':
           $ref: '#/components/responses/500'
 
+  /paths:
+    get:
+      summary: Get the list of paths contained in a group
+      description: Retrieves the list of paths of entities contained in a group. Includes the group path.
+      parameters:
+        - $ref: '#/components/parameters/file'
+        - $ref: '#/components/parameters/path'
+        - $ref: '#/components/parameters/resolve_links'
+      responses:
+        '200':
+          description: Paths in the group
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/paths'
+              examples:
+                'All paths':
+                  description: 'For an file containing an empty group and a group with a dataset'
+                  value: ['/', '/group_1', '/group_2', '/group_2/dataset']
+
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+
   /stats:
     get:
       summary: Get statistics on data of a dataset
@@ -343,6 +368,10 @@ components:
     numberOrNull:
       type: number
       nullable: true
+    paths:
+      type: array
+      items:
+        type: string
     selectionItem:
       anyOf:
         - type: string

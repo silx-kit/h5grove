@@ -200,8 +200,8 @@ def get_array_stats(data: np.ndarray) -> Dict[str, Union[float, int, None]]:
     }
 
 
-def hdf_path_join(prefix, suffix):
-    if prefix == "/":
+def hdf_path_join(prefix: Union[str, None], suffix: str):
+    if prefix is None or prefix == "/":
         return f"/{suffix}"
 
     return f'{prefix.rstrip("/")}/{suffix}'

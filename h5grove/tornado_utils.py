@@ -9,6 +9,7 @@ from .content import (
     EntityContent,
     ResolvedEntityContent,
     get_content_from_file,
+    get_list_of_paths,
 )
 from .encoders import Response, encode
 from .models import LinkResolution
@@ -48,10 +49,7 @@ class BaseHandler(RequestHandler):
             fallback=LinkResolution.ONLY_VALID,
         )
 
-        with get_content_from_file(
-            full_file_path, path, create_error, resolve_links
-        ) as content:
-            response = self.get_response(content)
+        response = self.get_response(full_file_path, path, resolve_links)
 
         for key, value in response.headers.items():
             self.set_header(key, value)
@@ -59,7 +57,9 @@ class BaseHandler(RequestHandler):
         self.write(response.content)
         self.finish()
 
-    def get_response(self, content: EntityContent) -> Response:
+    def get_response(
+        self, full_file_path: str, path: Optional[str], resolve_links: LinkResolution
+    ) -> Response:
         raise NotImplementedError
 
     def prepare(self):
@@ -71,10 +71,25 @@ class BaseHandler(RequestHandler):
         self.finish({"message": self._reason})
 
 
-class AttributeHandler(BaseHandler):
+class ContentHandler(BaseHandler):
+    def get_response(
+        self, full_file_path: str, path: Optional[str], resolve_links: LinkResolution
+    ) -> Response:
+        with get_content_from_file(
+            full_file_path, path, create_error, resolve_links
+        ) as content:
+            response = self.get_content_response(content)
+
+        return response
+
+    def get_content_response(self, content: EntityContent) -> Response:
+        raise NotImplementedError
+
+
+class AttributeHandler(ContentHandler):
     """/attr/ endpoint handler"""
 
-    def get_response(self, content: EntityContent) -> Response:
+    def get_content_response(self, content: EntityContent) -> Response:
         assert isinstance(content, ResolvedEntityContent)
 
         attr_keys = self.get_query_arguments("attr_keys", strip=False)
@@ -82,10 +97,10 @@ class AttributeHandler(BaseHandler):
         return encode(content.attributes(attr_keys if len(attr_keys) > 0 else None))
 
 
-class DataHandler(BaseHandler):
+class DataHandler(ContentHandler):
     """/data/ endpoint handler"""
 
-    def get_response(self, content: EntityContent) -> Response:
+    def get_content_response(self, content: EntityContent) -> Response:
         dtype = self.get_query_argument("dtype", None)
         format_arg = self.get_query_argument("format", None)
         selection = self.get_query_argument("selection", None)
@@ -98,21 +113,31 @@ class DataHandler(BaseHandler):
         return encode(data, format_arg)
 
 
-class MetadataHandler(BaseHandler):
+class MetadataHandler(ContentHandler):
     """/meta/ endpoint handler"""
 
-    def get_response(self, content: EntityContent) -> Response:
+    def get_content_response(self, content: EntityContent) -> Response:
         return encode(content.metadata())
 
 
-class StatisticsHandler(BaseHandler):
+class StatisticsHandler(ContentHandler):
     """/stats/ endpoint handler"""
 
-    def get_response(self, content: EntityContent) -> Response:
+    def get_content_response(self, content: EntityContent) -> Response:
         selection = self.get_query_argument("selection", None)
 
         assert isinstance(content, DatasetContent)
         return encode(content.data_stats(selection))
+
+
+class PathsHandler(BaseHandler):
+    def get_response(
+        self, full_file_path: str, path: Optional[str], resolve_links: LinkResolution
+    ) -> Response:
+        with get_list_of_paths(
+            full_file_path, path, create_error, resolve_links
+        ) as paths:
+            return encode(paths)
 
 
 # TODO: Setting the return type raises mypy errors
@@ -128,5 +153,6 @@ def get_handlers(base_dir: Optional[str], allow_origin: Optional[str] = None):
         (r"/attr/.*", AttributeHandler, init_args),
         (r"/data/.*", DataHandler, init_args),
         (r"/meta/.*", MetadataHandler, init_args),
+        (r"/paths/.*", PathsHandler, init_args),
         (r"/stats/.*", StatisticsHandler, init_args),
     ]

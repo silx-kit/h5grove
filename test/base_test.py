@@ -288,6 +288,34 @@ class BaseTestEndpoints:
         retrieved_stats = decode_response(response)
         assert retrieved_stats == expected_stats
 
+    def test_paths(self, server):
+        filename = "test.h5"
+
+        with h5py.File(server.served_directory / filename, "w") as h5file:
+            h5file["tree/branch/fruit"] = "apple"
+            h5file["tree/other_branch"] = 5
+            h5file["tree_2"] = "birch"
+
+        response = server.get(f"/paths/?file={filename}")
+        retrieved_paths = decode_response(response)
+
+        assert retrieved_paths == [
+            "/",
+            "/tree",
+            "/tree/branch",
+            "/tree/branch/fruit",
+            "/tree/other_branch",
+            "/tree_2",
+        ]
+
+        response = server.get(f"/paths/?file={filename}&path=/tree/branch")
+        retrieved_paths = decode_response(response)
+
+        assert retrieved_paths == [
+            "/tree/branch",
+            "/tree/branch/fruit",
+        ]
+
     def test_404_on_non_existing_path(self, server):
         filename = "test.h5"
         not_a_path = "not_a_path"
@@ -297,6 +325,7 @@ class BaseTestEndpoints:
         server.assert_404(f"/attr/?file={filename}&path={not_a_path}")
         server.assert_404(f"/data/?file={filename}&path={not_a_path}")
         server.assert_404(f"/meta/?file={filename}&path={not_a_path}")
+        server.assert_404(f"/paths/?file={filename}&path={not_a_path}")
         server.assert_404(f"/stats/?file={filename}&path={not_a_path}")
 
     def test_404_on_non_existing_file(self, server):
@@ -306,6 +335,7 @@ class BaseTestEndpoints:
         server.assert_404(f"/attr/?file={filename}&path={path}")
         server.assert_404(f"/data/?file={filename}&path={path}")
         server.assert_404(f"/meta/?file={filename}&path={path}")
+        server.assert_404(f"/paths/?file={filename}&path={path}")
         server.assert_404(f"/stats/?file={filename}&path={path}")
 
     @pytest.mark.parametrize(
@@ -348,4 +378,5 @@ class BaseTestEndpoints:
         server.assert_403(f"/attr/?file={filename}&path={path}")
         server.assert_403(f"/data/?file={filename}&path={path}")
         server.assert_403(f"/meta/?file={filename}&path={path}")
+        server.assert_403(f"/paths/?file={filename}&path={path}")
         server.assert_403(f"/stats/?file={filename}&path={path}")
