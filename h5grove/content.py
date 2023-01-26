@@ -15,6 +15,7 @@ from .utils import (
     attr_metadata,
     convert,
     get_array_stats,
+    open_file_with_error_fallback,
     stringify_dtype,
     get_filters,
     get_entity_from_file,
@@ -277,14 +278,7 @@ def get_content_from_file(
     resolve_links: LinkResolution = LinkResolution.ONLY_VALID,
     h5py_options: Dict[str, Any] = {},
 ):
-    try:
-        f = h5py.File(filepath, "r", **h5py_options)
-    except OSError as e:
-        if isinstance(e, FileNotFoundError) or "No such file or directory" in str(e):
-            raise create_error(404, "File not found!")
-        if isinstance(e, PermissionError) or "Permission denied" in str(e):
-            raise create_error(403, "Cannot read file: Permission denied!")
-        raise e
+    f = open_file_with_error_fallback(filepath, create_error, h5py_options)
 
     try:
         yield create_content(f, path, resolve_links)
@@ -302,14 +296,7 @@ def get_list_of_paths(
     resolve_links: LinkResolution = LinkResolution.ONLY_VALID,
     h5py_options: Dict[str, Any] = {},
 ):
-    try:
-        f = h5py.File(filepath, "r", **h5py_options)
-    except OSError as e:
-        if isinstance(e, FileNotFoundError) or "No such file or directory" in str(e):
-            raise create_error(404, "File not found!")
-        if isinstance(e, PermissionError) or "Permission denied" in str(e):
-            raise create_error(403, "Cannot read file: Permission denied!")
-        raise e
+    f = open_file_with_error_fallback(filepath, create_error, h5py_options)
 
     names = []
 

@@ -1,8 +1,9 @@
+from pathlib import Path
 import h5py
 from h5py.version import version_tuple as h5py_version
 from os.path import basename
 import numpy as np
-from typing import Any, Dict, List, Optional, Tuple, TypeVar, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, TypeVar, Union
 
 from .models import H5pyEntity, LinkResolution, Selection, StrDtype
 
@@ -275,3 +276,20 @@ def stringify_dtype(dtype: np.dtype) -> StrDtype:
     return {
         k: stringify_dtype(dtype_tuple[0]) for k, dtype_tuple in dtype.fields.items()
     }
+
+
+def open_file_with_error_fallback(
+    filepath: Union[str, Path],
+    create_error: Callable[[int, str], Exception],
+    h5py_options: Dict[str, Any] = {},
+) -> h5py.File:
+    try:
+        f = h5py.File(filepath, "r", **h5py_options)
+    except OSError as e:
+        if isinstance(e, FileNotFoundError) or "No such file or directory" in str(e):
+            raise create_error(404, "File not found!")
+        if isinstance(e, PermissionError) or "Permission denied" in str(e):
+            raise create_error(403, "Cannot read file: Permission denied!")
+        raise e
+
+    return f
