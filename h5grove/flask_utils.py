@@ -5,7 +5,12 @@ import os
 from typing import Any, Callable, Mapping, Optional
 
 
-from .content import DatasetContent, ResolvedEntityContent, get_content_from_file
+from .content import (
+    DatasetContent,
+    ResolvedEntityContent,
+    get_content_from_file,
+    get_list_of_paths,
+)
 from .encoders import encode
 from .models import LinkResolution
 from .utils import parse_bool_arg, parse_link_resolution_arg
@@ -15,6 +20,7 @@ __all__ = [
     "attr_route",
     "data_route",
     "meta_route",
+    "paths_route",
     "stats_route",
     "URL_RULES",
     "BLUEPRINT",
@@ -86,6 +92,18 @@ def meta_route():
         return make_encoded_response(content.metadata())
 
 
+def paths_route():
+    filename = get_filename(request)
+    path = request.args.get("path")
+    resolve_links = parse_link_resolution_arg(
+        request.args.get("resolve_links", None),
+        fallback=LinkResolution.ONLY_VALID,
+    )
+
+    with get_list_of_paths(filename, path, create_error, resolve_links) as paths:
+        return make_encoded_response(paths)
+
+
 def stats_route():
     """`/stats/` endpoint handler"""
     filename = get_filename(request)
@@ -101,6 +119,7 @@ URL_RULES = {
     "/attr/": attr_route,
     "/data/": data_route,
     "/meta/": meta_route,
+    "/paths/": paths_route,
     "/stats/": stats_route,
 }
 """Mapping of Flask URL endpoints to handlers"""

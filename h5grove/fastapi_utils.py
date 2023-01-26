@@ -8,6 +8,7 @@ from .content import (
     DatasetContent,
     ResolvedEntityContent,
     get_content_from_file,
+    get_list_of_paths,
 )
 from .encoders import encode
 from .models import LinkResolution
@@ -135,6 +136,23 @@ async def get_stats(
     with get_content_from_file(file, path, create_error) as content:
         assert isinstance(content, DatasetContent)
         h5grove_response = encode(content.data_stats(selection), "json")
+        return Response(
+            content=h5grove_response.content, headers=h5grove_response.headers
+        )
+
+
+@router.get("/paths/")
+async def get_paths(
+    file: str = Depends(add_base_path),
+    path: str = "/",
+    resolve_links: str = "only_valid",
+):
+    resolve_links = parse_link_resolution_arg(
+        resolve_links,
+        fallback=LinkResolution.ONLY_VALID,
+    )
+    with get_list_of_paths(file, path, create_error, resolve_links) as paths:
+        h5grove_response = encode(paths, "json")
         return Response(
             content=h5grove_response.content, headers=h5grove_response.headers
         )
