@@ -6,7 +6,7 @@ from tornado.httpclient import HTTPClientError
 import tornado.web
 
 from conftest import BaseServer
-from test_utils import Response, decode_response
+from test_utils import Response, assert_error_response
 import base_test
 
 from h5grove.tornado_utils import get_handlers
@@ -50,27 +50,19 @@ class _TornadoServer(BaseServer):
             status=r.code, headers=list(r.headers.get_all()), content=r.body
         )
 
-    def assert_404(self, url: str):
-        with pytest.raises(HTTPClientError) as exc:
+    def assert_error_code(self, url: str, error_code: int):
+        with pytest.raises(HTTPClientError) as e:
             self._get_response(url, lambda f: f())
-        r = exc.value.response
+        r = e.value.response
         assert r is not None
-
-        res = Response(status=r.code, headers=list(r.headers.get_all()), content=r.body)
-        assert res.status == 404
-        content = decode_response(res)
-        assert isinstance(content, dict) and isinstance(content["message"], str)
-
-    def assert_403(self, url: str):
-        with pytest.raises(HTTPClientError) as exc:
-            self._get_response(url, lambda f: f())
-        r = exc.value.response
-        assert r is not None
-
-        res = Response(status=r.code, headers=list(r.headers.get_all()), content=r.body)
-        assert res.status == 403
-        content = decode_response(res)
-        assert isinstance(content, dict) and isinstance(content["message"], str)
+        assert_error_response(
+            Response(
+                status=r.code,
+                headers=list(r.headers.get_all()),
+                content=r.body,
+            ),
+            error_code,
+        )
 
 
 @pytest.fixture
