@@ -364,7 +364,7 @@ class BaseTestEndpoints:
             }
 
     def test_403_on_file_without_read_permission(self, server):
-        filename = "test.h5"
+        filename = "test_permission.h5"
         path = "/"
 
         with h5py.File(server.served_directory / filename, mode="w") as h5file:
@@ -380,3 +380,31 @@ class BaseTestEndpoints:
         server.assert_error_code(f"/meta/?file={filename}&path={path}", 403)
         server.assert_error_code(f"/paths/?file={filename}&path={path}", 403)
         server.assert_error_code(f"/stats/?file={filename}&path={path}", 403)
+
+    def test_422_on_dtype_safe_with_non_numeric_data(self, server):
+        filename = "test.h5"
+        path = "/data"
+
+        with h5py.File(server.served_directory / filename, mode="w") as h5file:
+            h5file[path] = "I am not numeric"
+
+        server.assert_error_code(f"/data/?file={filename}&path={path}&dtype=safe", 422)
+
+    def test_422_on_invalid_query_arg(self, server):
+        filename = "test.h5"
+        path = "/data"
+
+        with h5py.File(server.served_directory / filename, mode="w") as h5file:
+            h5file[path] = 500
+
+        invalid_format = "foo"
+        server.assert_error_code(
+            f"/data/?file={filename}&path={path}&format={invalid_format}",
+            422,
+        )
+
+        invalid_link_resolution = "maybe"
+        server.assert_error_code(
+            f"/meta/?file={filename}&path={path}&resolve_links={invalid_link_resolution}",
+            422,
+        )

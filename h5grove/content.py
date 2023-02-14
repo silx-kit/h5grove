@@ -12,10 +12,12 @@ except ImportError:
 from .models import LinkResolution, Selection
 from .utils import (
     NotFoundError,
+    QueryArgumentError,
     attr_metadata,
     convert,
     get_array_stats,
     open_file_with_error_fallback,
+    parse_link_resolution_arg,
     stringify_dtype,
     get_filters,
     get_entity_from_file,
@@ -275,15 +277,25 @@ def get_content_from_file(
     filepath: Union[str, Path],
     path: Optional[str],
     create_error: Callable[[int, str], Exception],
-    resolve_links: LinkResolution = LinkResolution.ONLY_VALID,
+    resolve_links_arg: Optional[str] = LinkResolution.ONLY_VALID,
     h5py_options: Dict[str, Any] = {},
 ):
     f = open_file_with_error_fallback(filepath, create_error, h5py_options)
 
     try:
+        resolve_links = parse_link_resolution_arg(
+            resolve_links_arg,
+            fallback=LinkResolution.ONLY_VALID,
+        )
+    except QueryArgumentError as e:
+        raise create_error(422, str(e))
+
+    try:
         yield create_content(f, path, resolve_links)
     except NotFoundError as e:
         raise create_error(404, str(e))
+    except QueryArgumentError as e:
+        raise create_error(422, str(e))
     finally:
         f.close()
 
@@ -293,10 +305,18 @@ def get_list_of_paths(
     filepath: Union[str, Path],
     base_path: Optional[str],
     create_error: Callable[[int, str], Exception],
-    resolve_links: LinkResolution = LinkResolution.ONLY_VALID,
+    resolve_links_arg: Optional[str] = LinkResolution.ONLY_VALID,
     h5py_options: Dict[str, Any] = {},
 ):
     f = open_file_with_error_fallback(filepath, create_error, h5py_options)
+
+    try:
+        resolve_links = parse_link_resolution_arg(
+            resolve_links_arg,
+            fallback=LinkResolution.ONLY_VALID,
+        )
+    except QueryArgumentError as e:
+        raise create_error(422, str(e))
 
     names = []
 
@@ -313,5 +333,7 @@ def get_list_of_paths(
         yield names
     except NotFoundError as e:
         raise create_error(404, str(e))
+    except QueryArgumentError as e:
+        raise create_error(422, str(e))
     finally:
         f.close()

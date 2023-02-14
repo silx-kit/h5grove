@@ -11,8 +11,6 @@ from .content import (
     get_list_of_paths,
 )
 from .encoders import encode
-from .models import LinkResolution
-from .utils import parse_link_resolution_arg
 
 __all__ = [
     "router",
@@ -117,10 +115,7 @@ async def get_meta(
     resolve_links: str = "only_valid",
 ):
     """`/meta/` endpoint handler"""
-    resolve_links = parse_link_resolution_arg(
-        resolve_links,
-        fallback=LinkResolution.ONLY_VALID,
-    )
+
     with get_content_from_file(file, path, create_error, resolve_links) as content:
         h5grove_response = encode(content.metadata(), "json")
         return Response(
@@ -147,10 +142,6 @@ async def get_paths(
     path: str = "/",
     resolve_links: str = "only_valid",
 ):
-    resolve_links = parse_link_resolution_arg(
-        resolve_links,
-        fallback=LinkResolution.ONLY_VALID,
-    )
     with get_list_of_paths(file, path, create_error, resolve_links) as paths:
         h5grove_response = encode(paths, "json")
         return Response(

@@ -12,8 +12,7 @@ from .content import (
     get_list_of_paths,
 )
 from .encoders import encode
-from .models import LinkResolution
-from .utils import parse_bool_arg, parse_link_resolution_arg
+from .utils import parse_bool_arg
 
 
 __all__ = [
@@ -83,10 +82,7 @@ def meta_route():
     """`/meta/` endpoint handler"""
     filename = get_filename(request)
     path = request.args.get("path")
-    resolve_links = parse_link_resolution_arg(
-        request.args.get("resolve_links", None),
-        fallback=LinkResolution.ONLY_VALID,
-    )
+    resolve_links = request.args.get("resolve_links", None)
 
     with get_content_from_file(filename, path, create_error, resolve_links) as content:
         return make_encoded_response(content.metadata())
@@ -95,10 +91,7 @@ def meta_route():
 def paths_route():
     filename = get_filename(request)
     path = request.args.get("path")
-    resolve_links = parse_link_resolution_arg(
-        request.args.get("resolve_links", None),
-        fallback=LinkResolution.ONLY_VALID,
-    )
+    resolve_links = request.args.get("resolve_links", None)
 
     with get_list_of_paths(filename, path, create_error, resolve_links) as paths:
         return make_encoded_response(paths)

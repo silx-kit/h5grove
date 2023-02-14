@@ -3,7 +3,7 @@ import json
 import numpy as np
 from typing import List, NamedTuple, Tuple
 
-from h5grove.utils import QueryArgumentError, hdf_path_join
+from h5grove.utils import hdf_path_join
 
 
 class Response(NamedTuple):
@@ -40,7 +40,7 @@ def decode_response(response: Response, format: str = "json"):
     if format == "npy":
         assert content_type == "application/octet-stream"
         return np.load(io.BytesIO(response.content))
-    raise QueryArgumentError(f"Unsupported format: {format}")
+    raise ValueError(f"Unsupported format: {format}")
 
 
 def decode_array_response(
