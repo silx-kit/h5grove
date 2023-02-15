@@ -46,8 +46,12 @@ paths:
                 'filtered attributes':
                   description: 'For the same entity but attr_keys was set to a1'
                   value: { a1: 5 }
+        '403':
+          $ref: '#/components/responses/403'
         '404':
           $ref: '#/components/responses/404'
+        '422':
+          $ref: '#/components/responses/422'
         '500':
           $ref: '#/components/responses/500'
 
@@ -81,8 +85,12 @@ paths:
               schema:
                 type: string
 
+        '403':
+          $ref: '#/components/responses/403'
         '404':
           $ref: '#/components/responses/404'
+        '422':
+          $ref: '#/components/responses/422'
         '500':
           $ref: '#/components/responses/500'
 
@@ -115,8 +123,12 @@ paths:
                     other: '#/components/schemas/resolvedEntityMetadata'
                     soft_link: '#/components/schemas/softLinkMetadata'
 
+        '403':
+          $ref: '#/components/responses/403'
         '404':
           $ref: '#/components/responses/404'
+        '422':
+          $ref: '#/components/responses/422'
         '500':
           $ref: '#/components/responses/500'
 
@@ -140,8 +152,12 @@ paths:
                   description: 'For an file containing an empty group and a group with a dataset'
                   value: ['/', '/group_1', '/group_2', '/group_2/dataset']
 
+        '403':
+          $ref: '#/components/responses/403'
         '404':
           $ref: '#/components/responses/404'
+        '422':
+          $ref: '#/components/responses/422'
         '500':
           $ref: '#/components/responses/500'
 
@@ -182,8 +198,12 @@ paths:
                     mean: 36,
                     std: 7.5,
                   }
+        '403':
+          $ref: '#/components/responses/403'
         '404':
           $ref: '#/components/responses/404'
+        '422':
+          $ref: '#/components/responses/422'
         '500':
           $ref: '#/components/responses/500'
 
@@ -409,7 +429,11 @@ components:
       value: [5, 4, 7, 8, 10, 5, 7, 8, 9, 12]
 
   responses:
+    '403':
+      description: The file is not allowed to be read.
     '404':
       description: The file was not found or the queried path does not exist in the file.
+    '422':
+      description: A query argument is invalid.
     '500':
       description: The h5py entity type is not supported.
