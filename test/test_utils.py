@@ -57,3 +57,9 @@ def decode_array_response(
         return np.frombuffer(response.content, dtype=dtype).reshape(shape)
 
     return np.array(decode_response(response, format), copy=False)
+
+
+def assert_error_response(response: Response, error_code: int):
+    assert response.status == error_code
+    content = decode_response(response)
+    assert isinstance(content, dict) and isinstance(content["message"], str)

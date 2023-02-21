@@ -20,6 +20,10 @@ class LinkError(NotFoundError):
     pass
 
 
+class QueryArgumentError(ValueError):
+    pass
+
+
 def _get_attr_id(entity_attrs: h5py.AttributeManager, attr_name: str):
     return entity_attrs.get_id(attr_name)
 
@@ -163,13 +167,18 @@ def convert(data: T, dtype: Optional[str] = "origin") -> T:
 
     if dtype == "safe":
         if not is_numeric_data(data):
-            raise ValueError(f"Unsupported dtype {dtype} for non-numeric content")
+            raise QueryArgumentError(
+                f"Unsupported dtype {dtype} for non-numeric content"
+            )
         return data.astype(_sanitize_dtype(data.dtype), order="C", copy=False)
 
-    raise ValueError(f"Unsupported dtype {dtype}")
+    raise QueryArgumentError(f"Unsupported dtype {dtype}")
 
 
-def is_numeric_data(data: Union[np.ndarray, np.number, np.bool_]) -> bool:
+def is_numeric_data(data: Union[np.ndarray, np.number, np.bool_, bytes]) -> bool:
+    if not isinstance(data, (np.ndarray, np.number, np.bool_)):
+        return False
+
     return np.issubdtype(data.dtype, np.number) or np.issubdtype(data.dtype, np.bool_)
 
 
@@ -233,8 +242,8 @@ def parse_link_resolution_arg(
     if query_arg == LinkResolution.ONLY_VALID:
         return LinkResolution.ONLY_VALID
 
-    raise ValueError(
-        f"{raw_query_arg} is not a valid value for link resolution. Accepted values are: {LinkResolution.ALL}, f{LinkResolution.NONE} or {LinkResolution.ONLY_VALID}"
+    raise QueryArgumentError(
+        f"{raw_query_arg} is not a valid value for link resolution. Accepted values are: {LinkResolution.ALL}, {LinkResolution.NONE} or {LinkResolution.ONLY_VALID}"
     )
 
 

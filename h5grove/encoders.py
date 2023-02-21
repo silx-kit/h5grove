@@ -5,7 +5,7 @@ import orjson
 import h5py
 import tifffile
 
-from .utils import is_numeric_data
+from .utils import QueryArgumentError, is_numeric_data
 
 
 def bin_encode(array: np.ndarray) -> bytes:
@@ -102,7 +102,7 @@ def encode(content: Any, encoding: Optional[str] = "json") -> Response:
         - `npy`: nD arrays in downloadable npy files
         - `tiff`: 2D arrays in downloadable TIFF files
     :returns: A Response object containing content and headers
-    :raises ValueError: If encoding is not among the ones above.
+    :raises QueryArgumentError: If encoding is not among the ones above.
     """
     if encoding in ("json", None):
         return Response(
@@ -112,7 +112,9 @@ def encode(content: Any, encoding: Optional[str] = "json") -> Response:
 
     content_array = np.array(content, copy=False)
     if not is_numeric_data(content_array):
-        raise ValueError(f"Unsupported encoding {encoding} for non-numeric content")
+        raise QueryArgumentError(
+            f"Unsupported encoding {encoding} for non-numeric content"
+        )
 
     if encoding == "bin":
         return Response(
@@ -149,4 +151,4 @@ def encode(content: Any, encoding: Optional[str] = "json") -> Response:
             },
         )
 
-    raise ValueError(f"Unsupported encoding {encoding}")
+    raise QueryArgumentError(f"Unsupported encoding {encoding}")

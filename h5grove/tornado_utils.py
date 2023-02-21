@@ -12,8 +12,7 @@ from .content import (
     get_list_of_paths,
 )
 from .encoders import Response, encode
-from .models import LinkResolution
-from .utils import parse_bool_arg, parse_link_resolution_arg
+from .utils import parse_bool_arg
 
 __all__ = [
     "BaseHandler",
@@ -44,12 +43,10 @@ class BaseHandler(RequestHandler):
         path = self.get_query_argument("path", None, strip=False)
 
         full_file_path = os.path.join(self.base_dir, file_path)
-        resolve_links = parse_link_resolution_arg(
-            self.get_query_argument("resolve_links", None),
-            fallback=LinkResolution.ONLY_VALID,
-        )
 
-        response = self.get_response(full_file_path, path, resolve_links)
+        response = self.get_response(
+            full_file_path, path, self.get_query_argument("resolve_links", None)
+        )
 
         for key, value in response.headers.items():
             self.set_header(key, value)
@@ -58,7 +55,7 @@ class BaseHandler(RequestHandler):
         self.finish()
 
     def get_response(
-        self, full_file_path: str, path: Optional[str], resolve_links: LinkResolution
+        self, full_file_path: str, path: Optional[str], resolve_links: Optional[str]
     ) -> Response:
         raise NotImplementedError
 
@@ -73,7 +70,7 @@ class BaseHandler(RequestHandler):
 
 class ContentHandler(BaseHandler):
     def get_response(
-        self, full_file_path: str, path: Optional[str], resolve_links: LinkResolution
+        self, full_file_path: str, path: Optional[str], resolve_links: Optional[str]
     ) -> Response:
         with get_content_from_file(
             full_file_path, path, create_error, resolve_links
@@ -132,7 +129,7 @@ class StatisticsHandler(ContentHandler):
 
 class PathsHandler(BaseHandler):
     def get_response(
-        self, full_file_path: str, path: Optional[str], resolve_links: LinkResolution
+        self, full_file_path: str, path: Optional[str], resolve_links: Optional[str]
     ) -> Response:
         with get_list_of_paths(
             full_file_path, path, create_error, resolve_links

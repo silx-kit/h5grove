@@ -322,21 +322,21 @@ class BaseTestEndpoints:
         with h5py.File(server.served_directory / filename, mode="w") as h5file:
             h5file["data"] = 0
 
-        server.assert_404(f"/attr/?file={filename}&path={not_a_path}")
-        server.assert_404(f"/data/?file={filename}&path={not_a_path}")
-        server.assert_404(f"/meta/?file={filename}&path={not_a_path}")
-        server.assert_404(f"/paths/?file={filename}&path={not_a_path}")
-        server.assert_404(f"/stats/?file={filename}&path={not_a_path}")
+        server.assert_error_code(f"/attr/?file={filename}&path={not_a_path}", 404)
+        server.assert_error_code(f"/data/?file={filename}&path={not_a_path}", 404)
+        server.assert_error_code(f"/meta/?file={filename}&path={not_a_path}", 404)
+        server.assert_error_code(f"/paths/?file={filename}&path={not_a_path}", 404)
+        server.assert_error_code(f"/stats/?file={filename}&path={not_a_path}", 404)
 
     def test_404_on_non_existing_file(self, server):
         filename = "not_a_file.h5"
         path = "/"
 
-        server.assert_404(f"/attr/?file={filename}&path={path}")
-        server.assert_404(f"/data/?file={filename}&path={path}")
-        server.assert_404(f"/meta/?file={filename}&path={path}")
-        server.assert_404(f"/paths/?file={filename}&path={path}")
-        server.assert_404(f"/stats/?file={filename}&path={path}")
+        server.assert_error_code(f"/attr/?file={filename}&path={path}", 404)
+        server.assert_error_code(f"/data/?file={filename}&path={path}", 404)
+        server.assert_error_code(f"/meta/?file={filename}&path={path}", 404)
+        server.assert_error_code(f"/paths/?file={filename}&path={path}", 404)
+        server.assert_error_code(f"/stats/?file={filename}&path={path}", 404)
 
     @pytest.mark.parametrize(
         "resolve_links",
@@ -352,7 +352,7 @@ class BaseTestEndpoints:
 
         # It should return 404 if trying to resolve the broken link
         if resolve_links == LinkResolution.ALL:
-            server.assert_404(url)
+            server.assert_error_code(url, 404)
         # It should return the link metadata when not resolving the link (resolve_links set to NONE or ONLY_VALID)
         else:
             response = server.get(url)
@@ -364,7 +364,7 @@ class BaseTestEndpoints:
             }
 
     def test_403_on_file_without_read_permission(self, server):
-        filename = "test.h5"
+        filename = "test_permission.h5"
         path = "/"
 
         with h5py.File(server.served_directory / filename, mode="w") as h5file:
@@ -375,8 +375,36 @@ class BaseTestEndpoints:
             mode=stat.S_IWUSR,
         )
 
-        server.assert_403(f"/attr/?file={filename}&path={path}")
-        server.assert_403(f"/data/?file={filename}&path={path}")
-        server.assert_403(f"/meta/?file={filename}&path={path}")
-        server.assert_403(f"/paths/?file={filename}&path={path}")
-        server.assert_403(f"/stats/?file={filename}&path={path}")
+        server.assert_error_code(f"/attr/?file={filename}&path={path}", 403)
+        server.assert_error_code(f"/data/?file={filename}&path={path}", 403)
+        server.assert_error_code(f"/meta/?file={filename}&path={path}", 403)
+        server.assert_error_code(f"/paths/?file={filename}&path={path}", 403)
+        server.assert_error_code(f"/stats/?file={filename}&path={path}", 403)
+
+    def test_422_on_dtype_safe_with_non_numeric_data(self, server):
+        filename = "test.h5"
+        path = "/data"
+
+        with h5py.File(server.served_directory / filename, mode="w") as h5file:
+            h5file[path] = "I am not numeric"
+
+        server.assert_error_code(f"/data/?file={filename}&path={path}&dtype=safe", 422)
+
+    def test_422_on_invalid_query_arg(self, server):
+        filename = "test.h5"
+        path = "/data"
+
+        with h5py.File(server.served_directory / filename, mode="w") as h5file:
+            h5file[path] = 500
+
+        invalid_format = "foo"
+        server.assert_error_code(
+            f"/data/?file={filename}&path={path}&format={invalid_format}",
+            422,
+        )
+
+        invalid_link_resolution = "maybe"
+        server.assert_error_code(
+            f"/meta/?file={filename}&path={path}&resolve_links={invalid_link_resolution}",
+            422,
+        )

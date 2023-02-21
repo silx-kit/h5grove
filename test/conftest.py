@@ -9,7 +9,8 @@ from urllib.request import urlopen
 from urllib.error import HTTPError
 
 import pytest
-from test_utils import Response, decode_response
+from test_utils import Response, assert_error_response
+from h5grove.encoders import orjson_encode
 
 
 class BaseServer:
@@ -45,17 +46,8 @@ class BaseServer:
 
         return response
 
-    def assert_404(self, url: str):
-        response = self._get_response(url, lambda f: f())
-        assert response.status == 404
-        content = decode_response(response)
-        assert isinstance(content, dict) and isinstance(content["message"], str)
-
-    def assert_403(self, url: str):
-        response = self._get_response(url, lambda f: f())
-        assert response.status == 403
-        content = decode_response(response)
-        assert isinstance(content, dict) and isinstance(content["message"], str)
+    def assert_error_code(self, url: str, error_code: int):
+        assert_error_response(self._get_response(url, lambda f: f()), error_code)
 
 
 # subprocess_server fixture  ###
@@ -72,15 +64,19 @@ class SubprocessServer(BaseServer):
         r = benchmark(lambda: urlopen(self.__base_url + url))
         return Response(status=r.status, headers=r.headers.items(), content=r.read())
 
-    def assert_404(self, url: str):
+    def assert_error_code(self, url: str, error_code: int):
         with pytest.raises(HTTPError) as e:
             self._get_response(url, lambda f: f())
-            assert e.value.code == 404
-
-    def assert_403(self, url: str):
-        with pytest.raises(HTTPError) as e:
-            self._get_response(url, lambda f: f())
-            assert e.value.code == 403
+        assert e is not None
+        error = e.value
+        assert_error_response(
+            Response(
+                status=error.code,
+                headers=error.headers.items(),
+                content=orjson_encode({"message": error.reason}),
+            ),
+            error_code,
+        )
 
 
 def get_free_tcp_port(host: str = "localhost") -> int:
