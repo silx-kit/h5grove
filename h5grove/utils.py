@@ -258,7 +258,7 @@ def get_dataset_slice(dataset: h5py.Dataset, selection: Selection):
         parsed_slice = parse_slice(selection)
         if len(parsed_slice) > dataset.ndim:
             raise ValueError(
-                f"{selection} is has too many members to slice a {dataset.ndim}D dataset"
+                f"{selection} has too many members to slice a {dataset.ndim}D dataset"
             )
         return dataset[parsed_slice]
 
