@@ -7,7 +7,7 @@ import pytest
 
 from conftest import BaseServer
 import base_test
-from test_utils import Response
+from utils import Response
 
 from h5grove.fastapi_utils import router, settings
 

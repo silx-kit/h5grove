@@ -5,7 +5,7 @@ from flask import Flask
 import pytest
 
 from conftest import BaseServer
-from test_utils import Response
+from utils import Response
 import base_test
 
 from h5grove.flask_utils import BLUEPRINT
