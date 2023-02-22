@@ -79,23 +79,26 @@ def get_entity_from_file(
     return h5file[path]
 
 
-def parse_slice(dataset: h5py.Dataset, slice_str: str) -> Tuple[Union[slice, int], ...]:
+def parse_slice(slice_str: str) -> Tuple[Union[slice, int], ...]:
+    """
+    Parses a string containing a slice under NumPy format.
+
+    Examples:
+        '5' => (5,)
+        '1, 2:5' => (1, slice(2,5))
+        '0:10:5, 2, 3:' => (slice(0, 10, 5), 2, slice(3, None, None))
+
+    :param slice_str: String containing the slice
+    """
     if "," not in slice_str:
-        return (parse_slice_member(slice_str, dataset.shape[0]),)
+        return (parse_slice_member(slice_str),)
 
     slice_members = slice_str.split(",")
 
-    if len(slice_members) > dataset.ndim:
-        raise TypeError(
-            f"{slice_str} is a {len(slice_members)}d slice while the dataset is {dataset.ndim}d"
-        )
-
-    return tuple(
-        parse_slice_member(s, dataset.shape[i]) for i, s in enumerate(slice_members)
-    )
+    return tuple(parse_slice_member(s) for s in slice_members)
 
 
-def parse_slice_member(slice_member: str, max_dim: int) -> Union[slice, int]:
+def parse_slice_member(slice_member: str) -> Union[slice, int]:
     if ":" not in slice_member:
         return int(slice_member)
 
@@ -104,16 +107,16 @@ def parse_slice_member(slice_member: str, max_dim: int) -> Union[slice, int]:
         start, stop = slice_params
 
         return slice(
-            int(start) if start != "" else 0, int(stop) if stop != "" else max_dim
+            int(start) if start != "" else 0, int(stop) if stop != "" else None
         )
 
     if len(slice_params) == 3:
         start, stop, step = slice_params
 
         return slice(
-            int(start) if start != "" else 0,
-            int(stop) if stop != "" else max_dim,
-            int(step) if step != "" else 1,
+            int(start) if start != "" else None,
+            int(stop) if stop != "" else None,
+            int(step) if step != "" else None,
         )
 
     raise TypeError(f"{slice_member} is not a valid slice")
@@ -252,7 +255,12 @@ def get_dataset_slice(dataset: h5py.Dataset, selection: Selection):
         return dataset[()]
 
     if isinstance(selection, str):
-        return dataset[parse_slice(dataset, selection)]
+        parsed_slice = parse_slice(selection)
+        if len(parsed_slice) > dataset.ndim:
+            raise ValueError(
+                f"{selection} has too many members to slice a {dataset.ndim}D dataset"
+            )
+        return dataset[parsed_slice]
 
     return dataset[selection]
 

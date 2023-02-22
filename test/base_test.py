@@ -10,7 +10,7 @@ import pytest
 
 from conftest import BaseServer
 from h5grove.models import LinkResolution
-from test_utils import decode_response, decode_array_response
+from utils import decode_response, decode_array_response
 
 
 class BaseTestEndpoints:

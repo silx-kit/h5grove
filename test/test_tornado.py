@@ -6,7 +6,7 @@ from tornado.httpclient import HTTPClientError
 import tornado.web
 
 from conftest import BaseServer
-from test_utils import Response, assert_error_response
+from utils import Response, assert_error_response
 import base_test
 
 from h5grove.tornado_utils import get_handlers

@@ -9,7 +9,7 @@ from urllib.request import urlopen
 from urllib.error import HTTPError
 
 import pytest
-from test_utils import Response, assert_error_response
+from utils import Response, assert_error_response
 from h5grove.encoders import orjson_encode
 
 
