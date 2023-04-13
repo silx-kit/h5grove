@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: 'H5Grove API'
   description: 'The API provided by h5grove example implementations.'
-  version: 1.2.1
+  version: 1.3.0
 
 servers:
   - url: http://{ip}:{port}/
@@ -46,8 +46,12 @@ paths:
                 'filtered attributes':
                   description: 'For the same entity but attr_keys was set to a1'
                   value: { a1: 5 }
+        '403':
+          $ref: '#/components/responses/403'
         '404':
           $ref: '#/components/responses/404'
+        '422':
+          $ref: '#/components/responses/422'
         '500':
           $ref: '#/components/responses/500'
 
@@ -81,8 +85,12 @@ paths:
               schema:
                 type: string
 
+        '403':
+          $ref: '#/components/responses/403'
         '404':
           $ref: '#/components/responses/404'
+        '422':
+          $ref: '#/components/responses/422'
         '500':
           $ref: '#/components/responses/500'
 
@@ -115,8 +123,41 @@ paths:
                     other: '#/components/schemas/resolvedEntityMetadata'
                     soft_link: '#/components/schemas/softLinkMetadata'
 
+        '403':
+          $ref: '#/components/responses/403'
         '404':
           $ref: '#/components/responses/404'
+        '422':
+          $ref: '#/components/responses/422'
+        '500':
+          $ref: '#/components/responses/500'
+
+  /paths:
+    get:
+      summary: Get the list of paths contained in a group
+      description: Retrieves the list of paths of entities contained in a group. Includes the group path.
+      parameters:
+        - $ref: '#/components/parameters/file'
+        - $ref: '#/components/parameters/path'
+        - $ref: '#/components/parameters/resolve_links'
+      responses:
+        '200':
+          description: Paths in the group
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/paths'
+              examples:
+                'All paths':
+                  description: 'For an file containing an empty group and a group with a dataset'
+                  value: ['/', '/group_1', '/group_2', '/group_2/dataset']
+
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '422':
+          $ref: '#/components/responses/422'
         '500':
           $ref: '#/components/responses/500'
 
@@ -157,8 +198,12 @@ paths:
                     mean: 36,
                     std: 7.5,
                   }
+        '403':
+          $ref: '#/components/responses/403'
         '404':
           $ref: '#/components/responses/404'
+        '422':
+          $ref: '#/components/responses/422'
         '500':
           $ref: '#/components/responses/500'
 
@@ -343,6 +388,10 @@ components:
     numberOrNull:
       type: number
       nullable: true
+    paths:
+      type: array
+      items:
+        type: string
     selectionItem:
       anyOf:
         - type: string
@@ -380,7 +429,11 @@ components:
       value: [5, 4, 7, 8, 10, 5, 7, 8, 9, 12]
 
   responses:
+    '403':
+      description: The file is not allowed to be read.
     '404':
       description: The file was not found or the queried path does not exist in the file.
+    '422':
+      description: A query argument is invalid.
     '500':
       description: The h5py entity type is not supported.

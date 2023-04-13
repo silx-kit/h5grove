@@ -1,18 +1,20 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Example implementations &#8212; h5grove 1.2.1 documentation</title>
+    <title>Example implementations &#8212; h5grove 1.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/nature.css" />
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Integration in an existing application" href="integration.html" />
@@ -33,7 +35,7 @@
         <li class="right" >
           <a href="api.html" title="h5grove endpoints API"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">h5grove 1.2.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">h5grove 1.3.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Example implementations</a></li> 
       </ul>
     </div>  
@@ -44,18 +46,18 @@
           <div class="body" role="main">
             
   <section id="example-implementations">
-<h1>Example implementations<a class="headerlink" href="#example-implementations" title="Permalink to this headline">¶</a></h1>
+<h1>Example implementations<a class="headerlink" href="#example-implementations" title="Permalink to this heading">¶</a></h1>
 <p>Example implementations using FastAPI, Flask and Tornado are given in the <code class="docutils literal notranslate"><span class="pre">example</span></code> folder. These are functional backends that make use of the utilities provided by the <code class="docutils literal notranslate"><span class="pre">h5grove</span></code> package.</p>
-<p>The endpoints API is described <a class="reference internal" href="api.html"><span class="doc std std-doc">here</span></a>.</p>
+<p>The endpoints API is described <a class="reference internal" href="api.html"><span class="std std-doc">here</span></a>.</p>
 <section id="fastapi">
-<h2>FastAPI<a class="headerlink" href="#fastapi" title="Permalink to this headline">¶</a></h2>
+<h2>FastAPI<a class="headerlink" href="#fastapi" title="Permalink to this heading">¶</a></h2>
 <p><p>FastAPI-based server sample code</p>
 </p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">fastapi_app</span><span class="o">.</span><span class="n">py</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">p</span> <span class="n">PORT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">ip</span> <span class="n">IP</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">basedir</span> <span class="n">BASEDIR</span><span class="p">]</span>
 </pre></div>
 </div>
-<section id="Named Arguments">
-<h3>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h3>
+<section id="named-arguments">
+<h3>Named Arguments<a class="headerlink" href="#named-arguments" title="Permalink to this heading">¶</a></h3>
 <dl class="option-list">
 <dt><kbd>-p, --port</kbd></dt>
 <dd><p>Port the server is listening on</p>
@@ -73,15 +75,15 @@
 </section>
 </section>
 <section id="flask">
-<h2>Flask<a class="headerlink" href="#flask" title="Permalink to this headline">¶</a></h2>
+<h2>Flask<a class="headerlink" href="#flask" title="Permalink to this heading">¶</a></h2>
 <p><p>Flask-based server sample code</p>
 </p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">flask_app</span><span class="o">.</span><span class="n">py</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">p</span> <span class="n">PORT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">ip</span> <span class="n">IP</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">compression</span><span class="p">]</span>
                     <span class="p">[</span><span class="o">--</span><span class="n">basedir</span> <span class="n">BASEDIR</span><span class="p">]</span>
 </pre></div>
 </div>
-<section id="Named Arguments">
-<h3>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h3>
+<section id="named-arguments">
+<h3>Named Arguments<a class="headerlink" href="#named-arguments" title="Permalink to this heading">¶</a></h3>
 <dl class="option-list">
 <dt><kbd>-p, --port</kbd></dt>
 <dd><p>Port the server is listening on</p>
@@ -103,14 +105,14 @@
 </section>
 </section>
 <section id="tornado">
-<h2>Tornado<a class="headerlink" href="#tornado" title="Permalink to this headline">¶</a></h2>
+<h2>Tornado<a class="headerlink" href="#tornado" title="Permalink to this heading">¶</a></h2>
 <p><p>Tornado-based server sample code</p>
 </p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">tornado_app</span><span class="o">.</span><span class="n">py</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">p</span> <span class="n">PORT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">ip</span> <span class="n">IP</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">basedir</span> <span class="n">BASEDIR</span><span class="p">]</span>
 </pre></div>
 </div>
-<section id="Named Arguments">
-<h3>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h3>
+<section id="named-arguments">
+<h3>Named Arguments<a class="headerlink" href="#named-arguments" title="Permalink to this heading">¶</a></h3>
 <dl class="option-list">
 <dt><kbd>-p, --port</kbd></dt>
 <dd><p>Port the server is listening on</p>
@@ -136,31 +138,37 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">Example implementations</a><ul>
 <li><a class="reference internal" href="#fastapi">FastAPI</a><ul>
-<li><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
+<li><a class="reference internal" href="#named-arguments">Named Arguments</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#flask">Flask</a><ul>
-<li><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
+<li><a class="reference internal" href="#named-arguments">Named Arguments</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#tornado">Tornado</a><ul>
-<li><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
+<li><a class="reference internal" href="#named-arguments">Named Arguments</a></li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="api.html"
-                        title="previous chapter">h5grove endpoints API</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="integration.html"
-                        title="next chapter">Integration in an existing application</a></p>
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="api.html"
+                          title="previous chapter">h5grove endpoints API</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="integration.html"
+                          title="next chapter">Integration in an existing application</a></p>
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -177,7 +185,7 @@
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -197,13 +205,13 @@
         <li class="right" >
           <a href="api.html" title="h5grove endpoints API"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">h5grove 1.2.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">h5grove 1.3.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Example implementations</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, ESRF.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
     </div>
   </body>
 </html>
