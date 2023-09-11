@@ -111,7 +111,7 @@ def subprocess_server(tmp_path_factory, request):
     env = os.environ.copy()
     env["PYTHONPATH"] = f"{str(project_root_dir)}:{env.get('PYTHONPATH', '')}"
     process = subprocess.Popen(cmd, env=env)
-    time.sleep(1)
+    time.sleep(5)
     assert process.poll() is None  # Check that server is running
 
     yield SubprocessServer(served_dir=base_dir, base_url=f"http://{host}:{port}")
