@@ -1,7 +1,7 @@
 """Helpers for usage with `FastAPI <https://fastapi.tiangolo.com/>`_"""
 from fastapi import APIRouter, Depends, Response, Query, Request
 from fastapi.routing import APIRoute
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 from typing import List, Optional, Union, Callable
 
 from .content import (
