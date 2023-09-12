@@ -48,13 +48,6 @@ jobs:
       - name: pytest benchmark 📈
         run: invoke benchmark
 
-      - name: pytest tests h5py==2.9 🕶️
-        run: |
-          pip install h5py==2.9
-          pushd test/
-          invoke test
-          popd
-
       - name: sphinx build 🐪
         run: invoke doc
 
