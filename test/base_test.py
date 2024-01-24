@@ -133,12 +133,12 @@ class BaseTestEndpoints:
 
         assert content == {
             "attributes": [],
-            "filters": [{"id": 2, "name": "shuffle"}, {"id": 1, "name": "deflate"}],
             "chunks": [5, 5],
-            "name": "data",
             "dtype": "<f8",
+            "filters": [{"id": 2, "name": "shuffle"}, {"id": 1, "name": "deflate"}],
+            "kind": "dataset",
+            "name": "data",
             "shape": [10, 10],
-            "type": "dataset",
         }
 
     def test_meta_on_compound_dataset(self, server):
@@ -212,10 +212,10 @@ class BaseTestEndpoints:
         # Valid link is not resolved only if link resolution is 'none'.
         if resolve_links == LinkResolution.NONE:
             assert content == {
+                "kind": "external_link",
                 "name": "ext_link",
                 "target_file": "source.h5",
                 "target_path": "data",
-                "type": "external_link",
             }
         else:
             assert content == {
@@ -223,9 +223,9 @@ class BaseTestEndpoints:
                 "chunks": None,
                 "dtype": "<f8",
                 "filters": None,
+                "kind": "dataset",
                 "name": "ext_link",
                 "shape": [10],
-                "type": "dataset",
             }
 
     def test_stats_on_negative_scalar(self, server):
