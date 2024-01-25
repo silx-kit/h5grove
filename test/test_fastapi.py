@@ -1,4 +1,5 @@
 """Test fastapi_utils with fastapi testing"""
+
 import pathlib
 from typing import Callable
 from fastapi import FastAPI

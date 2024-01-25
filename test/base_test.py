@@ -1,4 +1,5 @@
 """Base class for testing with different servers"""
+
 import os
 import stat
 from typing import Generator

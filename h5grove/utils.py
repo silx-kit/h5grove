@@ -170,9 +170,9 @@ def get_type_metadata(type_id: h5py.h5t.TypeID) -> TypeMetadata:
 
     if isinstance(type_id, h5py.h5t.TypeEnumID):
         for i in range(0, type_id.get_nmembers()):
-            members[
-                type_id.get_member_name(i).decode("utf-8")
-            ] = type_id.get_member_value(i)
+            members[type_id.get_member_name(i).decode("utf-8")] = (
+                type_id.get_member_value(i)
+            )
 
         return {
             **base_metadata,
@@ -267,12 +267,14 @@ def get_array_stats(data: np.ndarray) -> Dict[str, Union[float, int, None]]:
     strict_positive_data = data[data > 0]
     positive_data = data[data >= 0]
     return {
-        "strict_positive_min": cast(np.min(strict_positive_data))
-        if strict_positive_data.size != 0
-        else None,
-        "positive_min": cast(np.min(positive_data))
-        if positive_data.size != 0
-        else None,
+        "strict_positive_min": (
+            cast(np.min(strict_positive_data))
+            if strict_positive_data.size != 0
+            else None
+        ),
+        "positive_min": (
+            cast(np.min(positive_data)) if positive_data.size != 0 else None
+        ),
         "min": cast(np.min(data)),
         "max": cast(np.max(data)),
         "mean": cast(np.mean(data)),

@@ -37,7 +37,7 @@ def test(c, verbose=False, keyword="", cov_lines=False):
     c.run(
         "pytest --benchmark-skip"
         + (" -vv" if verbose else "")
-        + ((" -k" + keyword) if keyword else "")
+        + (f" -k{keyword}" if keyword else "")
         + (" --cov-report term-missing" if cov_lines else "")
     )
 
