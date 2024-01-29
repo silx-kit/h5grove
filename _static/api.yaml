@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: 'H5Grove API'
   description: 'The API provided by h5grove example implementations.'
-  version: 1.3.0
+  version: 2.0.0b0
 
 servers:
   - url: http://{ip}:{port}/
@@ -270,50 +270,51 @@ components:
         mixed:
           description: Gets data[5, 0:10:2]
           value: [5, '0:10:2']
+
   schemas:
     # Metadata schemas
     attrMetadata:
       type: object
       description: Attribute metadata. Does not include the value.
       properties:
-        dtype:
-          $ref: '#/components/schemas/dtype'
         name:
           type: string
           example: 'attr1_name'
         shape:
           $ref: '#/components/schemas/shape'
+        type:
+          $ref: '#/components/schemas/type'
     entityMetadata:
       type: object
       properties:
+        kind:
+          enum: ['other']
+          type: string
         name:
           type: string
           example: 'entity_name'
-        type:
-          enum: ['other']
-          type: string
     softLinkMetadata:
       allOf:
         - $ref: '#/components/schemas/entityMetadata'
         - type: object
           properties:
+            kind:
+              enum: ['soft_link']
+              type: string
             target_path:
               type: string
               example: '/path/to/linked/entity'
-            type:
-              enum: ['soft_link']
-              type: string
     externalLinkMetadata:
       allOf:
         - $ref: '#/components/schemas/softLinkMetadata'
         - type: object
           properties:
-            target_file:
-              type: string
-            type:
+            kind:
               enum: ['external_link']
               type: string
               example: 'path/to/another/file.h5'
+            target_file:
+              type: string
     resolvedEntityMetadata:
       allOf:
         - $ref: '#/components/schemas/entityMetadata'
@@ -328,25 +329,28 @@ components:
         - $ref: '#/components/schemas/resolvedEntityMetadata'
         - type: object
           properties:
+            kind:
+              enum: ['dataset']
+              type: string
+            shape:
+              $ref: '#/components/schemas/shape'
+            type:
+              $ref: '#/components/schemas/type'
             chunks:
               $ref: '#/components/schemas/shape'
-            dtype:
-              $ref: '#/components/schemas/dtype'
             filters:
               type: array
               items:
                 $ref: '#/components/schemas/filterInfo'
               nullable: true
-            shape:
-              $ref: '#/components/schemas/shape'
-            type:
-              enum: ['dataset']
-              type: string
     groupMetadata:
       allOf:
         - $ref: '#/components/schemas/resolvedEntityMetadata'
         - type: object
           properties:
+            kind:
+              enum: ['group']
+              type: string
             children:
               type: array
               items:
@@ -356,18 +360,49 @@ components:
                   - $ref: '#/components/schemas/externalLinkMetadata'
                   - $ref: '#/components/schemas/resolvedEntityMetadata'
                   - $ref: '#/components/schemas/softLinkMetadata'
-            type:
-              enum: ['group']
-              type: string
     childGroupMetadata:
       allOf:
         - $ref: '#/components/schemas/resolvedEntityMetadata'
         - type: object
           properties:
-            type:
+            kind:
               enum: ['group']
               type: string
+
     # Other schemas
+    type:
+      type: object
+      properties:
+        class:
+          type: integer
+        dtype:
+          $ref: '#/components/schemas/dtype'
+        size:
+          type: integer
+        order:
+          type: integer
+        sign:
+          type: integer
+        cset:
+          type: integer
+        vlen:
+          type: boolean
+        tag:
+          type: string
+        dims:
+          $ref: '#/components/schemas/shape'
+        dims:
+          $ref: '#/components/schemas/shape'
+        members:
+          oneOf:
+            - type: object
+              additionalProperties:
+                $ref: '#/components/schemas/type'
+            - type: object
+              additionalProperties:
+                type: integer
+        base:
+          $ref: '#/components/schemas/type'
     dtype:
       oneOf:
         - type: 'string'
