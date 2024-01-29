@@ -115,7 +115,7 @@ paths:
                   - $ref: '#/components/schemas/groupMetadata'
                   - $ref: '#/components/schemas/softLinkMetadata'
                 discriminator:
-                  propertyName: type
+                  propertyName: kind
                   mapping:
                     dataset: '#/components/schemas/datasetMetadata'
                     external_link: '#/components/schemas/externalLinkMetadata'
