@@ -391,8 +391,6 @@ components:
           type: string
         dims:
           $ref: '#/components/schemas/shape'
-        dims:
-          $ref: '#/components/schemas/shape'
         members:
           oneOf:
             - type: object
