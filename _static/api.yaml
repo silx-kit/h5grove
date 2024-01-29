@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: 'H5Grove API'
   description: 'The API provided by h5grove example implementations.'
-  version: 2.0.0b0
+  version: 2.0.0b1
 
 servers:
   - url: http://{ip}:{port}/
@@ -389,8 +389,6 @@ components:
           type: boolean
         tag:
           type: string
-        dims:
-          $ref: '#/components/schemas/shape'
         dims:
           $ref: '#/components/schemas/shape'
         members:
