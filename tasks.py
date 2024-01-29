@@ -32,9 +32,14 @@ def lint(c):
 
 
 @task
-def test(c):
+def test(c, verbose=False, keyword="", cov_lines=False):
     """Test without benchmark"""
-    c.run("pytest --benchmark-skip")
+    c.run(
+        "pytest --benchmark-skip"
+        + (" -vv" if verbose else "")
+        + (f" -k{keyword}" if keyword else "")
+        + (" --cov-report term-missing" if cov_lines else "")
+    )
 
 
 @task

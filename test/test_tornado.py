@@ -1,4 +1,5 @@
 """Test tornado_utils using pytest-tornado"""
+
 import pathlib
 from typing import Callable
 import pytest

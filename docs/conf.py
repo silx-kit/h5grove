@@ -22,7 +22,7 @@ import h5grove  # noqa
 # -- Project information -----------------------------------------------------
 
 project = "h5grove"
-copyright = "2021, ESRF"
+copyright = "2024, ESRF"
 author = "ESRF"
 
 # The full version, including alpha/beta/rc tags

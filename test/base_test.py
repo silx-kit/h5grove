@@ -1,4 +1,5 @@
 """Base class for testing with different servers"""
+
 import os
 import stat
 from typing import Generator
@@ -85,7 +86,7 @@ class BaseTestEndpoints:
             h5file[tested_h5entity_path] = data
 
         response = server.get(
-            f"/data/?{urlencode({ 'file': filename, 'path': tested_h5entity_path, 'format': format_arg, 'dtype': dtype_arg })}"
+            f"/data/?{urlencode({'file': filename, 'path': tested_h5entity_path, 'format': format_arg, 'dtype': dtype_arg})}"
         )
 
         retrieved_data = decode_array_response(
@@ -133,12 +134,12 @@ class BaseTestEndpoints:
 
         assert content == {
             "attributes": [],
-            "filters": [{"id": 2, "name": "shuffle"}, {"id": 1, "name": "deflate"}],
             "chunks": [5, 5],
+            "filters": [{"id": 2, "name": "shuffle"}, {"id": 1, "name": "deflate"}],
+            "kind": "dataset",
             "name": "data",
-            "dtype": "<f8",
             "shape": [10, 10],
-            "type": "dataset",
+            "type": {"class": 1, "dtype": "<f8", "size": 8, "order": 0},
         }
 
     def test_meta_on_compound_dataset(self, server):
@@ -161,11 +162,129 @@ class BaseTestEndpoints:
         assert content == {
             "attributes": [],
             "chunks": None,
-            "dtype": {"name": "|S10", "age": "<i4", "weight": "<f4"},
             "filters": None,
+            "kind": "dataset",
             "name": "dogs",
             "shape": [2],
-            "type": "dataset",
+            "type": {
+                "class": 6,
+                "dtype": {"age": "<i4", "name": "|S10", "weight": "<f4"},
+                "size": 18,
+                "members": {
+                    "age": {
+                        "class": 0,
+                        "dtype": "<i4",
+                        "size": 4,
+                        "order": 0,
+                        "sign": 1,
+                    },
+                    "name": {
+                        "class": 3,
+                        "dtype": "|S10",
+                        "size": 10,
+                        "cset": 0,
+                        "vlen": False,
+                    },
+                    "weight": {"class": 1, "dtype": "<f4", "size": 4, "order": 0},
+                },
+            },
+        }
+
+    def test_meta_on_compound_dataset_with_advanced_types(self, server):
+        """Test /meta/ endpoint on compound dataset with advanced types"""
+        filename = "test.h5"
+        tested_h5entity_path = "/foo"
+
+        with h5py.File(server.served_directory / filename, mode="w") as h5file:
+            opaque = np.void(b"\x00\x11\x22")
+
+            for_ref = h5file.create_dataset("/bar", data=0)
+
+            h5file.create_dataset(
+                tested_h5entity_path,
+                data=np.array(
+                    [
+                        (
+                            opaque,
+                            42,
+                            np.array(["bar"], h5py.string_dtype()),
+                            np.array([0], np.uint64),
+                            for_ref.ref,
+                        )
+                    ],
+                    dtype=[
+                        ("opaque", opaque.dtype),
+                        ("enum", h5py.enum_dtype({"H2G2": 42})),
+                        ("arr", h5py.string_dtype(), (1,)),
+                        ("vlen", h5py.vlen_dtype(np.uint64)),
+                        ("ref", h5py.ref_dtype),
+                    ],
+                ),
+            )
+
+        response = server.get(f"/meta/?file={filename}&path={tested_h5entity_path}")
+        content = decode_response(response)
+
+        assert content == {
+            "attributes": [],
+            "chunks": None,
+            "filters": None,
+            "kind": "dataset",
+            "name": "foo",
+            "shape": [1],
+            "type": {
+                "class": 6,
+                "dtype": {
+                    "opaque": "|V3",
+                    "enum": "|u1",
+                    "arr": "|V8",
+                    "vlen": "|O",
+                    "ref": "|O",
+                },
+                "size": 36,
+                "members": {
+                    "opaque": {"class": 5, "dtype": "|V3", "size": 3, "tag": ""},
+                    "enum": {
+                        "class": 8,
+                        "dtype": "|u1",
+                        "size": 1,
+                        "members": {"H2G2": 42},
+                        "base": {
+                            "class": 0,
+                            "dtype": "|u1",
+                            "size": 1,
+                            "order": 0,
+                            "sign": 0,
+                        },
+                    },
+                    "arr": {
+                        "class": 10,
+                        "dtype": "|V8",
+                        "size": 8,
+                        "dims": [1],
+                        "base": {
+                            "class": 3,
+                            "dtype": "|O",
+                            "size": 8,
+                            "cset": 1,
+                            "vlen": True,
+                        },
+                    },
+                    "vlen": {
+                        "class": 9,
+                        "dtype": "|O",
+                        "size": 16,
+                        "base": {
+                            "class": 0,
+                            "dtype": "<u8",
+                            "order": 0,
+                            "sign": 0,
+                            "size": 8,
+                        },
+                    },
+                    "ref": {"class": 7, "dtype": "|O", "size": 8},
+                },
+            },
         }
 
     def test_meta_on_group(self, server):
@@ -212,20 +331,20 @@ class BaseTestEndpoints:
         # Valid link is not resolved only if link resolution is 'none'.
         if resolve_links == LinkResolution.NONE:
             assert content == {
+                "kind": "external_link",
                 "name": "ext_link",
                 "target_file": "source.h5",
                 "target_path": "data",
-                "type": "external_link",
             }
         else:
             assert content == {
                 "attributes": [],
                 "chunks": None,
-                "dtype": "<f8",
                 "filters": None,
+                "kind": "dataset",
                 "name": "ext_link",
                 "shape": [10],
-                "type": "dataset",
+                "type": {"class": 1, "dtype": "<f8", "order": 0, "size": 8},
             }
 
     def test_stats_on_negative_scalar(self, server):
@@ -358,9 +477,9 @@ class BaseTestEndpoints:
             response = server.get(url)
             content = decode_response(response)
             assert content == {
+                "kind": "soft_link",
                 "name": "link",
                 "target_path": "not_an_entity",
-                "type": "soft_link",
             }
 
     def test_403_on_file_without_read_permission(self, server):

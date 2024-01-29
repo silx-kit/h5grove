@@ -6,7 +6,7 @@
 pip install -e .[dev]
 ```
 
-will install `h5grove` in editable mode with all the linting/formating/testing packages. This will also [flask](https://flask.palletsprojects.com/en/) and [tornado](https://www.tornadoweb.org/en/stable/) packages as they are needed to build the documentation.
+will install `h5grove` in editable mode with all the linting/formating/testing packages. This will also install the [fastapi](https://fastapi.tiangolo.com/), [flask](https://flask.palletsprojects.com/en/) and [tornado](https://www.tornadoweb.org/en/stable/) packages as they are needed to build the documentation and test the project.
 
 ## Linting
 

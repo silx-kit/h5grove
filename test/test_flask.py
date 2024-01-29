@@ -1,4 +1,5 @@
 """Test flask_utils blueprint with Flask testing"""
+
 import pathlib
 from typing import Callable
 from flask import Flask

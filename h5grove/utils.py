@@ -5,7 +5,7 @@ from os.path import basename
 import numpy as np
 from typing import Any, Callable, Dict, List, Optional, Tuple, TypeVar, Union
 
-from .models import H5pyEntity, LinkResolution, Selection, StrDtype
+from .models import H5pyEntity, LinkResolution, Selection, StrDtype, TypeMetadata
 
 
 class NotFoundError(Exception):
@@ -43,9 +43,9 @@ def attr_metadata(entity_attrs: h5py.AttributeManager, attr_name: str) -> dict:
     attrId = get_attr_id(entity_attrs, attr_name)
 
     return {
-        "dtype": stringify_dtype(attrId.dtype),
         "name": attr_name,
         "shape": attrId.shape,
+        "type": get_type_metadata(attrId.get_type()),
     }
 
 
@@ -123,7 +123,74 @@ def parse_slice_member(slice_member: str) -> Union[slice, int]:
 
 
 def sorted_dict(*args: Tuple[str, Any]):
-    return dict(sorted(args))
+    return dict(sorted(args, key=lambda entry: entry[0]))
+
+
+def get_type_metadata(type_id: h5py.h5t.TypeID) -> TypeMetadata:
+    base_metadata: TypeMetadata = {
+        "class": type_id.get_class(),
+        "dtype": stringify_dtype(type_id.dtype),
+        "size": type_id.get_size(),
+    }
+    members = {}
+
+    if isinstance(type_id, h5py.h5t.TypeIntegerID):
+        return {
+            **base_metadata,
+            "order": type_id.get_order(),
+            "sign": type_id.get_sign(),
+        }
+
+    if isinstance(type_id, h5py.h5t.TypeFloatID):
+        return {
+            **base_metadata,
+            "order": type_id.get_order(),
+        }
+
+    if isinstance(type_id, h5py.h5t.TypeStringID):
+        return {
+            **base_metadata,
+            "cset": type_id.get_cset(),
+            "vlen": type_id.is_variable_str(),
+        }
+
+    if isinstance(type_id, h5py.h5t.TypeBitfieldID):
+        return {**base_metadata, "order": type_id.get_order()}
+
+    if isinstance(type_id, h5py.h5t.TypeOpaqueID):
+        return {**base_metadata, "tag": type_id.get_tag()}
+
+    if isinstance(type_id, h5py.h5t.TypeCompoundID):
+        for i in range(0, type_id.get_nmembers()):
+            members[type_id.get_member_name(i).decode("utf-8")] = get_type_metadata(
+                type_id.get_member_type(i)
+            )
+
+        return {**base_metadata, "members": members}
+
+    if isinstance(type_id, h5py.h5t.TypeEnumID):
+        for i in range(0, type_id.get_nmembers()):
+            members[type_id.get_member_name(i).decode("utf-8")] = (
+                type_id.get_member_value(i)
+            )
+
+        return {
+            **base_metadata,
+            "members": members,
+            "base": get_type_metadata(type_id.get_super()),
+        }
+
+    if isinstance(type_id, h5py.h5t.TypeVlenID):
+        return {**base_metadata, "base": get_type_metadata(type_id.get_super())}
+
+    if isinstance(type_id, h5py.h5t.TypeArrayID):
+        return {
+            **base_metadata,
+            "dims": type_id.get_array_dims(),
+            "base": get_type_metadata(type_id.get_super()),
+        }
+
+    return base_metadata
 
 
 def _sanitize_dtype(dtype: np.dtype) -> np.dtype:
@@ -200,12 +267,14 @@ def get_array_stats(data: np.ndarray) -> Dict[str, Union[float, int, None]]:
     strict_positive_data = data[data > 0]
     positive_data = data[data >= 0]
     return {
-        "strict_positive_min": cast(np.min(strict_positive_data))
-        if strict_positive_data.size != 0
-        else None,
-        "positive_min": cast(np.min(positive_data))
-        if positive_data.size != 0
-        else None,
+        "strict_positive_min": (
+            cast(np.min(strict_positive_data))
+            if strict_positive_data.size != 0
+            else None
+        ),
+        "positive_min": (
+            cast(np.min(positive_data)) if positive_data.size != 0 else None
+        ),
         "min": cast(np.min(data)),
         "max": cast(np.max(data)),
         "mean": cast(np.mean(data)),

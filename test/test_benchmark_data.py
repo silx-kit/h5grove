@@ -1,4 +1,5 @@
 """Benchmark data requests with server apps in example/ folder"""
+
 import pathlib
 from typing import Generator
 from urllib.parse import urlencode
