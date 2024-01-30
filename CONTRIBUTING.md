@@ -79,10 +79,14 @@ The relevant files are in `docs/`:
 - `index.md`: Landing documentation page. It includes the `README.md`.
 - `reference.md`: Generates API documentation for `content` and `encoders` modules using [sphinx.ext.autodoc](https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html).
 
-The documentation can be build locally using
+To build the documentation in development, with live reload at http://127.0.0.1:8000/, run:
 
 ```
 invoke doc
 ```
 
-The HTML pages will be generated in `_build`.
+To build the documentation once into the `_build` folder, run:
+
+```
+invoke docbuild
+```

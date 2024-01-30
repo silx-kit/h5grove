@@ -43,8 +43,16 @@ def test(c, verbose=False, keyword="", cov_lines=False):
 
 
 @task
-def doc(c):
+def docbuild(c):
     """Sphinx build"""
     result = c.run(f"{sys.executable} -m sphinx -W -b html docs _build")
+    if result.exited != 0:
+        raise SystemExit(result.exited)
+
+
+@task
+def doc(c):
+    """Sphinx autobuild"""
+    result = c.run(f"{sys.executable} -m sphinx_autobuild -W -b html docs _build")
     if result.exited != 0:
         raise SystemExit(result.exited)
