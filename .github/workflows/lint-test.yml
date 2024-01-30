@@ -49,7 +49,7 @@ jobs:
         run: invoke benchmark
 
       - name: sphinx build 🐪
-        run: invoke doc
+        run: invoke docbuild
 
       - name: check-manifest 📰
         run: check-manifest
