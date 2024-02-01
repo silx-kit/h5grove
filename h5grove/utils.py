@@ -194,27 +194,21 @@ def get_type_metadata(type_id: h5py.h5t.TypeID) -> TypeMetadata:
 
 
 def _sanitize_dtype(dtype: np.dtype) -> np.dtype:
-    """Convert dtype to a dtype supported by js-numpy-parser.
+    """Sanitize numpy dtype to one with a matching typed array in modern JavaScript.
 
-    See https://github.com/ludwigschubert/js-numpy-parser
-
-    :raises ValueError: For unsupported array dtype
+    :raises ValueError: If trying to sanitize a non-numeric numpy dtype
     """
     if dtype.kind not in ("f", "i", "u"):
-        raise ValueError("Unsupported array type")
+        raise ValueError(f"Unsupported numpy dtype `{dtype}`. Expected numeric dtype.")
 
     # Convert to little endian
     result = dtype.newbyteorder("<")
 
-    if result.kind == "i" and result.itemsize > 4:
-        return np.dtype("<i4")  # int64 -> int32
-
-    if result.kind == "u" and result.itemsize > 4:
-        return np.dtype("<u4")  # uint64 -> uint32
-
+    # Convert float16 to float32
     if result.kind == "f" and result.itemsize < 4:
         return np.dtype("<f4")
 
+    # Convert float128 to float64 (unavoidable loss of precision)
     if result.kind == "f" and result.itemsize > 8:
         return np.dtype("<f8")
 
@@ -230,16 +224,17 @@ def convert(data: T, dtype: Optional[str] = "origin") -> T:
     :param data: nD array or scalar to convert
     :param dtype: Data type conversion query parameter
         - `origin` (default): No conversion
-        - `safe`: Convert to a type supported by JS typedarray (https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/TypedArray)
+        - `safe`: Convert to type with matching JS TypedArray (https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/TypedArray)
+
+    :raises QueryArgumentError: When using `dtype=safe` to convert non-numeric data
+    :raises QueryArgumentError: For unsupported `dtype` argument
     """
     if dtype in ("origin", None):
         return data
 
     if dtype == "safe":
         if not is_numeric_data(data):
-            raise QueryArgumentError(
-                f"Unsupported dtype {dtype} for non-numeric content"
-            )
+            raise QueryArgumentError(f"Unsupported dtype {dtype} for non-numeric data")
         return data.astype(_sanitize_dtype(data.dtype), order="C", copy=False)
 
     raise QueryArgumentError(f"Unsupported dtype {dtype}")
