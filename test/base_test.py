@@ -412,8 +412,11 @@ class BaseTestEndpoints:
 
         with h5py.File(server.served_directory / filename, "w") as h5file:
             h5file["tree/branch/fruit"] = "apple"
+            h5file["tree/branch/fruit_2"] = h5py.SoftLink("fruit")
             h5file["tree/other_branch"] = 5
-            h5file["tree_2"] = "birch"
+            h5file["tree_2/branch"] = h5py.SoftLink("/tree/branch")
+            h5file["tree_2/trunk"] = "birch"
+            h5file["tree_3"] = h5py.ExternalLink("test2.h5", "/another_tree")
 
         response = server.get(f"/paths/?file={filename}")
         retrieved_paths = decode_response(response)
@@ -423,8 +426,12 @@ class BaseTestEndpoints:
             "/tree",
             "/tree/branch",
             "/tree/branch/fruit",
+            "/tree/branch/fruit_2",
             "/tree/other_branch",
             "/tree_2",
+            "/tree_2/branch",
+            "/tree_2/trunk",
+            "/tree_3",
         ]
 
         response = server.get(f"/paths/?file={filename}&path=/tree/branch")
@@ -433,6 +440,7 @@ class BaseTestEndpoints:
         assert retrieved_paths == [
             "/tree/branch",
             "/tree/branch/fruit",
+            "/tree/branch/fruit_2",
         ]
 
     def test_404_on_non_existing_path(self, server):
