@@ -320,8 +320,8 @@ def get_list_of_paths(
 
     names = []
 
-    def get_path(name: str):
-        full_path = hdf_path_join(base_path, name)
+    def get_path(name: bytes):
+        full_path = hdf_path_join(base_path, name.decode())
         content = create_content(f, full_path, resolve_links)
         names.append(content.path)
 
@@ -329,7 +329,7 @@ def get_list_of_paths(
         base_content = create_content(f, base_path, resolve_links)
         assert isinstance(base_content, GroupContent)
         names.append(base_content.path)
-        base_content._h5py_entity.visit(get_path)
+        base_content._h5py_entity.id.links.visit(get_path)
         yield names
     except NotFoundError as e:
         raise create_error(404, str(e))
