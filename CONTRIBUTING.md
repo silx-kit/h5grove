@@ -31,8 +31,14 @@ Tests are handled with [pytest](https://docs.pytest.org/en/stable/index.html). T
 Once `h5grove` is installed in editable mode, run the tests with
 
 ```
-invoke test
+invoke test [--options]
 ```
+
+Available options (cf. `invoke --help test`):
+
+- `-c`, `--cov-lines`: display line numbers in coverage report
+- `-k [keyword]`, `--keyword [keyword]`: filter tests by keyword
+- `-v`, `--verbose`: enable verbose test output
 
 ### Benchmarks
 
