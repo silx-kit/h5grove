@@ -111,10 +111,6 @@ def encode(content: Any, encoding: Optional[str] = "json") -> Response:
         )
 
     content_array = np.array(content, copy=False)
-    if not is_numeric_data(content_array):
-        raise QueryArgumentError(
-            f"Unsupported encoding {encoding} for non-numeric content"
-        )
 
     if encoding == "bin":
         return Response(
@@ -122,6 +118,11 @@ def encode(content: Any, encoding: Optional[str] = "json") -> Response:
             headers={
                 "Content-Type": "application/octet-stream",
             },
+        )
+
+    if not is_numeric_data(content_array):
+        raise QueryArgumentError(
+            f"Unsupported encoding {encoding} for non-numeric content"
         )
 
     if encoding == "csv":

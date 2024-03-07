@@ -31,7 +31,7 @@ Tests are handled with [pytest](https://docs.pytest.org/en/stable/index.html). T
 Once `h5grove` is installed in editable mode, run the tests with
 
 ```
-invoke test [--options]
+invoke test
 ```
 
 Available options (cf. `invoke --help test`):
