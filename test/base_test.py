@@ -113,6 +113,25 @@ class BaseTestEndpoints:
 
         assert retrieved_data - data[100, 0] < 1e-8
 
+    def test_data_on_opaque(self, server):
+        """Test /data/ endpoint on opaque dataset with format=bin"""
+        tested_h5entity_path = "/opaque"
+        data = np.void(b"\x00")
+
+        filename = "test.h5"
+        with h5py.File(server.served_directory / filename, mode="w") as h5file:
+            h5file[tested_h5entity_path] = data
+
+        response = server.get(
+            f"/data/?{urlencode({'file': filename, 'path': tested_h5entity_path, 'format': 'bin'})}"
+        )
+
+        content_type = response.find_header_value("content-type")
+        assert content_type == "application/octet-stream"
+
+        retrieved_data = np.void(response.content)
+        assert np.array_equal(retrieved_data, data)
+
     def test_meta_on_chunked_compressed_dataset(self, server):
         """Test /meta/ endpoint on a chunked and compressed dataset"""
         filename = "test.h5"
