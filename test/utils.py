@@ -3,6 +3,8 @@ import json
 import numpy as np
 from typing import List, NamedTuple, Tuple
 
+import tifffile
+
 from h5grove.utils import hdf_path_join
 
 
@@ -40,6 +42,12 @@ def decode_response(response: Response, format: str = "json"):
     if format == "npy":
         assert content_type == "application/octet-stream"
         return np.load(io.BytesIO(response.content))
+    if format == "csv":
+        assert content_type == "text/csv"
+        return np.genfromtxt(response.content.splitlines(), delimiter=",")
+    if format == "tiff":
+        assert content_type == "image/tiff"
+        return tifffile.imread(io.BytesIO(response.content))
     raise ValueError(f"Unsupported format: {format}")
 
 
@@ -47,7 +55,7 @@ def decode_array_response(
     response: Response,
     format: str,
     dtype: str,
-    shape: Tuple[int],
+    shape: Tuple[int, ...],
 ) -> np.ndarray:
     """Decode data array response content according to given information"""
     content_type = response.find_header_value("content-type")

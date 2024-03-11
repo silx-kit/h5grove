@@ -52,10 +52,9 @@ class BaseTestEndpoints:
         retrieved_attributes = decode_response(response)
         assert retrieved_attributes == nx_attributes
 
-    @pytest.mark.parametrize("format_arg", ("json", "npy"))
-    @pytest.mark.parametrize("flatten", (False, True))
-    def test_data_on_array(self, server, format_arg, flatten):
-        """Test /data/ endpoint on array dataset in a group"""
+    @pytest.mark.parametrize("format_arg", ("json", "bin", "npy", "csv", "tiff"))
+    def test_data_on_array_with_format(self, server, format_arg):
+        """Test /data/ endpoint on array dataset"""
         # Test condition
         tested_h5entity_path = "/entry/image"
         data = np.random.random((128, 128))
@@ -65,40 +64,40 @@ class BaseTestEndpoints:
             h5file[tested_h5entity_path] = data
 
         response = server.get(
-            f"/data/?{urlencode({'file': filename, 'path': tested_h5entity_path, 'format': format_arg, 'flatten': flatten})}"
+            f"/data/?{urlencode({'file': filename, 'path': tested_h5entity_path, 'format': format_arg})}"
         )
-        retrieved_data = np.array(decode_response(response, format_arg))
-
-        assert np.array_equal(retrieved_data, data.flatten() if flatten else data)
-
-    @pytest.mark.parametrize("format_arg", ("npy", "bin"))
-    @pytest.mark.parametrize("dtype_arg", ("origin", "safe"))
-    def test_data_on_array_with_dtype(self, server, format_arg, dtype_arg):
-        """Test /data/ endpoint on array dataset with dtype"""
-        # Test condition
-        tested_h5entity_path = "/entry/image"
-        data = np.random.random((128, 128)).astype(">f2")
-        # No Float16Array in JS => converted to float32
-        ref_dtype = "<f4" if dtype_arg == "safe" else ">f2"
-
-        filename = "test.h5"
-        with h5py.File(server.served_directory / filename, mode="w") as h5file:
-            h5file[tested_h5entity_path] = data
-
-        response = server.get(
-            f"/data/?{urlencode({'file': filename, 'path': tested_h5entity_path, 'format': format_arg, 'dtype': dtype_arg})}"
-        )
-
         retrieved_data = decode_array_response(
-            response, format_arg, ref_dtype, data.shape
+            response, format_arg, data.dtype.str, data.shape
         )
 
         assert np.array_equal(retrieved_data, data)
 
+    @pytest.mark.parametrize("format_arg", ("npy", "bin"))
+    def test_data_on_array_with_dtype_safe(
+        self,
+        server,
+        format_arg,
+    ):
+        """Test /data/ endpoint on array dataset with dtype=safe"""
+        # Test condition
+        tested_h5entity_path = "/entry/image"
+        data = np.random.random((128, 128)).astype(">f2")
+        # No Float16Array in JS => converted to float32
+
+        filename = "test.h5"
+        with h5py.File(server.served_directory / filename, mode="w") as h5file:
+            h5file[tested_h5entity_path] = data
+
+        response = server.get(
+            f"/data/?{urlencode({'file': filename, 'path': tested_h5entity_path, 'format': format_arg, 'dtype': 'safe'})}"
+        )
+
+        retrieved_data = decode_array_response(response, format_arg, "<f4", data.shape)
+        assert np.array_equal(retrieved_data, data)
+
     @pytest.mark.parametrize("format_arg", ("json", "npy"))
-    @pytest.mark.parametrize("flatten", (False, True))
-    def test_data_on_slice(self, server, format_arg, flatten):
-        """Test /data/ endpoint on array dataset in a group"""
+    def test_data_on_slice_with_format_and_flatten(self, server, format_arg):
+        """Test /data/ endpoint on array dataset with flatten"""
         # Test condition
         tested_h5entity_path = "/entry/image"
         data = np.random.random((128, 128))
@@ -108,7 +107,7 @@ class BaseTestEndpoints:
             h5file[tested_h5entity_path] = data
 
         response = server.get(
-            f"/data/?{urlencode({'file': filename, 'path': tested_h5entity_path, 'selection': '100,0', 'format': format_arg, 'flatten': flatten})}"
+            f"/data/?{urlencode({'file': filename, 'path': tested_h5entity_path, 'selection': '100,0', 'format': format_arg, 'flatten': True})}"
         )
         retrieved_data = np.array(decode_response(response, format_arg))
 
@@ -516,6 +515,21 @@ class BaseTestEndpoints:
             h5file[path] = "I am not numeric"
 
         server.assert_error_code(f"/data/?file={filename}&path={path}&dtype=safe", 422)
+
+    @pytest.mark.parametrize(
+        "format_arg",
+        ("csv", "npy", "tiff"),
+    )
+    def test_422_on_format_incompatible_with_non_numeric_data(self, server, format_arg):
+        filename = "test.h5"
+        path = "/data"
+
+        with h5py.File(server.served_directory / filename, mode="w") as h5file:
+            h5file[path] = "I am not numeric"
+
+        server.assert_error_code(
+            f"/data/?file={filename}&path={path}&format={format_arg}", 422
+        )
 
     def test_422_on_invalid_query_arg(self, server):
         filename = "test.h5"
