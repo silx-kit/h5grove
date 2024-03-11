@@ -4,6 +4,7 @@ import numpy as np
 import orjson
 import h5py
 import tifffile
+import numbers
 
 from .utils import QueryArgumentError, is_numeric_data
 
@@ -23,10 +24,10 @@ def orjson_default(o: Any) -> Union[list, float, str, None]:
     if isinstance(o, np.number) and o.dtype.kind == "f" and o.itemsize > 8:
         # Force conversion of float >64bits to native float even if it means losing precision
         return float(o)
+    if isinstance(o, numbers.Complex):
+        return [o.real, o.imag]
     if isinstance(o, (np.generic, np.ndarray)):
         return o.tolist()
-    if isinstance(o, complex):
-        return [o.real, o.imag]
     if isinstance(o, h5py.Empty):
         return None
     if isinstance(o, bytes):
