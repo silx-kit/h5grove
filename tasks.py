@@ -31,7 +31,7 @@ def lint(c):
     mypy(c)
 
 
-@task
+@task(optional=["verbose", "keyword", "cov-lines"])
 def test(c, verbose=False, keyword="", cov_lines=False):
     """Test without benchmark"""
     c.run(

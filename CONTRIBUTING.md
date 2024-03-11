@@ -34,6 +34,12 @@ Once `h5grove` is installed in editable mode, run the tests with
 invoke test
 ```
 
+Available options (cf. `invoke --help test`):
+
+- `-c`, `--cov-lines`: display line numbers in coverage report
+- `-k [keyword]`, `--keyword [keyword]`: filter tests by keyword
+- `-v`, `--verbose`: enable verbose test output
+
 ### Benchmarks
 
 Benchmarks of different formats (`json`, `.npy`) and web server frameworks (`flask`, `tornado`) are run as part of the tests. Those benchmarks are based on [pytest-benchmark](https://pytest-benchmark.readthedocs.io/en/latest/).
