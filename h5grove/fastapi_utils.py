@@ -16,6 +16,7 @@ from .encoders import encode
 __all__ = [
     "router",
     "settings",
+    "get_root",
     "get_attr",
     "get_data",
     "get_meta",
@@ -73,6 +74,12 @@ async def h5grove_exception_handler(request: Request, exc: H5GroveException):
 
 async def add_base_path(file):
     return f"{settings.base_dir}/{file}" if settings.base_dir else file
+
+
+@router.api_route("/", methods=["GET", "HEAD"])
+async def get_root():
+    """`/` endpoint handler to check server status"""
+    return Response("ok")
 
 
 @router.get("/attr/")

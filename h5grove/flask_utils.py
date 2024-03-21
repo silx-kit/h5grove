@@ -17,6 +17,7 @@ from .utils import parse_bool_arg
 
 
 __all__ = [
+    "root_route",
     "attr_route",
     "data_route",
     "meta_route",
@@ -49,6 +50,11 @@ def create_error(status_code: int, message: str):
     return HTTPException(
         response=make_encoded_response({"message": message}, status=status_code)
     )
+
+
+def root_route():
+    """`/` endpoint handler to check server status"""
+    return "ok"
 
 
 def attr_route():
@@ -110,6 +116,7 @@ def stats_route():
 
 
 URL_RULES = {
+    "/": root_route,
     "/attr/": attr_route,
     "/data/": data_route,
     "/meta/": meta_route,

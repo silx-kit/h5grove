@@ -16,6 +16,7 @@ from .encoders import Response, encode
 from .utils import parse_bool_arg
 
 __all__ = [
+    "RootHandler",
     "BaseHandler",
     "AttributeHandler",
     "DataHandler",
@@ -69,6 +70,16 @@ class BaseHandler(RequestHandler):
         self.finish({"message": self._reason})
 
 
+class RootHandler(BaseHandler):
+    """`/` endpoint handler to check server status"""
+
+    def get(self):
+        self.finish("ok")
+
+    def head(self):
+        self.finish()
+
+
 class ContentHandler(BaseHandler):
     def get_response(
         self, full_file_path: str, path: Optional[str], resolve_links: Optional[str]
@@ -85,7 +96,7 @@ class ContentHandler(BaseHandler):
 
 
 class AttributeHandler(ContentHandler):
-    """/attr/ endpoint handler"""
+    """`/attr/` endpoint handler"""
 
     def get_content_response(self, content: EntityContent) -> Response:
         assert isinstance(content, ResolvedEntityContent)
@@ -96,7 +107,7 @@ class AttributeHandler(ContentHandler):
 
 
 class DataHandler(ContentHandler):
-    """/data/ endpoint handler"""
+    """`/data/` endpoint handler"""
 
     def get_content_response(self, content: EntityContent) -> Response:
         dtype = self.get_query_argument("dtype", None)
@@ -112,14 +123,14 @@ class DataHandler(ContentHandler):
 
 
 class MetadataHandler(ContentHandler):
-    """/meta/ endpoint handler"""
+    """`/meta/` endpoint handler"""
 
     def get_content_response(self, content: EntityContent) -> Response:
         return encode(content.metadata())
 
 
 class StatisticsHandler(ContentHandler):
-    """/stats/ endpoint handler"""
+    """`/stats/` endpoint handler"""
 
     def get_content_response(self, content: EntityContent) -> Response:
         selection = self.get_query_argument("selection", None)
@@ -140,7 +151,7 @@ class PathsHandler(BaseHandler):
 
 # TODO: Setting the return type raises mypy errors
 def get_handlers(base_dir: Optional[str], allow_origin: Optional[str] = None):
-    """Build h5grove handlers (`/attr`, `/data`, `/meta` and `/stats`).
+    """Build h5grove handlers (`/`, `/attr/`, `/data/`, `/meta/` and `/stats/`).
 
     :param base_dir: Base directory from which the HDF5 files will be served
     :param allow_origin: Allowed origins for CORS
@@ -148,6 +159,7 @@ def get_handlers(base_dir: Optional[str], allow_origin: Optional[str] = None):
     """
     init_args = {"base_dir": base_dir, "allow_origin": allow_origin}
     return [
+        (r"/", RootHandler, init_args),
         (r"/attr/.*", AttributeHandler, init_args),
         (r"/data/.*", DataHandler, init_args),
         (r"/meta/.*", MetadataHandler, init_args),
