@@ -22,6 +22,11 @@ class BaseTestEndpoints:
         """Override in subclass with a fixture providing a :class:`BaseServer`"""
         raise NotImplementedError()
 
+    def test_ping(self, server):
+        """Test / endpoint used for checking server status"""
+        get_response = server.get("/")
+        assert get_response.content == b"ok"
+
     def test_attr_on_root(self, server):
         """Test /attr/ endpoint on root group"""
         # Test condition
