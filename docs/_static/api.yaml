@@ -385,6 +385,8 @@ components:
           type: integer
         cset:
           type: integer
+        strpad:
+          type: integer
         vlen:
           type: boolean
         tag:

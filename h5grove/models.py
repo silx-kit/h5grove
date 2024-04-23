@@ -31,6 +31,7 @@ TypeMetadata = TypedDict(
         "order": int,  # int, float, bitfield
         "sign": int,  # int
         "cset": int,  # string
+        "strpad": int,  # string
         "vlen": bool,  # string
         "tag": str,  # opaque
         "dims": Tuple[int, ...],  # array

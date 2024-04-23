@@ -151,6 +151,7 @@ def get_type_metadata(type_id: h5py.h5t.TypeID) -> TypeMetadata:
         return {
             **base_metadata,
             "cset": type_id.get_cset(),
+            "strpad": type_id.get_strpad(),
             "vlen": type_id.is_variable_str(),
         }
 
