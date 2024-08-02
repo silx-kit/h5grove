@@ -190,7 +190,7 @@ class DatasetContent(ResolvedEntityContent[h5py.Dataset]):
         return get_array_stats(data)
 
     def _get_finite_data(self, selection: Selection) -> np.ndarray:
-        data = np.array(self.data(selection), copy=False)  # So it works with scalars
+        data = np.asarray(self.data(selection))  # So it works with scalars
 
         if not np.issubdtype(data.dtype, np.floating):
             return data

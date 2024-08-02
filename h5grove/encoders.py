@@ -111,7 +111,7 @@ def encode(content: Any, encoding: Optional[str] = "json") -> Response:
             headers={"Content-Type": "application/json"},
         )
 
-    content_array = np.array(content, copy=False)
+    content_array = np.asarray(content)
 
     if encoding == "bin":
         return Response(
