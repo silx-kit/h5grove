@@ -77,6 +77,27 @@ class BaseTestEndpoints:
 
         assert np.array_equal(retrieved_data, data)
 
+    # TODO: What should we do for csv, tiff
+    @pytest.mark.parametrize("format_arg", ("json", "bin", "npy"))
+    def test_data_on_scalar_with_format(self, server, format_arg):
+        """Test /data/ endpoint on scalar dataset"""
+        # Test condition
+        tested_h5entity_path = "/entry/scalar"
+        data = 5
+
+        filename = "test.h5"
+        with h5py.File(server.served_directory / filename, mode="w") as h5file:
+            dset = h5file.create_dataset(tested_h5entity_path, data=data)
+            dtype = dset.dtype
+            shape = dset.shape
+
+        response = server.get(
+            f"/data/?{urlencode({'file': filename, 'path': tested_h5entity_path, 'format': format_arg})}"
+        )
+        retrieved_data = decode_array_response(response, format_arg, dtype.str, shape)
+
+        assert np.array_equal(retrieved_data, data)
+
     @pytest.mark.parametrize("format_arg", ("npy", "bin"))
     def test_data_on_array_with_dtype_safe(
         self,
@@ -114,7 +135,7 @@ class BaseTestEndpoints:
         response = server.get(
             f"/data/?{urlencode({'file': filename, 'path': tested_h5entity_path, 'selection': '100,0', 'format': format_arg, 'flatten': True})}"
         )
-        retrieved_data = np.array(decode_response(response, format_arg))
+        retrieved_data = np.asarray(decode_response(response, format_arg))
 
         assert retrieved_data - data[100, 0] < 1e-8
 

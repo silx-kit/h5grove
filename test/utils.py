@@ -64,7 +64,7 @@ def decode_array_response(
         assert content_type == "application/octet-stream"
         return np.frombuffer(response.content, dtype=dtype).reshape(shape)
 
-    return np.array(decode_response(response, format), copy=False)
+    return np.asarray(decode_response(response, format))
 
 
 def assert_error_response(response: Response, error_code: int):
