@@ -288,6 +288,7 @@ def get_content_from_file(
             fallback=LinkResolution.ONLY_VALID,
         )
     except QueryArgumentError as e:
+        f.close()
         raise create_error(422, str(e))
 
     try:
