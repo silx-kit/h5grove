@@ -126,21 +126,26 @@ def encode(content: Any, encoding: Optional[str] = "json") -> Response:
             f"Unsupported encoding {encoding} for non-numeric content"
         )
 
-    if encoding == "csv":
-        return Response(
-            csv_encode(content_array),
-            headers={
-                "Content-Type": "text/csv",
-                "Content-Disposition": 'attachment; filename="data.csv"',
-            },
-        )
-
     if encoding == "npy":
         return Response(
             npy_encode(content_array),
             headers={
                 "Content-Type": "application/octet-stream",
                 "Content-Disposition": 'attachment; filename="data.npy"',
+            },
+        )
+
+    if content_array.ndim == 0:
+        raise QueryArgumentError(
+            f"Unsupported encoding {encoding} for empty and scalar datasets"
+        )
+
+    if encoding == "csv":
+        return Response(
+            csv_encode(content_array),
+            headers={
+                "Content-Type": "text/csv",
+                "Content-Disposition": 'attachment; filename="data.csv"',
             },
         )
 

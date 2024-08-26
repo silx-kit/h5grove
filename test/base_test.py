@@ -77,7 +77,6 @@ class BaseTestEndpoints:
 
         assert np.array_equal(retrieved_data, data)
 
-    # TODO: What should we do for csv, tiff
     @pytest.mark.parametrize("format_arg", ("json", "bin", "npy"))
     def test_data_on_scalar_with_format(self, server, format_arg):
         """Test /data/ endpoint on scalar dataset"""
@@ -595,4 +594,21 @@ class BaseTestEndpoints:
         server.assert_error_code(
             f"/meta/?file={filename}&path={path}&resolve_links={invalid_link_resolution}",
             422,
+        )
+
+    @pytest.mark.parametrize("format_arg", ("csv", "tiff"))
+    def test_422_on_format_incompatible_with_empty_or_scalar_datasets(
+        self, server, format_arg
+    ):
+        filename = "test.h5"
+
+        with h5py.File(server.served_directory / filename, mode="w") as h5file:
+            h5file["scalar"] = 55
+            h5file["empty"] = h5py.Empty(dtype="<4f")
+
+        server.assert_error_code(
+            f"/data/?file={filename}&path=/scalar&format={format_arg}", 422
+        )
+        server.assert_error_code(
+            f"/data/?file={filename}&path=/empty&format={format_arg}", 422
         )
