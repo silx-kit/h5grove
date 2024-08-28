@@ -157,6 +157,23 @@ class BaseTestEndpoints:
         retrieved_data = np.void(response.content)
         assert np.array_equal(retrieved_data, data)
 
+    def test_meta_on_datatype(self, server):
+        """Test /meta/ endpoint on a committed datatype"""
+        filename = "test.h5"
+
+        with h5py.File(server.served_directory / filename, mode="w") as h5file:
+            h5file["committed_type"] = np.dtype("<f8")
+
+        response = server.get(f"/meta/?file={filename}&path=/committed_type")
+        content = decode_response(response)
+
+        assert content == {
+            "attributes": [],
+            "kind": "datatype",
+            "name": "committed_type",
+            "type": {"class": 1, "dtype": "<f8", "size": 8, "order": 0},
+        }
+
     def test_meta_on_chunked_compressed_dataset(self, server):
         """Test /meta/ endpoint on a chunked and compressed dataset"""
         filename = "test.h5"
