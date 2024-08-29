@@ -11,6 +11,11 @@ on:
 jobs:
   lint_test:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.8', '3.12']
+
     steps:
       - name: Checkout 🏷️
         uses: actions/checkout@v2
@@ -18,7 +23,7 @@ jobs:
       - name: Install Python 🐍
         uses: actions/setup-python@v2
         with:
-          python-version: '3.8'
+          python-version: ${{ matrix.python-version }}
           architecture: 'x64'
 
       - name: Install dependencies ⚙️
