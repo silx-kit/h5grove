@@ -5,7 +5,15 @@ from os.path import basename
 import numpy as np
 from typing import Any, Callable, Dict, List, Optional, Tuple, TypeVar, Union
 
-from .models import H5pyEntity, LinkResolution, Selection, StrDtype, TypeMetadata
+from .models import (
+    H5pyEntity,
+    LinkResolution,
+    Selection,
+    StrDtype,
+    TypeMetadata,
+    Stats,
+    AttributeMetadata,
+)
 
 
 class NotFoundError(Exception):
@@ -39,7 +47,9 @@ get_attr_id = (
 )
 
 
-def attr_metadata(entity_attrs: h5py.AttributeManager, attr_name: str) -> dict:
+def attr_metadata(
+    entity_attrs: h5py.AttributeManager, attr_name: str
+) -> AttributeMetadata:
     attrId = get_attr_id(entity_attrs, attr_name)
 
     return {
@@ -248,7 +258,7 @@ def is_numeric_data(data: Union[np.ndarray, np.number, np.bool_, bytes]) -> bool
     return np.issubdtype(data.dtype, np.number) or np.issubdtype(data.dtype, np.bool_)
 
 
-def get_array_stats(data: np.ndarray) -> Dict[str, Union[float, int, None]]:
+def get_array_stats(data: np.ndarray) -> Stats:
     if data.size == 0:
         return {
             "strict_positive_min": None,

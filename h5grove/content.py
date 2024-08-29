@@ -1,6 +1,16 @@
 import contextlib
 from pathlib import Path
-from typing import Any, Callable, Dict, Generic, Optional, Sequence, TypeVar, Union
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Generic,
+    Optional,
+    Sequence,
+    TypeVar,
+    Union,
+    cast,
+)
 import h5py
 import numpy as np
 
@@ -9,7 +19,19 @@ try:
 except ImportError:
     pass
 
-from .models import LinkResolution, Selection
+from .models import (
+    LinkResolution,
+    Selection,
+    EntityMetadata,
+    ExternalLinkMetadata,
+    SoftLinkMetadata,
+    AttributeMetadata,
+    ResolvedEntityMetadata,
+    GroupMetadata,
+    DatasetMetadata,
+    DatatypeMetadata,
+    Stats,
+)
 from .utils import (
     NotFoundError,
     QueryArgumentError,
@@ -35,21 +57,18 @@ class EntityContent:
     def __init__(self, path: str):
         self._path = path
 
-    def metadata(self) -> Dict[str, str]:
-        """Entity metadata
-
-        :returns: {"name": str, "kind": str}
-        """
+    def metadata(self) -> EntityMetadata:
+        """Entity metadata"""
         return {"name": self.name, "kind": self.kind}
 
     @property
     def name(self) -> str:
-        """Entity name. Last member of the path."""
+        """Entity name (last path segment)"""
         return self._path.split("/")[-1]
 
     @property
     def path(self) -> str:
-        """Path in the file."""
+        """Path in the file"""
         return self._path
 
 
@@ -61,11 +80,8 @@ class ExternalLinkContent(EntityContent):
         self._target_file = link.filename
         self._target_path = link.path
 
-    def metadata(self, depth=None):
-        """External link metadata
-
-        :returns: {"name": str, "target_file": str, "target_path": str, "kind": str}
-        """
+    def metadata(self, depth=None) -> ExternalLinkMetadata:
+        """External link metadata"""
         return sorted_dict(
             ("target_file", self._target_file),
             ("target_path", self._target_path),
@@ -89,12 +105,10 @@ class SoftLinkContent(EntityContent):
     def __init__(self, path: str, link: h5py.SoftLink) -> None:
         super().__init__(path)
         self._target_path = link.path
-        """ The target path of the link """
+        """The target path of the link"""
 
-    def metadata(self, depth=None):
-        """
-        :returns: {"name": str, "target_path": str, "kind": str}
-        """
+    def metadata(self, depth=None) -> SoftLinkMetadata:
+        """Soft link metadata"""
         return sorted_dict(
             ("target_path", self._target_path), *super().metadata().items()
         )
@@ -114,19 +128,19 @@ class ResolvedEntityContent(EntityContent, Generic[T]):
     def __init__(self, path: str, h5py_entity: T):
         super().__init__(path)
         self._h5py_entity = h5py_entity
-        """ Resolved h5py entity """
+        """Resolved h5py entity"""
 
-    def attributes(self, attr_keys: Optional[Sequence[str]] = None):
+    def attributes(
+        self, attr_keys: Optional[Sequence[str]] = None
+    ) -> Dict[str, AttributeMetadata]:
         """Attributes of the h5py entity. Can be filtered by keys."""
         if attr_keys is None:
             return dict((*self._h5py_entity.attrs.items(),))
 
         return dict((key, self._h5py_entity.attrs[key]) for key in attr_keys)
 
-    def metadata(self, depth=None):
-        """
-        :returns: {"attributes": AttributeMetadata, "name": str, "kind": str}
-        """
+    def metadata(self, depth=None) -> ResolvedEntityMetadata:
+        """Resolved entity metadata"""
         attribute_names = sorted(self._h5py_entity.attrs.keys())
         return sorted_dict(
             (
@@ -143,10 +157,8 @@ class ResolvedEntityContent(EntityContent, Generic[T]):
 class DatasetContent(ResolvedEntityContent[h5py.Dataset]):
     kind = "dataset"
 
-    def metadata(self, depth=None):
-        """
-        :returns: {"attributes": AttributeMetadata, chunks": tuple, "filters": tuple, "kind": str, "name": str, "shape": tuple, "type": TypeMetadata}
-        """
+    def metadata(self, depth=None) -> DatasetMetadata:
+        """Dataset metadata"""
         return sorted_dict(
             ("chunks", self._h5py_entity.chunks),
             ("filters", get_filters(self._h5py_entity)),
@@ -177,13 +189,10 @@ class DatasetContent(ResolvedEntityContent[h5py.Dataset]):
 
         return result
 
-    def data_stats(
-        self, selection: Selection = None
-    ) -> Dict[str, Union[float, int, None]]:
+    def data_stats(self, selection: Selection = None) -> Stats:
         """Statistics on the data. Providing a selection will compute stats only on the selected slice.
 
         :param selection: NumPy-like indexing to define a selection as a slice
-        :returns: {"strict_positive_min": number | None, "positive_min": number | None, "min": number | None, "max": number | None, "mean": number | None, "std": number | None}
         """
         data = self._get_finite_data(selection)
 
@@ -208,7 +217,7 @@ class GroupContent(ResolvedEntityContent[h5py.Group]):
     def __init__(self, path: str, h5py_entity: h5py.Group, h5file: h5py.File):
         super().__init__(path, h5py_entity)
         self._h5file = h5file
-        """ File in which the entity was resolved. This is needed to resolve child entity. """
+        """File in which the entity was resolved. This is needed to resolve child entity."""
 
     def _get_child_metadata_content(self, depth=0):
         return [
@@ -218,14 +227,13 @@ class GroupContent(ResolvedEntityContent[h5py.Group]):
             for child_path in self._h5py_entity.keys()
         ]
 
-    def metadata(self, depth: int = 1):
+    def metadata(self, depth: int = 1) -> GroupMetadata:
         """Metadata of the group. Recursively includes child metadata if depth > 0.
 
         :parameter depth: The level of child metadata resolution.
-        :returns: {"attributes": AttributeMetadata, "children": ChildMetadata, "name": str, "kind": str}
         """
         if depth <= 0:
-            return super().metadata()
+            return cast(GroupMetadata, super().metadata())
 
         return sorted_dict(
             ("children", self._get_child_metadata_content(depth - 1)),
@@ -236,10 +244,8 @@ class GroupContent(ResolvedEntityContent[h5py.Group]):
 class DatatypeContent(ResolvedEntityContent[h5py.Datatype]):
     kind = "datatype"
 
-    def metadata(self, depth=None):
-        """
-        :returns: {"attributes": AttributeMetadata, "kind": str, "name": str, "type": TypeMetadata}
-        """
+    def metadata(self, depth=None) -> DatatypeMetadata:
+        """Datatype metadata"""
         return sorted_dict(
             ("type", get_type_metadata(self._h5py_entity.id)),
             *super().metadata().items(),

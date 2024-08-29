@@ -1,6 +1,6 @@
 from enum import Enum
-from typing import Dict, Tuple, Union
-from typing_extensions import TypedDict
+from typing import Dict, Tuple, Union, List
+from typing_extensions import TypedDict, NotRequired, Optional
 import h5py
 
 H5pyEntity = Union[
@@ -39,4 +39,55 @@ TypeMetadata = TypedDict(
         "base": "TypeMetadata",  # array, enum, vlen
     },
     total=False,
+)
+
+
+class EntityMetadata(TypedDict):
+    name: str
+    kind: str
+
+
+class ExternalLinkMetadata(EntityMetadata):
+    target_file: str
+    target_path: str
+
+
+class SoftLinkMetadata(EntityMetadata):
+    target_path: str
+
+
+AttributeMetadata = TypedDict(
+    "AttributeMetadata", {"name": str, "shape": tuple, "type": TypeMetadata}
+)
+
+
+class ResolvedEntityMetadata(EntityMetadata):
+    attributes: List[AttributeMetadata]
+
+
+class GroupMetadata(ResolvedEntityMetadata):
+    children: NotRequired[List[EntityMetadata]]
+
+
+class DatasetMetadata(ResolvedEntityMetadata):
+    chunks: tuple
+    filters: tuple
+    shape: tuple
+    type: TypeMetadata
+
+
+class DatatypeMetadata(ResolvedEntityMetadata):
+    type: TypeMetadata
+
+
+Stats = TypedDict(
+    "Stats",
+    {
+        "strict_positive_min": Optional[Union[int, float]],
+        "positive_min": Optional[Union[int, float]],
+        "min": Optional[Union[int, float]],
+        "max": Optional[Union[int, float]],
+        "mean": Optional[Union[int, float]],
+        "std": Optional[Union[int, float]],
+    },
 )
