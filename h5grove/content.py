@@ -233,6 +233,19 @@ class GroupContent(ResolvedEntityContent[h5py.Group]):
         )
 
 
+class DatatypeContent(ResolvedEntityContent[h5py.Datatype]):
+    kind = "datatype"
+
+    def metadata(self, depth=None):
+        """
+        :returns: {"attributes": AttributeMetadata, "kind": str, "name": str, "type": TypeMetadata}
+        """
+        return sorted_dict(
+            ("type", get_type_metadata(self._h5py_entity.id)),
+            *super().metadata().items(),
+        )
+
+
 def create_content(
     h5file: h5py.File,
     path: Optional[str],
@@ -267,7 +280,7 @@ def create_content(
         return GroupContent(path, entity, h5file)
 
     if isinstance(entity, h5py.Datatype):
-        return ResolvedEntityContent(path, entity)
+        return DatatypeContent(path, entity)
 
     raise TypeError(f"h5py entity {type(entity)} not supported")
 
