@@ -1,8 +1,10 @@
 """Base class for testing with different servers"""
 
+from __future__ import annotations
+from collections.abc import Generator
+
 import os
 import stat
-from typing import Generator
 from urllib.parse import urlencode
 
 import h5py

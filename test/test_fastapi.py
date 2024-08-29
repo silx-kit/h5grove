@@ -1,7 +1,9 @@
 """Test fastapi_utils with fastapi testing"""
 
+from __future__ import annotations
+from collections.abc import Callable
+
 import pathlib
-from typing import Callable
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 import pytest

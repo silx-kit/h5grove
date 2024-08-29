@@ -1,10 +1,12 @@
+from __future__ import annotations
+from collections.abc import Callable
+
 import os
 import pathlib
 import socketserver
 import subprocess
 import sys
 import time
-from typing import Callable, Optional
 from urllib.request import urlopen
 from urllib.error import HTTPError
 
@@ -31,7 +33,7 @@ class BaseServer:
     def get(
         self,
         url: str,
-        benchmark: Optional[Callable] = None,
+        benchmark: Callable | None = None,
     ) -> Response:
         """Request url and return retrieved response"""
         if benchmark is None:

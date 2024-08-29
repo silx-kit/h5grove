@@ -1,7 +1,9 @@
 """Test flask_utils blueprint with Flask testing"""
 
+from __future__ import annotations
+from collections.abc import Callable
+
 import pathlib
-from typing import Callable
 from flask import Flask
 import pytest
 

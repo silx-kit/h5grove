@@ -1,8 +1,9 @@
 """Helpers for usage with `Tornado <https://www.tornadoweb.org>`_"""
 
-import os
-from typing import Any, Optional
+from __future__ import annotations
+from typing import Any
 
+import os
 from tornado.web import HTTPError, MissingArgumentError, RequestHandler
 
 from .content import (
@@ -33,7 +34,7 @@ def create_error(status_code: int, message: str):
 class BaseHandler(RequestHandler):
     """Base class for h5grove handlers"""
 
-    def initialize(self, base_dir: str, allow_origin: Optional[str] = None) -> None:
+    def initialize(self, base_dir: str, allow_origin: str | None = None) -> None:
         self.base_dir = base_dir
         self.allow_origin = allow_origin
 
@@ -57,7 +58,7 @@ class BaseHandler(RequestHandler):
         self.finish()
 
     def get_response(
-        self, full_file_path: str, path: Optional[str], resolve_links: Optional[str]
+        self, full_file_path: str, path: str | None, resolve_links: str | None
     ) -> Response:
         raise NotImplementedError
 
@@ -82,7 +83,7 @@ class RootHandler(BaseHandler):
 
 class ContentHandler(BaseHandler):
     def get_response(
-        self, full_file_path: str, path: Optional[str], resolve_links: Optional[str]
+        self, full_file_path: str, path: str | None, resolve_links: str | None
     ) -> Response:
         with get_content_from_file(
             full_file_path, path, create_error, resolve_links
@@ -141,7 +142,7 @@ class StatisticsHandler(ContentHandler):
 
 class PathsHandler(BaseHandler):
     def get_response(
-        self, full_file_path: str, path: Optional[str], resolve_links: Optional[str]
+        self, full_file_path: str, path: str | None, resolve_links: str | None
     ) -> Response:
         with get_list_of_paths(
             full_file_path, path, create_error, resolve_links
@@ -150,7 +151,7 @@ class PathsHandler(BaseHandler):
 
 
 # TODO: Setting the return type raises mypy errors
-def get_handlers(base_dir: Optional[str], allow_origin: Optional[str] = None):
+def get_handlers(base_dir: str | None, allow_origin: str | None = None):
     """Build h5grove handlers (`/`, `/attr/`, `/data/`, `/meta/` and `/stats/`).
 
     :param base_dir: Base directory from which the HDF5 files will be served

@@ -1,16 +1,14 @@
-import contextlib
-from pathlib import Path
+from __future__ import annotations
+from collections.abc import Callable, Sequence
 from typing import (
     Any,
-    Callable,
-    Dict,
     Generic,
-    Optional,
-    Sequence,
     TypeVar,
-    Union,
     cast,
 )
+
+import contextlib
+from pathlib import Path
 import h5py
 import numpy as np
 
@@ -131,8 +129,8 @@ class ResolvedEntityContent(EntityContent, Generic[T]):
         """Resolved h5py entity"""
 
     def attributes(
-        self, attr_keys: Optional[Sequence[str]] = None
-    ) -> Dict[str, AttributeMetadata]:
+        self, attr_keys: Sequence[str] | None = None
+    ) -> dict[str, AttributeMetadata]:
         """Attributes of the h5py entity. Can be filtered by keys."""
         if attr_keys is None:
             return dict((*self._h5py_entity.attrs.items(),))
@@ -169,9 +167,9 @@ class DatasetContent(ResolvedEntityContent[h5py.Dataset]):
 
     def data(
         self,
-        selection: Selection = None,
+        selection: Selection | None = None,
         flatten: bool = False,
-        dtype: Optional[str] = "origin",
+        dtype: str | None = "origin",
     ):
         """Dataset data.
 
@@ -189,7 +187,7 @@ class DatasetContent(ResolvedEntityContent[h5py.Dataset]):
 
         return result
 
-    def data_stats(self, selection: Selection = None) -> Stats:
+    def data_stats(self, selection: Selection | None = None) -> Stats:
         """Statistics on the data. Providing a selection will compute stats only on the selected slice.
 
         :param selection: NumPy-like indexing to define a selection as a slice
@@ -254,7 +252,7 @@ class DatatypeContent(ResolvedEntityContent[h5py.Datatype]):
 
 def create_content(
     h5file: h5py.File,
-    path: Optional[str],
+    path: str | None,
     resolve_links: LinkResolution = LinkResolution.ONLY_VALID,
 ):
     """
@@ -293,11 +291,11 @@ def create_content(
 
 @contextlib.contextmanager
 def get_content_from_file(
-    filepath: Union[str, Path],
-    path: Optional[str],
+    filepath: str | Path,
+    path: str | None,
     create_error: Callable[[int, str], Exception],
-    resolve_links_arg: Optional[str] = LinkResolution.ONLY_VALID,
-    h5py_options: Dict[str, Any] = {},
+    resolve_links_arg: str | None = LinkResolution.ONLY_VALID,
+    h5py_options: dict[str, Any] = {},
 ):
     f = open_file_with_error_fallback(filepath, create_error, h5py_options)
 
@@ -322,11 +320,11 @@ def get_content_from_file(
 
 @contextlib.contextmanager
 def get_list_of_paths(
-    filepath: Union[str, Path],
-    base_path: Optional[str],
+    filepath: str | Path,
+    base_path: str | None,
     create_error: Callable[[int, str], Exception],
-    resolve_links_arg: Optional[str] = LinkResolution.ONLY_VALID,
-    h5py_options: Dict[str, Any] = {},
+    resolve_links_arg: str | None = LinkResolution.ONLY_VALID,
+    h5py_options: dict[str, Any] = {},
 ):
     f = open_file_with_error_fallback(filepath, create_error, h5py_options)
 

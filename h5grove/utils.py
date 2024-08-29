@@ -1,9 +1,12 @@
+from __future__ import annotations
+from collections.abc import Callable
+from typing import Any, TypeVar
+
 from pathlib import Path
 import h5py
 from h5py.version import version_tuple as h5py_version
 from os.path import basename
 import numpy as np
-from typing import Any, Callable, Dict, List, Optional, Tuple, TypeVar, Union
 
 from .models import (
     H5pyEntity,
@@ -89,7 +92,7 @@ def get_entity_from_file(
     return h5file[path]
 
 
-def parse_slice(slice_str: str) -> Tuple[Union[slice, int], ...]:
+def parse_slice(slice_str: str) -> tuple[slice | int, ...]:
     """
     Parses a string containing a slice under NumPy format.
 
@@ -108,7 +111,7 @@ def parse_slice(slice_str: str) -> Tuple[Union[slice, int], ...]:
     return tuple(parse_slice_member(s) for s in slice_members)
 
 
-def parse_slice_member(slice_member: str) -> Union[slice, int]:
+def parse_slice_member(slice_member: str) -> slice | int:
     if ":" not in slice_member:
         return int(slice_member)
 
@@ -132,7 +135,7 @@ def parse_slice_member(slice_member: str) -> Union[slice, int]:
     raise TypeError(f"{slice_member} is not a valid slice")
 
 
-def sorted_dict(*args: Tuple[str, Any]):
+def sorted_dict(*args: tuple[str, Any]):
     return dict(sorted(args, key=lambda entry: entry[0]))
 
 
@@ -229,7 +232,7 @@ def _sanitize_dtype(dtype: np.dtype) -> np.dtype:
 T = TypeVar("T", np.ndarray, np.number, np.bool_)
 
 
-def convert(data: T, dtype: Optional[str] = "origin") -> T:
+def convert(data: T, dtype: str | None = "origin") -> T:
     """Convert array or numpy scalar to given dtype query param
 
     :param data: nD array or scalar to convert
@@ -251,7 +254,7 @@ def convert(data: T, dtype: Optional[str] = "origin") -> T:
     raise QueryArgumentError(f"Unsupported dtype {dtype}")
 
 
-def is_numeric_data(data: Union[np.ndarray, np.number, np.bool_, bytes]) -> bool:
+def is_numeric_data(data: np.ndarray | np.number | np.bool_ | bytes) -> bool:
     if not isinstance(data, (np.ndarray, np.number, np.bool_)):
         return False
 
@@ -288,14 +291,14 @@ def get_array_stats(data: np.ndarray) -> Stats:
     }
 
 
-def hdf_path_join(prefix: Union[str, None], suffix: str):
+def hdf_path_join(prefix: str | None, suffix: str):
     if prefix is None or prefix == "/":
         return f"/{suffix}"
 
     return f'{prefix.rstrip("/")}/{suffix}'
 
 
-def parse_bool_arg(query_arg: Union[str, None], fallback: bool) -> bool:
+def parse_bool_arg(query_arg: str | None, fallback: bool) -> bool:
     if query_arg is None:
         return fallback
 
@@ -303,7 +306,7 @@ def parse_bool_arg(query_arg: Union[str, None], fallback: bool) -> bool:
 
 
 def parse_link_resolution_arg(
-    raw_query_arg: Union[str, None], fallback: LinkResolution
+    raw_query_arg: str | None, fallback: LinkResolution
 ) -> LinkResolution:
     if raw_query_arg is None:
         return fallback
@@ -342,7 +345,7 @@ def get_dataset_slice(dataset: h5py.Dataset, selection: Selection):
 
 def get_filters(
     dataset: h5py.Dataset,
-) -> Optional[List[Dict[str, Union[int, str]]]]:
+) -> list[dict[str, int | str]] | None:
     property_list = dataset.id.get_create_plist()
 
     n_filters = property_list.get_nfilters()
@@ -353,8 +356,8 @@ def get_filters(
 
 
 def get_filter_info(
-    filter: Tuple[int, int, Tuple[int, ...], str]
-) -> Dict[str, Union[int, str]]:
+    filter: tuple[int, int, tuple[int, ...], str]
+) -> dict[str, int | str]:
     # https://api.h5py.org/h5p.html#h5py.h5p.PropDCID.get_filter
     (filter_id, _, _, name) = filter
 
@@ -371,9 +374,9 @@ def stringify_dtype(dtype: np.dtype) -> StrDtype:
 
 
 def open_file_with_error_fallback(
-    filepath: Union[str, Path],
+    filepath: str | Path,
     create_error: Callable[[int, str], Exception],
-    h5py_options: Dict[str, Any] = {},
+    h5py_options: dict[str, Any] = {},
 ) -> h5py.File:
     try:
         f = h5py.File(filepath, "r", **h5py_options)

@@ -1,6 +1,7 @@
+from __future__ import annotations
 from enum import Enum
-from typing import Dict, Tuple, Union, List
-from typing_extensions import TypedDict, NotRequired, Optional
+from typing import Union, Tuple, Dict, List
+from typing_extensions import TypedDict, NotRequired
 import h5py
 
 H5pyEntity = Union[
@@ -22,6 +23,7 @@ class LinkResolution(str, Enum):
 StrDtype = Union[str, Dict[str, "StrDtype"]]  # type: ignore
 
 # https://api.h5py.org/h5t.html
+# Must use functional `TypedDict` syntax because of `class` key
 TypeMetadata = TypedDict(
     "TypeMetadata",
     {
@@ -56,9 +58,10 @@ class SoftLinkMetadata(EntityMetadata):
     target_path: str
 
 
-AttributeMetadata = TypedDict(
-    "AttributeMetadata", {"name": str, "shape": tuple, "type": TypeMetadata}
-)
+class AttributeMetadata(TypedDict):
+    name: str
+    shape: tuple
+    type: TypeMetadata
 
 
 class ResolvedEntityMetadata(EntityMetadata):
@@ -80,14 +83,10 @@ class DatatypeMetadata(ResolvedEntityMetadata):
     type: TypeMetadata
 
 
-Stats = TypedDict(
-    "Stats",
-    {
-        "strict_positive_min": Optional[Union[int, float]],
-        "positive_min": Optional[Union[int, float]],
-        "min": Optional[Union[int, float]],
-        "max": Optional[Union[int, float]],
-        "mean": Optional[Union[int, float]],
-        "std": Optional[Union[int, float]],
-    },
-)
+class Stats(TypedDict):
+    strict_positive_min: Union[int, float, None]
+    positive_min: Union[int, float, None]
+    min: Union[int, float, None]
+    max: Union[int, float, None]
+    mean: Union[int, float, None]
+    std: Union[int, float, None]

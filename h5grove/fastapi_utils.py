@@ -1,9 +1,11 @@
 """Helpers for usage with `FastAPI <https://fastapi.tiangolo.com/>`_"""
 
+from __future__ import annotations
+from collections.abc import Callable
+
 from fastapi import APIRouter, Depends, Response, Query, Request
 from fastapi.routing import APIRoute
 from pydantic_settings import BaseSettings
-from typing import List, Optional, Union, Callable
 
 from .content import (
     DatasetContent,
@@ -46,7 +48,7 @@ The directory from which files are served can be defined in `settings`.
 
 
 class Settings(BaseSettings):
-    base_dir: Union[str, None] = None
+    base_dir: str | None = None
 
 
 settings = Settings()
@@ -86,7 +88,7 @@ async def get_root():
 async def get_attr(
     file: str = Depends(add_base_path),
     path: str = "/",
-    attr_keys: Optional[List[str]] = Query(default=None),
+    attr_keys: list[str] | None = Query(default=None),
 ):
     """`/attr/` endpoint handler"""
     with get_content_from_file(file, path, create_error) as content:

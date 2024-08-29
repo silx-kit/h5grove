@@ -1,5 +1,8 @@
+from __future__ import annotations
+from collections.abc import Callable
+from typing import Any
+
 import io
-from typing import Any, Callable, Dict, Optional, Union
 import numpy as np
 import orjson
 import h5py
@@ -17,7 +20,7 @@ def bin_encode(array: np.ndarray) -> bytes:
     return array.tobytes()
 
 
-def orjson_default(o: Any) -> Union[list, float, str, None]:
+def orjson_default(o: Any) -> list | float | str | None:
     """Converts Python objects to JSON-serializable objects.
 
     :raises TypeError: if the object is not supported."""
@@ -37,7 +40,7 @@ def orjson_default(o: Any) -> Union[list, float, str, None]:
     raise TypeError
 
 
-def orjson_encode(content: Any, default: Optional[Callable] = None) -> bytes:
+def orjson_encode(content: Any, default: Callable | None = None) -> bytes:
     """Encode in JSON using orjson.
 
     :param: content: Content to encode
@@ -82,15 +85,15 @@ def tiff_encode(data: np.ndarray) -> bytes:
 class Response:
     content: bytes
     """ Encoded `content` as bytes """
-    headers: Dict[str, str]
+    headers: dict[str, str]
     """ Associated headers """
 
-    def __init__(self, content: bytes, headers: Dict[str, str]):
+    def __init__(self, content: bytes, headers: dict[str, str]):
         self.content = content
         self.headers = {**headers, "Content-Length": str(len(content))}
 
 
-def encode(content: Any, encoding: Optional[str] = "json") -> Response:
+def encode(content: Any, encoding: str | None = "json") -> Response:
     """Encode content in given encoding.
 
     Warning: Not all encodings supports all types of content.
