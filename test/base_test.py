@@ -388,7 +388,7 @@ class BaseTestEndpoints:
             h5file["ext_link"] = h5py.ExternalLink(source_file, "data")
 
         response = server.get(
-            f"/meta/?{urlencode({'file': filename, 'path': '/ext_link', 'resolve_links': f'{resolve_links}'})}"
+            f"/meta/?{urlencode({'file': filename, 'path': '/ext_link', 'resolve_links': resolve_links.value})}"
         )
         content = decode_response(response)
 
@@ -539,7 +539,7 @@ class BaseTestEndpoints:
         with h5py.File(server.served_directory / filename, mode="w") as h5file:
             h5file[link_path] = h5py.SoftLink("not_an_entity")
 
-        url = f"/meta/?{urlencode({'file': filename, 'path': link_path, 'resolve_links': f'{resolve_links}'})}"
+        url = f"/meta/?{urlencode({'file': filename, 'path': link_path, 'resolve_links': resolve_links.value})}"
 
         # It should return 404 if trying to resolve the broken link
         if resolve_links == LinkResolution.ALL:
