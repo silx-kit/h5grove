@@ -140,6 +140,27 @@ class BaseTestEndpoints:
 
         assert retrieved_data - data[100, 0] < 1e-8
 
+    def test_data_on_bool(self, server):
+        """Test /data/ endpoint on boolean dataset with format=bin"""
+        tested_h5entity_path = "/bool"
+        data = np.array([True, False, True, True])
+
+        filename = "test.h5"
+        with h5py.File(server.served_directory / filename, mode="w") as h5file:
+            dset = h5file.create_dataset(tested_h5entity_path, data=data)
+            dtype = dset.dtype
+            shape = dset.shape
+
+        response = server.get(
+            f"/data/?{urlencode({'file': filename, 'path': tested_h5entity_path, 'format': 'bin'})}"
+        )
+
+        content_type = response.find_header_value("content-type")
+        assert content_type == "application/octet-stream"
+
+        retrieved_data = decode_array_response(response, "bin", dtype.str, shape)
+        assert np.array_equal(retrieved_data, data)
+
     def test_data_on_opaque(self, server):
         """Test /data/ endpoint on opaque dataset with format=bin"""
         tested_h5entity_path = "/opaque"

@@ -212,7 +212,7 @@ def _sanitize_dtype(dtype: np.dtype) -> np.dtype:
 
     :raises ValueError: If trying to sanitize a non-numeric numpy dtype
     """
-    if dtype.kind not in ("f", "i", "u"):
+    if dtype.kind not in ("f", "i", "u", "b"):
         raise ValueError(f"Unsupported numpy dtype `{dtype}`. Expected numeric dtype.")
 
     # Convert to little endian
