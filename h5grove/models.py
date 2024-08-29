@@ -1,6 +1,7 @@
+from __future__ import annotations
 from enum import Enum
-from typing import Dict, Tuple, Union
-from typing_extensions import TypedDict
+from typing import Union, Tuple, Dict, List
+from typing_extensions import TypedDict, NotRequired
 import h5py
 
 H5pyEntity = Union[
@@ -22,6 +23,7 @@ class LinkResolution(str, Enum):
 StrDtype = Union[str, Dict[str, "StrDtype"]]  # type: ignore
 
 # https://api.h5py.org/h5t.html
+# Must use functional `TypedDict` syntax because of `class` key
 TypeMetadata = TypedDict(
     "TypeMetadata",
     {
@@ -40,3 +42,51 @@ TypeMetadata = TypedDict(
     },
     total=False,
 )
+
+
+class EntityMetadata(TypedDict):
+    name: str
+    kind: str
+
+
+class ExternalLinkMetadata(EntityMetadata):
+    target_file: str
+    target_path: str
+
+
+class SoftLinkMetadata(EntityMetadata):
+    target_path: str
+
+
+class AttributeMetadata(TypedDict):
+    name: str
+    shape: tuple
+    type: TypeMetadata
+
+
+class ResolvedEntityMetadata(EntityMetadata):
+    attributes: List[AttributeMetadata]
+
+
+class GroupMetadata(ResolvedEntityMetadata):
+    children: NotRequired[List[EntityMetadata]]
+
+
+class DatasetMetadata(ResolvedEntityMetadata):
+    chunks: tuple
+    filters: tuple
+    shape: tuple
+    type: TypeMetadata
+
+
+class DatatypeMetadata(ResolvedEntityMetadata):
+    type: TypeMetadata
+
+
+class Stats(TypedDict):
+    strict_positive_min: Union[int, float, None]
+    positive_min: Union[int, float, None]
+    min: Union[int, float, None]
+    max: Union[int, float, None]
+    mean: Union[int, float, None]
+    std: Union[int, float, None]

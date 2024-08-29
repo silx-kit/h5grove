@@ -1,7 +1,9 @@
 """Benchmark data requests with server apps in example/ folder"""
 
+from __future__ import annotations
+from collections.abc import Generator
+
 import pathlib
-from typing import Generator
 from urllib.parse import urlencode
 import h5py
 import numpy as np

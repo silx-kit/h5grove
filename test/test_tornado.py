@@ -1,7 +1,9 @@
 """Test tornado_utils using pytest-tornado"""
 
+from __future__ import annotations
+from collections.abc import Callable
+
 import pathlib
-from typing import Callable
 import pytest
 from tornado.httpclient import HTTPClientError
 import tornado.web

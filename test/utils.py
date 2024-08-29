@@ -1,7 +1,9 @@
+from __future__ import annotations
+from typing import NamedTuple
+
 import io
 import json
 import numpy as np
-from typing import List, NamedTuple, Tuple
 
 import tifffile
 
@@ -12,7 +14,7 @@ class Response(NamedTuple):
     """Return type of :meth:`get`"""
 
     status: int
-    headers: List[Tuple[str, str]]
+    headers: list[tuple[str, str]]
     content: bytes
 
     def find_header_value(self, key: str):
@@ -55,7 +57,7 @@ def decode_array_response(
     response: Response,
     format: str,
     dtype: str,
-    shape: Tuple[int, ...],
+    shape: tuple[int, ...],
 ) -> np.ndarray:
     """Decode data array response content according to given information"""
     content_type = response.find_header_value("content-type")

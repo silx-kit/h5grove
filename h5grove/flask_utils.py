@@ -1,10 +1,12 @@
 """Helpers for usage with `Flask <https://flask.palletsprojects.com/>`_"""
 
+from __future__ import annotations
+from collections.abc import Callable, Mapping
+from typing import Any
+
 from werkzeug.exceptions import HTTPException
 from flask import Blueprint, current_app, request, Response, Request
 import os
-from typing import Any, Callable, Mapping, Optional
-
 
 from .content import (
     DatasetContent,
@@ -29,7 +31,7 @@ __all__ = [
 
 
 def make_encoded_response(
-    content, format_arg: Optional[str] = "json", status: Optional[int] = None
+    content, format_arg: str | None = "json", status: int | None = None
 ) -> Response:
     """Prepare flask Response according to format"""
     h5grove_response = encode(content, format_arg)
