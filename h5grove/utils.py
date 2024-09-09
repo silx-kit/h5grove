@@ -208,25 +208,21 @@ def get_type_metadata(type_id: h5py.h5t.TypeID) -> TypeMetadata:
 
 
 def _sanitize_dtype(dtype: np.dtype) -> np.dtype:
-    """Sanitize numpy dtype to one with a matching typed array in modern JavaScript.
-
-    :raises ValueError: If trying to sanitize a non-numeric numpy dtype
-    """
-    if dtype.kind not in ("f", "i", "u"):
-        raise ValueError(f"Unsupported numpy dtype `{dtype}`. Expected numeric dtype.")
-
-    # Convert to little endian
-    result = dtype.newbyteorder("<")
+    """Sanitize numpy dtype to one with a matching typed array in modern JavaScript."""
 
     # Convert float16 to float32
-    if result.kind == "f" and result.itemsize < 4:
+    if dtype.kind == "f" and dtype.itemsize < 4:
         return np.dtype("<f4")
 
     # Convert float128 to float64 (unavoidable loss of precision)
-    if result.kind == "f" and result.itemsize > 8:
+    if dtype.kind == "f" and dtype.itemsize > 8:
         return np.dtype("<f8")
 
-    return result
+    # Convert native and big-endian byte-orders to little-endian
+    if dtype.byteorder == "=" or dtype.byteorder == ">":
+        return dtype.newbyteorder("<")
+
+    return dtype
 
 
 T = TypeVar("T", np.ndarray, np.number, np.bool_)
