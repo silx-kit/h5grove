@@ -3,11 +3,21 @@ from collections.abc import Callable
 from typing import Any, TypeVar
 
 from pathlib import Path
+import zarr
 import h5py
 from h5py.version import version_tuple as h5py_version
 from os.path import basename
 import numpy as np
 
+from .custom_types import (
+    T,
+    TH5py,
+    TAttributes,
+    TFile,
+    TDataset,
+    TNp
+)
+from .zarr_type_wrapper import ZarrTypeWrapper
 from .models import (
     H5pyEntity,
     LinkResolution,
@@ -43,7 +53,7 @@ def _legacy_get_attr_id(entity_attrs: h5py.AttributeManager, attr_name: str):
     return h5py.h5a.open(entity_attrs._id, entity_attrs._e(attr_name))
 
 
-get_attr_id = (
+get_attr_id_hdf5 = (
     _legacy_get_attr_id
     if h5py_version.major <= 2 and h5py_version.minor <= 9
     else _get_attr_id
@@ -51,45 +61,59 @@ get_attr_id = (
 
 
 def attr_metadata(
-    entity_attrs: h5py.AttributeManager, attr_name: str
+        entity_attrs: TAttributes, attr_name: str
 ) -> AttributeMetadata:
-    attrId = get_attr_id(entity_attrs, attr_name)
+    if isinstance(entity_attrs, h5py.AttributeManager):
+        attrId = get_attr_id_hdf5(entity_attrs, attr_name)
 
-    return {
-        "name": attr_name,
-        "shape": attrId.shape,
-        "type": get_type_metadata(attrId.get_type()),
-    }
-
+        return {
+            "name": attr_name,
+            "shape": attrId.shape,
+            "type": get_type_metadata_h5py(attrId.get_type()),
+        }
+    else:
+        cast = np.array(entity_attrs[attr_name])
+        return {
+            "name": attr_name,
+            "shape": cast.shape,
+            "type": ZarrTypeWrapper(cast.dtype, cast.shape).get_metadata()
+        }
 
 def get_entity_from_file(
-    h5file: h5py.File,
+    file_entity: TFile,
     path: str,
     resolve_links: LinkResolution = LinkResolution.ONLY_VALID,
 ) -> H5pyEntity:
     if path == "/":
-        return h5file[path]
+        return file_entity[path]
 
-    link = h5file.get(path, getlink=True)
+    if isinstance(file_entity, h5py.File):
+        link = file_entity.get(path, getlink=True)
+    else:
+        link = file_entity.get(path)
 
     if link is None:
-        raise PathError(f"{path} is not a valid path in {basename(h5file.filename)}")
+        if isinstance(file_entity, h5py.File):
+            raise PathError(f"{path} is not a valid path in {basename(file_entity.filename)}")
+        else:
+            raise PathError(f"{path} is not a valid path in {file_entity.store}")
+
 
     if isinstance(link, h5py.ExternalLink) or isinstance(link, h5py.SoftLink):
         if resolve_links == LinkResolution.NONE:
             return link
 
         try:
-            return h5file[path]
+            return file_entity[path]
         except (OSError, KeyError):
             if resolve_links == LinkResolution.ONLY_VALID:
                 return link
 
             raise LinkError(
-                f"Cannot resolve {link} at {path} of {basename(h5file.filename)}"
+                f"Cannot resolve {link} at {path} of {basename(file_entity.filename)}"
             )
 
-    return h5file[path]
+    return file_entity[path]
 
 
 def parse_slice(slice_str: str) -> tuple[slice | int, ...]:
@@ -138,8 +162,15 @@ def parse_slice_member(slice_member: str) -> slice | int:
 def sorted_dict(*args: tuple[str, Any]):
     return dict(sorted(args, key=lambda entry: entry[0]))
 
+def get_type_metadata(entity: T) -> TypeMetadata:
+    if isinstance(entity, (h5py.Dataset, h5py.Datatype, h5py.Group)):
+        return get_type_metadata_h5py(entity.id.get_type())
+    else:
+        return ZarrTypeWrapper(entity.dtype, entity.shape).get_metadata()
 
-def get_type_metadata(type_id: h5py.h5t.TypeID) -> TypeMetadata:
+
+
+def get_type_metadata_h5py(type_id: h5py.h5t.TypeID) -> TypeMetadata:
     base_metadata: TypeMetadata = {
         "class": type_id.get_class(),
         "dtype": stringify_dtype(type_id.dtype),
@@ -176,7 +207,7 @@ def get_type_metadata(type_id: h5py.h5t.TypeID) -> TypeMetadata:
 
     if isinstance(type_id, h5py.h5t.TypeCompoundID):
         for i in range(0, type_id.get_nmembers()):
-            members[type_id.get_member_name(i).decode("utf-8")] = get_type_metadata(
+            members[type_id.get_member_name(i).decode("utf-8")] = get_type_metadata_h5py(
                 type_id.get_member_type(i)
             )
 
@@ -191,17 +222,17 @@ def get_type_metadata(type_id: h5py.h5t.TypeID) -> TypeMetadata:
         return {
             **base_metadata,
             "members": members,
-            "base": get_type_metadata(type_id.get_super()),
+            "base": get_type_metadata_h5py(type_id.get_super()),
         }
 
     if isinstance(type_id, h5py.h5t.TypeVlenID):
-        return {**base_metadata, "base": get_type_metadata(type_id.get_super())}
+        return {**base_metadata, "base": get_type_metadata_h5py(type_id.get_super())}
 
     if isinstance(type_id, h5py.h5t.TypeArrayID):
         return {
             **base_metadata,
             "dims": type_id.get_array_dims(),
-            "base": get_type_metadata(type_id.get_super()),
+            "base": get_type_metadata_h5py(type_id.get_super()),
         }
 
     return base_metadata
@@ -225,10 +256,7 @@ def _sanitize_dtype(dtype: np.dtype) -> np.dtype:
     return dtype
 
 
-T = TypeVar("T", np.ndarray, np.number, np.bool_)
-
-
-def convert(data: T, dtype: str | None = "origin") -> T:
+def convert(data: TNp, dtype: str | None = "origin") -> TNp:
     """Convert array or numpy scalar to given dtype query param
 
     :param data: nD array or scalar to convert
@@ -324,7 +352,7 @@ def parse_link_resolution_arg(
     )
 
 
-def get_dataset_slice(dataset: h5py.Dataset, selection: Selection):
+def get_dataset_slice(dataset: TDataset, selection: Selection):
     if selection is None:
         return dataset[()]
 
@@ -340,16 +368,18 @@ def get_dataset_slice(dataset: h5py.Dataset, selection: Selection):
 
 
 def get_filters(
-    dataset: h5py.Dataset,
+    dataset: TDataset,
 ) -> list[dict[str, int | str]] | None:
-    property_list = dataset.id.get_create_plist()
+    if isinstance(dataset, h5py.Dataset):
+        property_list = dataset.id.get_create_plist()
 
-    n_filters = property_list.get_nfilters()
-    if n_filters <= 0:
-        return None
+        n_filters = property_list.get_nfilters()
+        if n_filters <= 0:
+            return None
 
-    return [get_filter_info(property_list.get_filter(i)) for i in range(n_filters)]
-
+        return [get_filter_info(property_list.get_filter(i)) for i in range(n_filters)]
+    else:
+        return [codec.to_dict() for codec in dataset.compressors]
 
 def get_filter_info(
     filter: tuple[int, int, tuple[int, ...], str]
@@ -368,14 +398,30 @@ def stringify_dtype(dtype: np.dtype) -> StrDtype:
         k: stringify_dtype(dtype_tuple[0]) for k, dtype_tuple in dtype.fields.items()
     }
 
+def is_h5py_file(filepath):
+    return filepath.endswith(('.h5', '.hdf5'))
+
+def is_zarr_file(filepath):
+    return filepath.endswith('.zarr')
+
+def close_file(filepath, f):
+    if is_h5py_file(filepath):
+        f.close()
+    else:
+        f.store.close()
 
 def open_file_with_error_fallback(
     filepath: str | Path,
     create_error: Callable[[int, str], Exception],
-    h5py_options: dict[str, Any] = {},
-) -> h5py.File:
+    options: dict[str, Any] = {},
+) -> TFile:
     try:
-        f = h5py.File(filepath, "r", **h5py_options)
+        if is_h5py_file(filepath):
+            f = h5py.File(filepath, "r", **options)
+        elif is_zarr_file(filepath):
+            f = zarr.open(filepath, mode="r", **options)
+        else:
+            raise create_error(406, "File extension not recognized, or unsuppported!")
     except OSError as e:
         if isinstance(e, FileNotFoundError) or "No such file or directory" in str(e):
             raise create_error(404, "File not found!")

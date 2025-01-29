@@ -3,12 +3,12 @@ from collections.abc import Callable, Sequence
 from typing import (
     Any,
     Generic,
-    TypeVar,
     cast,
 )
-
+import os
 import contextlib
 from pathlib import Path
+import zarr
 import h5py
 import numpy as np
 
@@ -17,6 +17,13 @@ try:
 except ImportError:
     pass
 
+from .custom_types import (
+    T,
+    TDataset,
+    TGroup,
+    TFile,
+    TDatatype
+)
 from .models import (
     LinkResolution,
     Selection,
@@ -44,6 +51,8 @@ from .utils import (
     hdf_path_join,
     get_dataset_slice,
     sorted_dict,
+    is_h5py_file,
+    close_file,
 )
 
 
@@ -117,51 +126,47 @@ class SoftLinkContent(EntityContent):
         return self._target_path
 
 
-T = TypeVar("T", h5py.Dataset, h5py.Datatype, h5py.Group)
-
-
 class ResolvedEntityContent(EntityContent, Generic[T]):
     """Content for a link that can be resolved into a h5py entity"""
 
-    def __init__(self, path: str, h5py_entity: T):
+    def __init__(self, path: str, entity: T):
         super().__init__(path)
-        self._h5py_entity = h5py_entity
-        """Resolved h5py entity"""
+        self._entity = entity
+        """Resolved h5py or zarr entity"""
 
     def attributes(
         self, attr_keys: Sequence[str] | None = None
     ) -> dict[str, AttributeMetadata]:
         """Attributes of the h5py entity. Can be filtered by keys."""
         if attr_keys is None:
-            return dict((*self._h5py_entity.attrs.items(),))
+            return dict((*self._entity.attrs.items(),))
 
-        return dict((key, self._h5py_entity.attrs[key]) for key in attr_keys)
+        return dict((key, self._entity.attrs[key]) for key in attr_keys)
 
     def metadata(self, depth=None) -> ResolvedEntityMetadata:
         """Resolved entity metadata"""
-        attribute_names = sorted(self._h5py_entity.attrs.keys())
+        attribute_names = sorted(self._entity.attrs.keys())
         return sorted_dict(
             (
                 "attributes",
                 [
-                    attr_metadata(self._h5py_entity.attrs, name)
+                    attr_metadata(self._entity.attrs, name)
                     for name in attribute_names
                 ],
             ),
             *super().metadata().items(),
         )
 
-
-class DatasetContent(ResolvedEntityContent[h5py.Dataset]):
+class DatasetContent(ResolvedEntityContent[TDataset]):
     kind = "dataset"
 
     def metadata(self, depth=None) -> DatasetMetadata:
         """Dataset metadata"""
         return sorted_dict(
-            ("chunks", self._h5py_entity.chunks),
-            ("filters", get_filters(self._h5py_entity)),
-            ("shape", self._h5py_entity.shape),
-            ("type", get_type_metadata(self._h5py_entity.id.get_type())),
+            ("chunks", self._entity.chunks),
+            ("filters", get_filters(self._entity)),
+            ("shape", self._entity.shape),
+            ("type", get_type_metadata(self._entity)),
             *super().metadata().items(),
         )
 
@@ -179,7 +184,7 @@ class DatasetContent(ResolvedEntityContent[h5py.Dataset]):
           - `origin` (default): No conversion
           - `safe`: Convert to a type supported by JS typedarray (https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/TypedArray)
         """
-        result = convert(get_dataset_slice(self._h5py_entity, selection), dtype)
+        result = convert(get_dataset_slice(self._entity, selection), dtype)
 
         # Do not flatten scalars nor h5py.Empty
         if flatten and isinstance(result, np.ndarray):
@@ -209,20 +214,20 @@ class DatasetContent(ResolvedEntityContent[h5py.Dataset]):
         return data[mask]
 
 
-class GroupContent(ResolvedEntityContent[h5py.Group]):
+class GroupContent(ResolvedEntityContent[TGroup]):
     kind = "group"
 
-    def __init__(self, path: str, h5py_entity: h5py.Group, h5file: h5py.File):
-        super().__init__(path, h5py_entity)
-        self._h5file = h5file
+    def __init__(self, path: str, entity: TGroup, file_entity: TFile):
+        super().__init__(path, entity)
+        self._file_entity = file_entity
         """File in which the entity was resolved. This is needed to resolve child entity."""
 
     def _get_child_metadata_content(self, depth=0):
         return [
             create_content(
-                self._h5file, hdf_path_join(self._path, child_path)
+                self._file_entity, hdf_path_join(self._path, child_path)
             ).metadata(depth)
-            for child_path in self._h5py_entity.keys()
+            for child_path in self._entity.keys()
         ]
 
     def metadata(self, depth: int = 1) -> GroupMetadata:
@@ -239,19 +244,19 @@ class GroupContent(ResolvedEntityContent[h5py.Group]):
         )
 
 
-class DatatypeContent(ResolvedEntityContent[h5py.Datatype]):
+class DatatypeContent(ResolvedEntityContent[TDatatype]):
     kind = "datatype"
 
     def metadata(self, depth=None) -> DatatypeMetadata:
         """Datatype metadata"""
         return sorted_dict(
-            ("type", get_type_metadata(self._h5py_entity.id)),
+            ("type", get_type_metadata(self._entity)),
             *super().metadata().items(),
         )
 
 
 def create_content(
-    h5file: h5py.File,
+    file_entity: TFile,
     path: str | None,
     resolve_links: LinkResolution = LinkResolution.ONLY_VALID,
 ):
@@ -259,7 +264,7 @@ def create_content(
     Factory function to get entity content from a HDF5 file.
     This handles external/soft link resolution and dataset decompression.
 
-    :param h5file: An open HDF5 file containing the entity
+    :param file_entity: An open HDF5 file containing the entity
     :param path: Path to the entity in the file.
     :param resolve_links: Tells which external and soft links should be resolved. Defaults to resolving only valid links.
     :raises h5grove.utils.PathError: If the path cannot be found in the file
@@ -269,7 +274,7 @@ def create_content(
     if path is None:
         path = "/"
 
-    entity = get_entity_from_file(h5file, path, resolve_links)
+    entity = get_entity_from_file(file_entity, path, resolve_links)
 
     if isinstance(entity, h5py.ExternalLink):
         return ExternalLinkContent(path, entity)
@@ -277,16 +282,18 @@ def create_content(
     if isinstance(entity, h5py.SoftLink):
         return SoftLinkContent(path, entity)
 
-    if isinstance(entity, h5py.Dataset):
+    if isinstance(entity, (h5py.Dataset, zarr.Array)):
         return DatasetContent(path, entity)
 
-    if isinstance(entity, h5py.Group):
-        return GroupContent(path, entity, h5file)
+    if isinstance(entity, (h5py.Group, zarr.Group)):
+        return GroupContent(path, entity, file_entity)
 
-    if isinstance(entity, h5py.Datatype):
+    if isinstance(entity, (h5py.Datatype, np.dtype)):
         return DatatypeContent(path, entity)
 
-    raise TypeError(f"h5py entity {type(entity)} not supported")
+
+
+    raise TypeError(f"Entity {type(entity)} not supported")
 
 
 @contextlib.contextmanager
@@ -305,7 +312,7 @@ def get_content_from_file(
             fallback=LinkResolution.ONLY_VALID,
         )
     except QueryArgumentError as e:
-        f.close()
+        close_file(filepath, f)
         raise create_error(422, str(e))
 
     try:
@@ -315,7 +322,7 @@ def get_content_from_file(
     except QueryArgumentError as e:
         raise create_error(422, str(e))
     finally:
-        f.close()
+        close_file(filepath, f)
 
 
 @contextlib.contextmanager
@@ -324,9 +331,9 @@ def get_list_of_paths(
     base_path: str | None,
     create_error: Callable[[int, str], Exception],
     resolve_links_arg: str | None = LinkResolution.ONLY_VALID,
-    h5py_options: dict[str, Any] = {},
+    open_options: dict[str, Any] = {},
 ):
-    f = open_file_with_error_fallback(filepath, create_error, h5py_options)
+    f = open_file_with_error_fallback(filepath, create_error, open_options)
 
     try:
         resolve_links = parse_link_resolution_arg(
@@ -338,20 +345,28 @@ def get_list_of_paths(
 
     names = []
 
-    def get_path(name: bytes):
-        full_path = hdf_path_join(base_path, name.decode())
-        content = create_content(f, full_path, resolve_links)
-        names.append(content.path)
+    if is_h5py_file(filepath):
+        def get_path(name: bytes):
+            full_path = hdf_path_join(base_path, name.decode())
+            content = create_content(f, full_path, resolve_links)
+            names.append(content.path)
 
-    try:
-        base_content = create_content(f, base_path, resolve_links)
-        assert isinstance(base_content, GroupContent)
-        names.append(base_content.path)
-        base_content._h5py_entity.id.links.visit(get_path)
-        yield names
-    except NotFoundError as e:
-        raise create_error(404, str(e))
-    except QueryArgumentError as e:
-        raise create_error(422, str(e))
-    finally:
-        f.close()
+
+        try:
+            base_content = create_content(f, base_path, resolve_links)
+            assert isinstance(base_content, GroupContent)
+            names.append(base_content.path)
+            base_content._entity.id.links.visit(get_path)
+            yield names
+        except NotFoundError as e:
+            raise create_error(404, str(e))
+        except QueryArgumentError as e:
+            raise create_error(422, str(e))
+        finally:
+            close_file(filepath, f)
+    else:
+        entity = get_entity_from_file(f, base_path, resolve_links)
+        if isinstance(entity, zarr.Group):
+            yield [m[0] for m in entity.members(max_depth=None)]
+        else:
+            yield entity.path
