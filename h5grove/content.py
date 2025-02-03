@@ -52,6 +52,7 @@ from .utils import (
     get_dataset_slice,
     sorted_dict,
     is_h5py_file,
+    is_zarr_file,
     close_file,
 )
 
@@ -225,7 +226,7 @@ class GroupContent(ResolvedEntityContent[TGroup]):
     def _get_child_metadata_content(self, depth=0):
         return [
             create_content(
-                self._file_entity, hdf_path_join(self._path, child_path)
+                self._file_entity, os.path.join(self._path, child_path)
             ).metadata(depth)
             for child_path in self._entity.keys()
         ]
@@ -306,6 +307,9 @@ def get_content_from_file(
 ):
     f = open_file_with_error_fallback(filepath, create_error, h5py_options)
 
+    if is_zarr_file(filepath):
+        path = path.lstrip('/')
+
     try:
         resolve_links = parse_link_resolution_arg(
             resolve_links_arg,
@@ -314,7 +318,6 @@ def get_content_from_file(
     except QueryArgumentError as e:
         close_file(filepath, f)
         raise create_error(422, str(e))
-
     try:
         yield create_content(f, path, resolve_links)
     except NotFoundError as e:
