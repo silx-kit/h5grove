@@ -51,8 +51,8 @@ from .utils import (
     hdf_path_join,
     get_dataset_slice,
     sorted_dict,
-    is_h5py_file,
-    is_zarr_file,
+    is_file_type,
+    FileTypeEnum,
     close_file,
 )
 
@@ -307,7 +307,7 @@ def get_content_from_file(
 ):
     f = open_file_with_error_fallback(filepath, create_error, h5py_options)
 
-    if is_zarr_file(filepath):
+    if is_file_type(filepath, FileTypeEnum.ZARR):
         path = path.lstrip('/')
 
     try:
@@ -348,7 +348,7 @@ def get_list_of_paths(
 
     names = []
 
-    if is_h5py_file(filepath):
+    if is_file_type(filepath, FileTypeEnum.H5PY):
         def get_path(name: bytes):
             full_path = hdf_path_join(base_path, name.decode())
             content = create_content(f, full_path, resolve_links)

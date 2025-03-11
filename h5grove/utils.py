@@ -1,6 +1,7 @@
 from __future__ import annotations
 from collections.abc import Callable
-from typing import Any, TypeVar
+from enum import Enum, auto
+from typing import Any
 
 from pathlib import Path
 import zarr
@@ -11,7 +12,6 @@ import numpy as np
 
 from .custom_types import (
     T,
-    TH5py,
     TAttributes,
     TFile,
     TDataset,
@@ -27,6 +27,11 @@ from .models import (
     Stats,
     AttributeMetadata,
 )
+
+
+class FileTypeEnum(Enum):
+    H5PY = auto()
+    ZARR = auto()
 
 
 class NotFoundError(Exception):
@@ -404,8 +409,22 @@ def is_h5py_file(filepath):
 def is_zarr_file(filepath):
     return filepath.endswith('.zarr')
 
+def is_file_type(filepath, file_type = FileTypeEnum.H5PY):
+    if isinstance(filepath, str):
+        filepath_str = filepath
+    elif getattr(filepath, 'path', None) is not None:
+        filepath_str = getattr(filepath, 'path', None)
+    else:
+        filepath_str = str(filepath)
+
+    match file_type:
+        case FileTypeEnum.H5PY:
+            return is_h5py_file(filepath_str)
+        case FileTypeEnum.ZARR:
+            return is_zarr_file(filepath_str)
+
 def close_file(filepath, f):
-    if is_h5py_file(filepath):
+    if is_file_type(filepath, FileTypeEnum.H5PY):
         f.close()
     else:
         f.store.close()
@@ -416,9 +435,9 @@ def open_file_with_error_fallback(
     options: dict[str, Any] = {},
 ) -> TFile:
     try:
-        if is_h5py_file(filepath):
+        if is_file_type(filepath, file_type=FileTypeEnum.H5PY):
             f = h5py.File(filepath, "r", **options)
-        elif is_zarr_file(filepath):
+        elif is_file_type(filepath, file_type=FileTypeEnum.ZARR):
             f = zarr.open(filepath, mode="r", **options)
         else:
             raise create_error(406, "File extension not recognized, or unsuppported!")
