@@ -4,8 +4,6 @@ graft h5grove
 include LICENSE
 include pyproject.toml
 include README.md
-include setup.cfg
-include setup.py
 
 prune docs
 prune test

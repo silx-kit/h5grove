@@ -2,9 +2,66 @@
 requires = ["setuptools>=42.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
+
+[project]
+name = "h5grove"
+version = "2.3.0"
+authors = [{ name = "ESRF", email = "h5web@esrf.fr" }]
+description = "Core utilities to serve HDF5 file contents"
+readme = { file = "README.md", content-type = "text/markdown" }
+license = { file = "LICENSE" }
+classifiers = ["Programming Language :: Python :: 3"]
+requires-python = ">=3.8"
+dependencies = ["numpy", "orjson", "h5py >= 3", "tifffile", "typing-extensions"]
+
+[project.urls]
+Homepage = "https://github.com/silx-kit/h5grove"
+Documentation = "https://silx-kit.github.io/h5grove/"
+Repository = "https://github.com/silx-kit/h5grove"
+Issues = "https://github.com/silx-kit/h5grove/issues"
+Changelog = "https://github.com/silx-kit/h5grove/releases"
+
+[project.optional-dependencies]
+fastapi = ["fastapi", "pydantic > 2", "pydantic-settings", "uvicorn"]
+flask = ["Flask", "Flask-Compress", "Flask-Cors"]
+tornado = ["tornado"]
+dev = [
+    "black >= 25",
+    "bump2version",
+    "check-manifest",
+    "eval_type_backport",
+    "flake8",
+    "h5grove[fastapi]",
+    "h5grove[flask]",
+    "h5grove[tornado]",
+    "invoke",
+    "mypy",
+    "myst-parser",
+    "httpx >= 0.23",
+    "pytest",
+    "pytest-benchmark",
+    "pytest-cov",
+    "pytest-tornado",
+    "sphinx",
+    "sphinx-argparse",
+    "sphinx-autobuild",
+    "types-contextvars",
+    "types-dataclasses",
+    "types-orjson",
+    "types-setuptools",
+]
+
+[tool.setuptools.packages.find]
+where = ["h5grove"]
+
 [tool.pytest.ini_options]
 minversion = "6.0"
 addopts = "--benchmark-columns=median,iqr,min,max --benchmark-group-by=param:h5path --cov=h5grove"
-testpaths = [
-    "test",
-]
+testpaths = ["test"]
+
+[tool.mypy]
+python_version = "3.8"
+
+[[tool.mypy.overrides]]
+module = ["h5py.*", "hdf5plugin", "tifffile"]
+ignore_missing_imports = true
