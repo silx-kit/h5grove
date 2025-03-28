@@ -26,7 +26,7 @@ fastapi = ["fastapi", "pydantic > 2", "pydantic-settings", "uvicorn"]
 flask = ["Flask", "Flask-Compress", "Flask-Cors"]
 tornado = ["tornado"]
 dev = [
-    "black >= 25",
+    "black",
     "bump2version",
     "check-manifest",
     "eval_type_backport",
