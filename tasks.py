@@ -10,7 +10,7 @@ def benchmark(c):
 
 @task
 def black(c):
-    c.run(f"{sys.executable} -m black --check h5grove/ example/ test/")
+    c.run(f"{sys.executable} -m black --check src/ example/")
 
 
 @task
@@ -20,7 +20,7 @@ def flake8(c):
 
 @task
 def mypy(c):
-    c.run(f"{sys.executable} -m mypy h5grove/ example/ test/")
+    c.run(f"{sys.executable} -m mypy src/ example/")
 
 
 @task

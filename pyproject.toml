@@ -51,13 +51,16 @@ dev = [
     "types-setuptools",
 ]
 
+[tool.setuptools]
+package-dir = { "" = "src" }
+
 [tool.setuptools.packages.find]
-where = ["h5grove"]
+where = ["src"]
 
 [tool.pytest.ini_options]
 minversion = "6.0"
 addopts = "--benchmark-columns=median,iqr,min,max --benchmark-group-by=param:h5path --cov=h5grove"
-testpaths = ["test"]
+testpaths = ["src/tests"]
 
 [tool.mypy]
 python_version = "3.8"

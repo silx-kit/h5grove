@@ -1,14 +1,15 @@
 graft example
-graft h5grove
+graft src
 
 include LICENSE
 include pyproject.toml
 include README.md
 
 prune docs
-prune test
+prune src/tests
 
 global-exclude *.pyc
 exclude .bumpversion.cfg
+exclude .flake8
 exclude CONTRIBUTING.md
 exclude tasks.py
