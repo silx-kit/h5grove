@@ -97,7 +97,7 @@ def subprocess_server(tmp_path_factory, request):
     """
     base_dir = tmp_path_factory.mktemp("h5grove_example_app_served").absolute()
 
-    project_root_dir = pathlib.Path(__file__).absolute().parent.parent
+    project_root_dir = pathlib.Path(__file__).absolute().parent.parent.parent
     host = "localhost"
     port = str(get_free_tcp_port(host))
     cmd = [

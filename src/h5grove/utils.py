@@ -149,30 +149,30 @@ def get_type_metadata(type_id: h5py.h5t.TypeID) -> TypeMetadata:
 
     if isinstance(type_id, h5py.h5t.TypeIntegerID):
         return {
-            **base_metadata,
+            **base_metadata,  # type: ignore
             "order": type_id.get_order(),
             "sign": type_id.get_sign(),
         }
 
     if isinstance(type_id, h5py.h5t.TypeFloatID):
         return {
-            **base_metadata,
+            **base_metadata,  # type: ignore
             "order": type_id.get_order(),
         }
 
     if isinstance(type_id, h5py.h5t.TypeStringID):
         return {
-            **base_metadata,
+            **base_metadata,  # type: ignore
             "cset": type_id.get_cset(),
             "strpad": type_id.get_strpad(),
             "vlen": type_id.is_variable_str(),
         }
 
     if isinstance(type_id, h5py.h5t.TypeBitfieldID):
-        return {**base_metadata, "order": type_id.get_order()}
+        return {**base_metadata, "order": type_id.get_order()}  # type: ignore
 
     if isinstance(type_id, h5py.h5t.TypeOpaqueID):
-        return {**base_metadata, "tag": type_id.get_tag()}
+        return {**base_metadata, "tag": type_id.get_tag()}  # type: ignore
 
     if isinstance(type_id, h5py.h5t.TypeCompoundID):
         for i in range(0, type_id.get_nmembers()):
@@ -180,7 +180,7 @@ def get_type_metadata(type_id: h5py.h5t.TypeID) -> TypeMetadata:
                 type_id.get_member_type(i)
             )
 
-        return {**base_metadata, "members": members}
+        return {**base_metadata, "members": members}  # type: ignore
 
     if isinstance(type_id, h5py.h5t.TypeEnumID):
         for i in range(0, type_id.get_nmembers()):
@@ -189,17 +189,17 @@ def get_type_metadata(type_id: h5py.h5t.TypeID) -> TypeMetadata:
             )
 
         return {
-            **base_metadata,
+            **base_metadata,  # type: ignore
             "members": members,
             "base": get_type_metadata(type_id.get_super()),
         }
 
     if isinstance(type_id, h5py.h5t.TypeVlenID):
-        return {**base_metadata, "base": get_type_metadata(type_id.get_super())}
+        return {**base_metadata, "base": get_type_metadata(type_id.get_super())}  # type: ignore
 
     if isinstance(type_id, h5py.h5t.TypeArrayID):
         return {
-            **base_metadata,
+            **base_metadata,  # type: ignore
             "dims": type_id.get_array_dims(),
             "base": get_type_metadata(type_id.get_super()),
         }
@@ -352,7 +352,7 @@ def get_filters(
 
 
 def get_filter_info(
-    filter: tuple[int, int, tuple[int, ...], str]
+    filter: tuple[int, int, tuple[int, ...], str],
 ) -> dict[str, int | str]:
     # https://api.h5py.org/h5p.html#h5py.h5p.PropDCID.get_filter
     (filter_id, _, _, name) = filter
