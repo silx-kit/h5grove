@@ -28,36 +28,33 @@ jobs:
 
       - name: Install dependencies ⚙️
         run: |
-          python -m pip install --upgrade pip
-          pip install .[dev]
+          python -m pip install -U pip hatch
+          hatch env create
 
       - name: Log Python environment ✏️
         run: |
-          pip freeze
+          hatch run python -m pip freeze
 
       - name: black ◼️
-        run: invoke black
+        run: hatch run lint_black
 
       - name: flake8 ❄️
-        run: invoke flake8
+        run: hatch run lint_flake8
 
       - name: mypy 🧐
-        run: invoke mypy
+        run: hatch run lint_mypy
 
       - name: bandit 🦝
-        run: invoke bandit
+        run: hatch run lint_bandit
 
       - name: pytest tests 👓
         run: |
           pushd src/tests/
-          invoke test
+          hatch run test
           popd
 
       - name: pytest benchmark 📈
-        run: invoke benchmark
+        run: hatch run benchmark
 
       - name: sphinx build 🐪
-        run: invoke docbuild
-
-      - name: check-manifest 📰
-        run: check-manifest
+        run: hatch run docbuild
