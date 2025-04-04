@@ -345,7 +345,8 @@ def get_list_of_paths(
 
     try:
         base_content = create_content(f, base_path, resolve_links)
-        assert isinstance(base_content, GroupContent)
+        if not isinstance(base_content, GroupContent):
+            raise TypeError(f"{base_content.path} is not a group")
         names.append(base_content.path)
         base_content._h5py_entity.id.links.visit(get_path)
         yield names

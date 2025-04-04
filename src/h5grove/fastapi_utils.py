@@ -92,7 +92,8 @@ async def get_attr(
 ):
     """`/attr/` endpoint handler"""
     with get_content_from_file(file, path, create_error) as content:
-        assert isinstance(content, ResolvedEntityContent)
+        if not isinstance(content, ResolvedEntityContent):
+            raise TypeError(f"{content.path} is not a resolved entity")
         h5grove_response = encode(content.attributes(attr_keys), "json")
         return Response(
             content=h5grove_response.content, headers=h5grove_response.headers
@@ -110,7 +111,8 @@ async def get_data(
 ):
     """`/data/` endpoint handler"""
     with get_content_from_file(file, path, create_error) as content:
-        assert isinstance(content, DatasetContent)
+        if not isinstance(content, DatasetContent):
+            raise TypeError(f"{content.path} is not a dataset")
         data = content.data(selection, flatten, dtype)
         h5grove_response = encode(data, format)
         return Response(
@@ -139,7 +141,8 @@ async def get_stats(
 ):
     """`/stats/` endpoint handler"""
     with get_content_from_file(file, path, create_error) as content:
-        assert isinstance(content, DatasetContent)
+        if not isinstance(content, DatasetContent):
+            raise TypeError(f"{content.path} is not a dataset")
         h5grove_response = encode(content.data_stats(selection), "json")
         return Response(
             content=h5grove_response.content, headers=h5grove_response.headers
