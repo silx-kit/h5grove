@@ -18,7 +18,7 @@ will install `h5grove` in editable mode with all the linting/formating/testing p
 All lint checks can be run with
 
 ```
-invoke lint
+hatch run lint
 ```
 
 Configuration entries are located in `pyproject.toml` (except for Flake8 that uses `.flake8`).
@@ -32,14 +32,14 @@ Tests are handled with [pytest](https://docs.pytest.org/en/stable/index.html). T
 Once `h5grove` is installed in editable mode, run the tests with
 
 ```
-invoke test
+hatch run test
 ```
 
-Available options (cf. `invoke --help test`):
+All `pytest` options can be used. For example, to run tests in verbose mode:
 
-- `-c`, `--cov-lines`: display line numbers in coverage report
-- `-k [keyword]`, `--keyword [keyword]`: filter tests by keyword
-- `-v`, `--verbose`: enable verbose test output
+```
+hatch run test -vv
+```
 
 ### Benchmarks
 
@@ -48,7 +48,7 @@ Benchmarks of different formats (`json`, `.npy`) and web server frameworks (`fla
 Benchmarks can be run with:
 
 ```
-invoke benchmark
+hatch run benchmark
 ```
 
 ## Release
@@ -89,11 +89,11 @@ The relevant files are in `docs/`:
 To build the documentation in development, with live reload at http://127.0.0.1:8000/, run:
 
 ```
-invoke doc
+hatch run doc
 ```
 
 To build the documentation once into the `_build` folder, run:
 
 ```
-invoke docbuild
+hatch run docbuild
 ```
