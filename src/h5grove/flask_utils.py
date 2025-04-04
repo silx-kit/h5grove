@@ -68,7 +68,9 @@ def attr_route():
     )
 
     with get_content_from_file(filename, path, create_error) as content:
-        assert isinstance(content, ResolvedEntityContent)
+        if not isinstance(content, ResolvedEntityContent):
+            raise TypeError(f"{content.path} is not a resolved entity")
+
         return make_encoded_response(content.attributes(attr_keys))
 
 
@@ -82,7 +84,8 @@ def data_route():
     flatten = parse_bool_arg(request.args.get("flatten"), fallback=False)
 
     with get_content_from_file(filename, path, create_error) as content:
-        assert isinstance(content, DatasetContent)
+        if not isinstance(content, DatasetContent):
+            raise TypeError(f"{content.path} is not a dataset")
         data = content.data(selection, flatten, dtype)
         return make_encoded_response(data, format_arg)
 
@@ -113,7 +116,8 @@ def stats_route():
     selection = request.args.get("selection")
 
     with get_content_from_file(filename, path, create_error) as content:
-        assert isinstance(content, DatasetContent)
+        if not isinstance(content, DatasetContent):
+            raise TypeError(f"{content.path} is not a dataset")
         return make_encoded_response(content.data_stats(selection))
 
 

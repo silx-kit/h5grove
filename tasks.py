@@ -24,11 +24,17 @@ def mypy(c):
 
 
 @task
+def bandit(c):
+    c.run(f"{sys.executable} -m bandit -c pyproject.toml -r src/")
+
+
+@task
 def lint(c):
     """Lint"""
     black(c)
     flake8(c)
     mypy(c)
+    bandit(c)
 
 
 @task(optional=["verbose", "keyword", "cov-lines"])

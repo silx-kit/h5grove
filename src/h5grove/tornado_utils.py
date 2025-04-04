@@ -100,7 +100,8 @@ class AttributeHandler(ContentHandler):
     """`/attr/` endpoint handler"""
 
     def get_content_response(self, content: EntityContent) -> Response:
-        assert isinstance(content, ResolvedEntityContent)
+        if not isinstance(content, ResolvedEntityContent):
+            raise TypeError(f"{content.path} is not a resolved entity")
 
         attr_keys = self.get_query_arguments("attr_keys", strip=False)
         # get_query_arguments returns an empty list if `attr_keys` is not present
@@ -118,7 +119,8 @@ class DataHandler(ContentHandler):
             self.get_query_argument("flatten", None), fallback=False
         )
 
-        assert isinstance(content, DatasetContent)
+        if not isinstance(content, DatasetContent):
+            raise TypeError(f"{content.path} is not a dataset")
         data = content.data(selection, flatten, dtype)
         return encode(data, format_arg)
 
@@ -136,7 +138,8 @@ class StatisticsHandler(ContentHandler):
     def get_content_response(self, content: EntityContent) -> Response:
         selection = self.get_query_argument("selection", None)
 
-        assert isinstance(content, DatasetContent)
+        if not isinstance(content, DatasetContent):
+            raise TypeError(f"{content.path} is not a dataset")
         return encode(content.data_stats(selection))
 
 

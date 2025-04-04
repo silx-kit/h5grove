@@ -26,6 +26,7 @@ fastapi = ["fastapi", "pydantic > 2", "pydantic-settings", "uvicorn"]
 flask = ["Flask", "Flask-Compress", "Flask-Cors"]
 tornado = ["tornado"]
 dev = [
+    "bandit",
     "black",
     "bump2version",
     "check-manifest",
@@ -68,3 +69,6 @@ python_version = "3.9"
 [[tool.mypy.overrides]]
 module = ["h5py.*", "hdf5plugin", "tifffile"]
 ignore_missing_imports = true
+
+[tool.bandit]
+exclude_dirs = ["src/tests"]
