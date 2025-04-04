@@ -13,6 +13,7 @@ will install `h5grove` in editable mode with all the linting/formating/testing p
 - Formatted with [black](https://github.com/psf/black)
 - Linted with [flake8](https://github.com/PyCQA/flake8)
 - Type-checked with [mypy](https://github.com/python/mypy)
+- Checked for common security issues with [bandit](https://github.com/PyCQA/bandit)
 
 All lint checks can be run with
 
@@ -20,7 +21,7 @@ All lint checks can be run with
 invoke lint
 ```
 
-Configuration entries are located in `setup.cfg`.
+Configuration entries are located in `pyproject.toml` (except for Flake8 that uses `.flake8`).
 
 **Code is checked at each push on main and for each PR** (see `lint-test.yml` workflow).
 
