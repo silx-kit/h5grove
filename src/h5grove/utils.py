@@ -1,5 +1,6 @@
 from __future__ import annotations
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
+from contextlib import contextmanager
 from typing import Any, TypeVar
 
 from pathlib import Path
@@ -369,18 +370,18 @@ def stringify_dtype(dtype: np.dtype) -> StrDtype:
     }
 
 
+@contextmanager
 def open_file_with_error_fallback(
     filepath: str | Path,
     create_error: Callable[[int, str], Exception],
     h5py_options: dict[str, Any] = {},
-) -> h5py.File:
+) -> Iterator[h5py.File]:
     try:
-        f = h5py.File(filepath, "r", **h5py_options)
+        with h5py.File(filepath, "r", **h5py_options) as f:
+            yield f
     except OSError as e:
         if isinstance(e, FileNotFoundError) or "No such file or directory" in str(e):
             raise create_error(404, "File not found!")
         if isinstance(e, PermissionError) or "Permission denied" in str(e):
             raise create_error(403, "Cannot read file: Permission denied!")
         raise e
-
-    return f
