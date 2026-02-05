@@ -11,10 +11,10 @@ jobs:
 
     steps:
       - name: Checkout 🏷️
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
 
       - name: Set up Python 🐍
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v6
         with:
           python-version: '3.10'
           architecture: 'x64'
@@ -28,13 +28,13 @@ jobs:
         run: hatch run docbuild
 
       - name: Deploy documentation 🚀
-        uses: JamesIves/github-pages-deploy-action@4.1.5
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
           BRANCH: gh-pages
           FOLDER: _build
 
       - name: Build the package 📦
-        run: hatch run build
+        run: hatch build
 
       - name: Release on PyPI 🎉
         env:
