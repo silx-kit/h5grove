@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>h5grove reference &#8212; h5grove 2.3.0 documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
-    <link rel="stylesheet" type="text/css" href="_static/nature.css?v=8fc2db88" />
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=e1b27810"></script>
-    <script src="_static/doctools.js?v=888ff710"></script>
-    <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+    <title>h5grove reference &#8212; h5grove 3.0.0-rc1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/nature.css?v=279e0f84" />
+    <script src="_static/documentation_options.js?v=7b4b2963"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="prev" title="Integration in an existing application" href="integration.html" /> 
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -27,7 +27,7 @@
         <li class="right" >
           <a href="integration.html" title="Integration in an existing application"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">h5grove 2.3.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">h5grove 3.0.0-rc1 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">h5grove reference</a></li> 
       </ul>
     </div>  
@@ -38,21 +38,21 @@
           <div class="body" role="main">
             
   <section id="h5grove-reference">
-<h1>h5grove reference<a class="headerlink" href="#h5grove-reference" title="Permalink to this heading">¶</a></h1>
+<h1>h5grove reference<a class="headerlink" href="#h5grove-reference" title="Link to this heading">¶</a></h1>
 <section id="content-module">
-<h2><code class="docutils literal notranslate"><span class="pre">content</span></code> module<a class="headerlink" href="#content-module" title="Permalink to this heading">¶</a></h2>
+<h2><code class="docutils literal notranslate"><span class="pre">content</span></code> module<a class="headerlink" href="#content-module" title="Link to this heading">¶</a></h2>
 <section id="create-a-content-object">
-<h3>Create a content object<a class="headerlink" href="#create-a-content-object" title="Permalink to this heading">¶</a></h3>
+<h3>Create a content object<a class="headerlink" href="#create-a-content-object" title="Link to this heading">¶</a></h3>
 <p>h5grove provides the <a class="reference external" href="https://silx-kit.github.io/h5grove/reference.html#create-a-content-object">create_content</a> that is a h5py wrapper to get a desired h5py entity. The function handles support link resolution and dataset decompression using <a class="reference external" href="https://pypi.org/project/hdf5plugin/">hdf5plugin</a></p>
 <dl class="py function">
 <dt class="sig sig-object py" id="h5grove.content.create_content">
-<span class="sig-prename descclassname"><span class="pre">h5grove.content.</span></span><span class="sig-name descname"><span class="pre">create_content</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">h5file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolve_links</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">LinkResolution.ONLY_VALID</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.content.create_content" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">h5grove.content.</span></span><span class="sig-name descname"><span class="pre">create_content</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">h5file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolve_links</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">LinkResolution.ONLY_VALID</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.content.create_content" title="Link to this definition">¶</a></dt>
 <dd><p>Factory function to get entity content from a HDF5 file.
 This handles external/soft link resolution and dataset decompression.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>h5file</strong> (<em>h5py.File</em>) – An open HDF5 file containing the entity</p></li>
+<li><p><strong>h5file</strong> (<em>File</em>) – An open HDF5 file containing the entity</p></li>
 <li><p><strong>path</strong> (<em>str</em><em> | </em><em>None</em>) – Path to the entity in the file.</p></li>
 <li><p><strong>resolve_links</strong> (<em>LinkResolution</em>) – Tells which external and soft links should be resolved. Defaults to resolving only valid links.</p></li>
 </ul>
@@ -69,7 +69,7 @@ This handles external/soft link resolution and dataset decompression.</p>
 
 </section>
 <section id="content-object-reference">
-<h3>Content object reference<a class="headerlink" href="#content-object-reference" title="Permalink to this heading">¶</a></h3>
+<h3>Content object reference<a class="headerlink" href="#content-object-reference" title="Link to this heading">¶</a></h3>
 <p>The <a class="reference external" href="https://silx-kit.github.io/h5grove/reference.html#content-object-reference">Content</a> objects returned by <a class="reference external" href="https://silx-kit.github.io/h5grove/reference.html#create-a-content-object">create_content</a> hold information to design endpoints.</p>
 <p>The <a class="reference external" href="https://silx-kit.github.io/h5grove/reference.html#content-object-reference">Content</a> objects returned by <a class="reference external" href="https://silx-kit.github.io/h5grove/reference.html#create-a-content-object">create_content</a> expose the relevant information of the entity through methods:</p>
 <ul class="simple">
@@ -81,23 +81,23 @@ This handles external/soft link resolution and dataset decompression.</p>
 <p>These methods are directly plugged to the endpoints from the example implementations so you can take a look at the <a class="reference external" href="https://silx-kit.github.io/h5grove/api.html">endpoints API</a> for more information.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="h5grove.content.ExternalLinkContent">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">h5grove.content.</span></span><span class="sig-name descname"><span class="pre">ExternalLinkContent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">link</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.content.ExternalLinkContent" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">h5grove.content.</span></span><span class="sig-name descname"><span class="pre">ExternalLinkContent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">link</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.content.ExternalLinkContent" title="Link to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>path</strong> (<em>str</em>) – </p></li>
-<li><p><strong>link</strong> (<em>h5py.ExternalLink</em>) – </p></li>
+<li><p><strong>path</strong> (<em>str</em>)</p></li>
+<li><p><strong>link</strong> (<em>h5py.ExternalLink</em>)</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="h5grove.content.ExternalLinkContent.kind">
-<span class="sig-name descname"><span class="pre">kind</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'external_link'</span></em><a class="headerlink" href="#h5grove.content.ExternalLinkContent.kind" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">kind</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'external_link'</span></em><a class="headerlink" href="#h5grove.content.ExternalLinkContent.kind" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="h5grove.content.ExternalLinkContent.metadata">
-<span class="sig-name descname"><span class="pre">metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.content.ExternalLinkContent.metadata" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.content.ExternalLinkContent.metadata" title="Link to this definition">¶</a></dt>
 <dd><p>External link metadata</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
@@ -108,25 +108,25 @@ This handles external/soft link resolution and dataset decompression.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="h5grove.content.ExternalLinkContent.name">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#h5grove.content.ExternalLinkContent.name" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#h5grove.content.ExternalLinkContent.name" title="Link to this definition">¶</a></dt>
 <dd><p>Entity name (last path segment)</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="h5grove.content.ExternalLinkContent.path">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#h5grove.content.ExternalLinkContent.path" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#h5grove.content.ExternalLinkContent.path" title="Link to this definition">¶</a></dt>
 <dd><p>Path in the file</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="h5grove.content.ExternalLinkContent.target_file">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">target_file</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#h5grove.content.ExternalLinkContent.target_file" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">target_file</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#h5grove.content.ExternalLinkContent.target_file" title="Link to this definition">¶</a></dt>
 <dd><p>The target file of the link</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="h5grove.content.ExternalLinkContent.target_path">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">target_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#h5grove.content.ExternalLinkContent.target_path" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">target_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#h5grove.content.ExternalLinkContent.target_path" title="Link to this definition">¶</a></dt>
 <dd><p>The target path of the link (in the target file)</p>
 </dd></dl>
 
@@ -134,23 +134,23 @@ This handles external/soft link resolution and dataset decompression.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="h5grove.content.SoftLinkContent">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">h5grove.content.</span></span><span class="sig-name descname"><span class="pre">SoftLinkContent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">link</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.content.SoftLinkContent" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">h5grove.content.</span></span><span class="sig-name descname"><span class="pre">SoftLinkContent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">link</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.content.SoftLinkContent" title="Link to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>path</strong> (<em>str</em>) – </p></li>
-<li><p><strong>link</strong> (<em>h5py.SoftLink</em>) – </p></li>
+<li><p><strong>path</strong> (<em>str</em>)</p></li>
+<li><p><strong>link</strong> (<em>h5py.SoftLink</em>)</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="h5grove.content.SoftLinkContent.kind">
-<span class="sig-name descname"><span class="pre">kind</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'soft_link'</span></em><a class="headerlink" href="#h5grove.content.SoftLinkContent.kind" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">kind</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'soft_link'</span></em><a class="headerlink" href="#h5grove.content.SoftLinkContent.kind" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="h5grove.content.SoftLinkContent.metadata">
-<span class="sig-name descname"><span class="pre">metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.content.SoftLinkContent.metadata" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.content.SoftLinkContent.metadata" title="Link to this definition">¶</a></dt>
 <dd><p>Soft link metadata</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
@@ -161,19 +161,19 @@ This handles external/soft link resolution and dataset decompression.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="h5grove.content.SoftLinkContent.name">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#h5grove.content.SoftLinkContent.name" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#h5grove.content.SoftLinkContent.name" title="Link to this definition">¶</a></dt>
 <dd><p>Entity name (last path segment)</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="h5grove.content.SoftLinkContent.path">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#h5grove.content.SoftLinkContent.path" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#h5grove.content.SoftLinkContent.path" title="Link to this definition">¶</a></dt>
 <dd><p>Path in the file</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="h5grove.content.SoftLinkContent.target_path">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">target_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#h5grove.content.SoftLinkContent.target_path" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">target_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#h5grove.content.SoftLinkContent.target_path" title="Link to this definition">¶</a></dt>
 <dd><p>The target path of the link</p>
 </dd></dl>
 
@@ -181,24 +181,32 @@ This handles external/soft link resolution and dataset decompression.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="h5grove.content.DatasetContent">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">h5grove.content.</span></span><span class="sig-name descname"><span class="pre">DatasetContent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h5py_entity</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.content.DatasetContent" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="py method">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">h5grove.content.</span></span><span class="sig-name descname"><span class="pre">DatasetContent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h5py_entity</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.content.DatasetContent" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<em>str</em>)</p></li>
+<li><p><strong>h5py_entity</strong> (<em>T</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
 <dt class="sig sig-object py" id="h5grove.content.DatasetContent.attributes">
-<span class="sig-name descname"><span class="pre">attributes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attr_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.content.DatasetContent.attributes" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">attributes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attr_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.content.DatasetContent.attributes" title="Link to this definition">¶</a></dt>
 <dd><p>Attributes of the h5py entity. Can be filtered by keys.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>attr_keys</strong> (<em>Sequence</em><em>[</em><em>str</em><em>] </em><em>| </em><em>None</em>) – </p>
+<dd class="field-odd"><p><strong>attr_keys</strong> (<em>Sequence</em><em>[</em><em>str</em><em>] </em><em>| </em><em>None</em>)</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>dict[str, AttributeMetadata]</p>
+<dd class="field-even"><p>dict[str, <em>AttributeMetadata</em>]</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="h5grove.content.DatasetContent.data">
-<span class="sig-name descname"><span class="pre">data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flatten</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'origin'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.content.DatasetContent.data" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flatten</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'origin'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.content.DatasetContent.data" title="Link to this definition">¶</a></dt>
 <dd><p>Dataset data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -215,7 +223,7 @@ This handles external/soft link resolution and dataset decompression.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="h5grove.content.DatasetContent.data_stats">
-<span class="sig-name descname"><span class="pre">data_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.content.DatasetContent.data_stats" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">data_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.content.DatasetContent.data_stats" title="Link to this definition">¶</a></dt>
 <dd><p>Statistics on the data. Providing a selection will compute stats only on the selected slice.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -229,12 +237,12 @@ This handles external/soft link resolution and dataset decompression.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="h5grove.content.DatasetContent.kind">
-<span class="sig-name descname"><span class="pre">kind</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'dataset'</span></em><a class="headerlink" href="#h5grove.content.DatasetContent.kind" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">kind</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'dataset'</span></em><a class="headerlink" href="#h5grove.content.DatasetContent.kind" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="h5grove.content.DatasetContent.metadata">
-<span class="sig-name descname"><span class="pre">metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.content.DatasetContent.metadata" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.content.DatasetContent.metadata" title="Link to this definition">¶</a></dt>
 <dd><p>Dataset metadata</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
@@ -245,13 +253,13 @@ This handles external/soft link resolution and dataset decompression.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="h5grove.content.DatasetContent.name">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#h5grove.content.DatasetContent.name" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#h5grove.content.DatasetContent.name" title="Link to this definition">¶</a></dt>
 <dd><p>Entity name (last path segment)</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="h5grove.content.DatasetContent.path">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#h5grove.content.DatasetContent.path" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#h5grove.content.DatasetContent.path" title="Link to this definition">¶</a></dt>
 <dd><p>Path in the file</p>
 </dd></dl>
 
@@ -259,35 +267,44 @@ This handles external/soft link resolution and dataset decompression.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="h5grove.content.GroupContent">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">h5grove.content.</span></span><span class="sig-name descname"><span class="pre">GroupContent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h5py_entity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h5file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.content.GroupContent" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="py method">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">h5grove.content.</span></span><span class="sig-name descname"><span class="pre">GroupContent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h5py_entity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h5file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.content.GroupContent" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<em>str</em>)</p></li>
+<li><p><strong>h5py_entity</strong> (<em>h5py.Group</em>)</p></li>
+<li><p><strong>h5file</strong> (<em>h5py.File</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
 <dt class="sig sig-object py" id="h5grove.content.GroupContent.attributes">
-<span class="sig-name descname"><span class="pre">attributes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attr_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.content.GroupContent.attributes" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">attributes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attr_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.content.GroupContent.attributes" title="Link to this definition">¶</a></dt>
 <dd><p>Attributes of the h5py entity. Can be filtered by keys.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>attr_keys</strong> (<em>Sequence</em><em>[</em><em>str</em><em>] </em><em>| </em><em>None</em>) – </p>
+<dd class="field-odd"><p><strong>attr_keys</strong> (<em>Sequence</em><em>[</em><em>str</em><em>] </em><em>| </em><em>None</em>)</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>dict[str, AttributeMetadata]</p>
+<dd class="field-even"><p>dict[str, <em>AttributeMetadata</em>]</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="h5grove.content.GroupContent.kind">
-<span class="sig-name descname"><span class="pre">kind</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'group'</span></em><a class="headerlink" href="#h5grove.content.GroupContent.kind" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">kind</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'group'</span></em><a class="headerlink" href="#h5grove.content.GroupContent.kind" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="h5grove.content.GroupContent.metadata">
-<span class="sig-name descname"><span class="pre">metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.content.GroupContent.metadata" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.content.GroupContent.metadata" title="Link to this definition">¶</a></dt>
 <dd><p>Metadata of the group. Recursively includes child metadata if depth &gt; 0.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>depth</strong> (<em>int</em>) – The level of child metadata resolution.</p></li>
-<li><p><strong>depth</strong> – </p></li>
+<li><p><strong>depth</strong></p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -298,13 +315,13 @@ This handles external/soft link resolution and dataset decompression.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="h5grove.content.GroupContent.name">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#h5grove.content.GroupContent.name" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#h5grove.content.GroupContent.name" title="Link to this definition">¶</a></dt>
 <dd><p>Entity name (last path segment)</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="h5grove.content.GroupContent.path">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#h5grove.content.GroupContent.path" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#h5grove.content.GroupContent.path" title="Link to this definition">¶</a></dt>
 <dd><p>Path in the file</p>
 </dd></dl>
 
@@ -313,13 +330,13 @@ This handles external/soft link resolution and dataset decompression.</p>
 </section>
 </section>
 <section id="encoders-module">
-<h2><code class="docutils literal notranslate"><span class="pre">encoders</span></code> module<a class="headerlink" href="#encoders-module" title="Permalink to this heading">¶</a></h2>
+<h2><code class="docutils literal notranslate"><span class="pre">encoders</span></code> module<a class="headerlink" href="#encoders-module" title="Link to this heading">¶</a></h2>
 <p>The <a class="reference external" href="https://silx-kit.github.io/h5grove/reference.html#encoders-module">encoders</a> module contain functions that encode data and provide the appropriate headers to build request responses. The module provides a JSON encoder using <code class="docutils literal notranslate"><span class="pre">orjson</span></code>, a binary encoder for NumPy arrays and other encoders to serve NumPy arrays as downloadable files.</p>
 <section id="general">
-<h3>General<a class="headerlink" href="#general" title="Permalink to this heading">¶</a></h3>
+<h3>General<a class="headerlink" href="#general" title="Link to this heading">¶</a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="h5grove.encoders.encode">
-<span class="sig-prename descclassname"><span class="pre">h5grove.encoders.</span></span><span class="sig-name descname"><span class="pre">encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">content</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'json'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.encoders.encode" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">h5grove.encoders.</span></span><span class="sig-name descname"><span class="pre">encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">content</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'json'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.encoders.encode" title="Link to this definition">¶</a></dt>
 <dd><p>Encode content in given encoding.</p>
 <p>Warning: Not all encodings supports all types of content.</p>
 <dl class="field-list simple">
@@ -343,31 +360,31 @@ This handles external/soft link resolution and dataset decompression.</p>
 <dd class="field-odd"><p><strong>QueryArgumentError</strong> – If encoding is not among the ones above.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="#h5grove.encoders.Response" title="h5grove.encoders.Response">Response</a></p>
+<dd class="field-even"><p><a class="reference internal" href="#h5grove.encoders.Response" title="h5grove.encoders.Response"><em>Response</em></a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="h5grove.encoders.Response">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">h5grove.encoders.</span></span><span class="sig-name descname"><span class="pre">Response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">content</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.encoders.Response" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">h5grove.encoders.</span></span><span class="sig-name descname"><span class="pre">Response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">content</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.encoders.Response" title="Link to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>content</strong> (<em>bytes</em>) – </p></li>
-<li><p><strong>headers</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>str</em><em>]</em>) – </p></li>
+<li><p><strong>content</strong> (<em>bytes</em>)</p></li>
+<li><p><strong>headers</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>str</em><em>]</em>)</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="h5grove.encoders.Response.content">
-<span class="sig-name descname"><span class="pre">content</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bytes</span></em><a class="headerlink" href="#h5grove.encoders.Response.content" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">content</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bytes</span></em><a class="headerlink" href="#h5grove.encoders.Response.content" title="Link to this definition">¶</a></dt>
 <dd><p>Encoded <cite>content</cite> as bytes</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="h5grove.encoders.Response.headers">
-<span class="sig-name descname"><span class="pre">headers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#h5grove.encoders.Response.headers" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">headers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#h5grove.encoders.Response.headers" title="Link to this definition">¶</a></dt>
 <dd><p>Associated headers</p>
 </dd></dl>
 
@@ -375,17 +392,17 @@ This handles external/soft link resolution and dataset decompression.</p>
 
 </section>
 <section id="id1">
-<h3>General<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h3>
+<h3>General<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="h5grove.encoders.orjson_default">
-<span class="sig-prename descclassname"><span class="pre">h5grove.encoders.</span></span><span class="sig-name descname"><span class="pre">orjson_default</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">o</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.encoders.orjson_default" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">h5grove.encoders.</span></span><span class="sig-name descname"><span class="pre">orjson_default</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">o</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.encoders.orjson_default" title="Link to this definition">¶</a></dt>
 <dd><p>Converts Python objects to JSON-serializable objects.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>TypeError</strong> – if the object is not supported.</p>
 </dd>
 <dt class="field-even">Parameters<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>o</strong> (<em>Any</em>) – </p>
+<dd class="field-even"><p><strong>o</strong> (<em>Any</em>)</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list | float | str | None</p>
@@ -395,7 +412,7 @@ This handles external/soft link resolution and dataset decompression.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="h5grove.encoders.orjson_encode">
-<span class="sig-prename descclassname"><span class="pre">h5grove.encoders.</span></span><span class="sig-name descname"><span class="pre">orjson_encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">content</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.encoders.orjson_encode" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">h5grove.encoders.</span></span><span class="sig-name descname"><span class="pre">orjson_encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">content</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.encoders.orjson_encode" title="Link to this definition">¶</a></dt>
 <dd><p>Encode in JSON using orjson.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Param<span class="colon">:</span></dt>
@@ -404,7 +421,7 @@ This handles external/soft link resolution and dataset decompression.</p>
 <dt class="field-even">Parameters<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><strong>default</strong> (<em>Callable</em><em> | </em><em>None</em>) – orjson default (<a class="reference external" href="https://github.com/ijl/orjson#default">https://github.com/ijl/orjson#default</a>)</p></li>
-<li><p><strong>content</strong> (<em>Any</em>) – </p></li>
+<li><p><strong>content</strong> (<em>Any</em>)</p></li>
 </ul>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
@@ -415,10 +432,10 @@ This handles external/soft link resolution and dataset decompression.</p>
 
 </section>
 <section id="binary">
-<h3>Binary<a class="headerlink" href="#binary" title="Permalink to this heading">¶</a></h3>
+<h3>Binary<a class="headerlink" href="#binary" title="Link to this heading">¶</a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="h5grove.encoders.bin_encode">
-<span class="sig-prename descclassname"><span class="pre">h5grove.encoders.</span></span><span class="sig-name descname"><span class="pre">bin_encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.encoders.bin_encode" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">h5grove.encoders.</span></span><span class="sig-name descname"><span class="pre">bin_encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.encoders.bin_encode" title="Link to this definition">¶</a></dt>
 <dd><p>Convert array to bytes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -432,17 +449,17 @@ This handles external/soft link resolution and dataset decompression.</p>
 
 </section>
 <section id="file-formats">
-<h3>File formats<a class="headerlink" href="#file-formats" title="Permalink to this heading">¶</a></h3>
+<h3>File formats<a class="headerlink" href="#file-formats" title="Link to this heading">¶</a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="h5grove.encoders.csv_encode">
-<span class="sig-prename descclassname"><span class="pre">h5grove.encoders.</span></span><span class="sig-name descname"><span class="pre">csv_encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.encoders.csv_encode" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">h5grove.encoders.</span></span><span class="sig-name descname"><span class="pre">csv_encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.encoders.csv_encode" title="Link to this definition">¶</a></dt>
 <dd><p>Encodes a NumPy array in CSV.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Param<span class="colon">:</span></dt>
 <dd class="field-odd"><p>data: NumPy array to encode</p>
 </dd>
 <dt class="field-even">Parameters<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>data</strong> (<em>ndarray</em>) – </p>
+<dd class="field-even"><p><strong>data</strong> (<em>ndarray</em>)</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>bytes</p>
@@ -452,14 +469,14 @@ This handles external/soft link resolution and dataset decompression.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="h5grove.encoders.npy_encode">
-<span class="sig-prename descclassname"><span class="pre">h5grove.encoders.</span></span><span class="sig-name descname"><span class="pre">npy_encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.encoders.npy_encode" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">h5grove.encoders.</span></span><span class="sig-name descname"><span class="pre">npy_encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.encoders.npy_encode" title="Link to this definition">¶</a></dt>
 <dd><p>Encodes a NumPy array in NPY.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Param<span class="colon">:</span></dt>
 <dd class="field-odd"><p>data: NumPy array to encode</p>
 </dd>
 <dt class="field-even">Parameters<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>data</strong> (<em>ndarray</em>) – </p>
+<dd class="field-even"><p><strong>data</strong> (<em>ndarray</em>)</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>bytes</p>
@@ -469,14 +486,14 @@ This handles external/soft link resolution and dataset decompression.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="h5grove.encoders.tiff_encode">
-<span class="sig-prename descclassname"><span class="pre">h5grove.encoders.</span></span><span class="sig-name descname"><span class="pre">tiff_encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.encoders.tiff_encode" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">h5grove.encoders.</span></span><span class="sig-name descname"><span class="pre">tiff_encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.encoders.tiff_encode" title="Link to this definition">¶</a></dt>
 <dd><p>Encodes a NumPy array in TIFF. The data should be 2D.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Param<span class="colon">:</span></dt>
 <dd class="field-odd"><p>data: NumPy array to encode</p>
 </dd>
 <dt class="field-even">Parameters<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>data</strong> (<em>ndarray</em>) – </p>
+<dd class="field-even"><p><strong>data</strong> (<em>ndarray</em>)</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>bytes</p>
@@ -493,7 +510,7 @@ This handles external/soft link resolution and dataset decompression.</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
   <div>
     <h3><a href="index.html">Table of Contents</a></h3>
@@ -588,7 +605,7 @@ This handles external/soft link resolution and dataset decompression.</p>
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
@@ -596,13 +613,13 @@ This handles external/soft link resolution and dataset decompression.</p>
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
+</search>
 <script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -614,13 +631,13 @@ This handles external/soft link resolution and dataset decompression.</p>
         <li class="right" >
           <a href="integration.html" title="Integration in an existing application"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">h5grove 2.3.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">h5grove 3.0.0-rc1 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">h5grove reference</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-    &#169; Copyright 2024, ESRF.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+    &#169; Copyright 2021-2025, ESRF.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
     </div>
   </body>
 </html>
