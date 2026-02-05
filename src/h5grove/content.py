@@ -297,25 +297,21 @@ def get_content_from_file(
     resolve_links_arg: str | None = LinkResolution.ONLY_VALID,
     h5py_options: dict[str, Any] = {},
 ):
-    f = open_file_with_error_fallback(filepath, create_error, h5py_options)
-
     try:
         resolve_links = parse_link_resolution_arg(
             resolve_links_arg,
             fallback=LinkResolution.ONLY_VALID,
         )
     except QueryArgumentError as e:
-        f.close()
         raise create_error(422, str(e))
 
     try:
-        yield create_content(f, path, resolve_links)
+        with open_file_with_error_fallback(filepath, create_error, h5py_options) as f:
+            yield create_content(f, path, resolve_links)
     except NotFoundError as e:
         raise create_error(404, str(e))
     except QueryArgumentError as e:
         raise create_error(422, str(e))
-    finally:
-        f.close()
 
 
 @contextlib.contextmanager
@@ -326,8 +322,6 @@ def get_list_of_paths(
     resolve_links_arg: str | None = LinkResolution.ONLY_VALID,
     h5py_options: dict[str, Any] = {},
 ):
-    f = open_file_with_error_fallback(filepath, create_error, h5py_options)
-
     try:
         resolve_links = parse_link_resolution_arg(
             resolve_links_arg,
@@ -344,15 +338,14 @@ def get_list_of_paths(
         names.append(content.path)
 
     try:
-        base_content = create_content(f, base_path, resolve_links)
-        if not isinstance(base_content, GroupContent):
-            raise TypeError(f"{base_content.path} is not a group")
-        names.append(base_content.path)
-        base_content._h5py_entity.id.links.visit(get_path)
-        yield names
+        with open_file_with_error_fallback(filepath, create_error, h5py_options) as f:
+            base_content = create_content(f, base_path, resolve_links)
+            if not isinstance(base_content, GroupContent):
+                raise TypeError(f"{base_content.path} is not a group")
+            names.append(base_content.path)
+            base_content._h5py_entity.id.links.visit(get_path)
+            yield names
     except NotFoundError as e:
         raise create_error(404, str(e))
     except QueryArgumentError as e:
         raise create_error(422, str(e))
-    finally:
-        f.close()
