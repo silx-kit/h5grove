@@ -1,7 +1,6 @@
 [build-system]
-requires = ["setuptools>=42.0.0", "wheel"]
-build-backend = "setuptools.build_meta"
-
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "h5grove"
@@ -29,12 +28,11 @@ dev = [
     "bandit",
     "black",
     "bump2version",
-    "check-manifest",
     "flake8",
+    "hatch",
     "h5grove[fastapi]",
     "h5grove[flask]",
     "h5grove[tornado]",
-    "invoke",
     "mypy",
     "myst-parser",
     "httpx >= 0.23",
@@ -51,12 +49,6 @@ dev = [
     "types-setuptools",
 ]
 
-[tool.setuptools]
-package-dir = { "" = "src" }
-
-[tool.setuptools.packages.find]
-where = ["src"]
-
 [tool.pytest.ini_options]
 minversion = "6.0"
 addopts = "--benchmark-columns=median,iqr,min,max --benchmark-group-by=param:h5path --cov=src/h5grove"
@@ -71,3 +63,26 @@ ignore_missing_imports = true
 
 [tool.bandit]
 exclude_dirs = ["src/tests"]
+
+[tool.hatch.envs.default]
+features = ["dev"]
+
+[tool.hatch.envs.default.scripts]
+benchmark = "pytest --benchmark-only"
+test = 'pytest --benchmark-skip {args}'
+lint_black = "black --check src/ example/"
+lint_flake8 = 'flake8 -v'
+lint_mypy = 'mypy src/ example/'
+lint_bandit = 'bandit -c pyproject.toml -r src/'
+lint = ['lint_black', 'lint_flake8', 'lint_mypy', 'lint_bandit']
+docbuild = "sphinx-build -W -b html docs _build"
+doc = "sphinx-autobuild -W -b html docs _build"
+
+[tool.hatch.build.targets.sdist]
+include = ["src/h5grove"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/h5grove"]
+
+[tool.hatch.publish.index]
+disable = true
