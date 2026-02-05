@@ -19,7 +19,6 @@ sys.path.insert(0, os.path.abspath(".."))
 
 import h5grove  # noqa
 
-
 # -- Project information -----------------------------------------------------
 
 project = "h5grove"

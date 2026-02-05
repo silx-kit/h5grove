@@ -17,7 +17,6 @@ from .content import (
 from .encoders import encode
 from .utils import parse_bool_arg
 
-
 __all__ = [
     "root_route",
     "attr_route",

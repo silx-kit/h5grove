@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 """Flask-based server sample code"""
+
 import argparse
 from flask import Flask
 from flask_compress import Compress  # type: ignore

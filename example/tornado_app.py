@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 """Tornado-based server sample code"""
+
 import argparse
 import os
 import tornado.web

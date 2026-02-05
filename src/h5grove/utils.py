@@ -356,7 +356,7 @@ def get_filter_info(
     filter: tuple[int, int, tuple[int, ...], str],
 ) -> dict[str, int | str]:
     # https://api.h5py.org/h5p.html#h5py.h5p.PropDCID.get_filter
-    (filter_id, _, _, name) = filter
+    filter_id, _, _, name = filter
 
     return {"id": filter_id, "name": name}
 
