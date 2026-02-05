@@ -1,14 +1,14 @@
 from __future__ import annotations
 from enum import Enum
-from typing import Union, Tuple, Dict, List
-from typing_extensions import TypedDict, NotRequired
+from typing import TypedDict
+from typing_extensions import NotRequired
 import h5py
 
-H5pyEntity = Union[
-    h5py.Dataset, h5py.Datatype, h5py.ExternalLink, h5py.Group, h5py.SoftLink
-]
+H5pyEntity = (
+    h5py.Dataset | h5py.Datatype | h5py.ExternalLink | h5py.Group | h5py.SoftLink
+)
 
-Selection = Union[str, int, slice, Tuple[Union[slice, int], ...], None]
+Selection = str | int | slice | tuple[slice | int, ...] | None
 
 
 class LinkResolution(str, Enum):
@@ -20,7 +20,7 @@ class LinkResolution(str, Enum):
 
 
 # Recursive types not supported by mypy: https://github.com/python/mypy/issues/731
-StrDtype = Union[str, Dict[str, "StrDtype"]]  # type: ignore
+StrDtype = str | dict[str, "StrDtype"]  # type: ignore
 
 # https://api.h5py.org/h5t.html
 # Must use functional `TypedDict` syntax because of `class` key
@@ -36,8 +36,8 @@ TypeMetadata = TypedDict(
         "strpad": int,  # string
         "vlen": bool,  # string
         "tag": str,  # opaque
-        "dims": Tuple[int, ...],  # array
-        "members": Union[Dict[str, "TypeMetadata"], Dict[str, int]],  # compound, enum
+        "dims": tuple[int, ...],  # array
+        "members": dict[str, "TypeMetadata"] | dict[str, int],  # compound, enum
         "base": "TypeMetadata",  # array, enum, vlen
     },
     total=False,
@@ -65,11 +65,11 @@ class AttributeMetadata(TypedDict):
 
 
 class ResolvedEntityMetadata(EntityMetadata):
-    attributes: List[AttributeMetadata]
+    attributes: list[AttributeMetadata]
 
 
 class GroupMetadata(ResolvedEntityMetadata):
-    children: NotRequired[List[EntityMetadata]]
+    children: NotRequired[list[EntityMetadata]]
 
 
 class DatasetMetadata(ResolvedEntityMetadata):
@@ -84,9 +84,9 @@ class DatatypeMetadata(ResolvedEntityMetadata):
 
 
 class Stats(TypedDict):
-    strict_positive_min: Union[int, float, None]
-    positive_min: Union[int, float, None]
-    min: Union[int, float, None]
-    max: Union[int, float, None]
-    mean: Union[int, float, None]
-    std: Union[int, float, None]
+    strict_positive_min: int | float | None
+    positive_min: int | float | None
+    min: int | float | None
+    max: int | float | None
+    mean: int | float | None
+    std: int | float | None

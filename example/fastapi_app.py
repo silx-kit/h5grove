@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 """FastAPI-based server sample code"""
+
 import argparse
 import os
 import uvicorn
