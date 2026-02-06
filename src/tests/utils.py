@@ -1,10 +1,10 @@
 from __future__ import annotations
-from typing import NamedTuple
 
 import io
 import json
-import numpy as np
+from typing import NamedTuple
 
+import numpy as np
 import tifffile
 
 from h5grove.utils import hdf_path_join

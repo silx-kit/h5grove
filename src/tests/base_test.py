@@ -1,19 +1,19 @@
 """Base class for testing with different servers"""
 
 from __future__ import annotations
-from collections.abc import Generator
 
 import os
 import stat
+from collections.abc import Generator
 from urllib.parse import urlencode
 
 import h5py
 import numpy as np
 import pytest
-
 from conftest import BaseServer
+from utils import decode_array_response, decode_response
+
 from h5grove.models import LinkResolution
-from utils import decode_response, decode_array_response
 
 
 class BaseTestEndpoints:
@@ -30,7 +30,7 @@ class BaseTestEndpoints:
         assert get_response.content == b"ok"
 
     def test_attr_on_root(self, server):
-        """Test /attr/ endpoint on root group"""
+        """Test /attr endpoint on root group"""
         # Test condition
         tested_h5entity_path = "/"
         nx_attributes = {
@@ -47,21 +47,21 @@ class BaseTestEndpoints:
             for name, value in attributes.items():
                 h5file.attrs[name] = value
 
-        response = server.get(f"/attr/?file={filename}&path={tested_h5entity_path}")
+        response = server.get(f"/attr?file={filename}&path={tested_h5entity_path}")
         retrieved_attributes = decode_response(response)
 
         assert retrieved_attributes == attributes
 
         # Test attr_keys query parameter by getting only NX attributes
         response = server.get(
-            f"/attr/?file={filename}&path={tested_h5entity_path}{''.join(f'&attr_keys={k}' for k in nx_attributes.keys())}"
+            f"/attr?file={filename}&path={tested_h5entity_path}{''.join(f'&attr_keys={k}' for k in nx_attributes.keys())}"
         )
         retrieved_attributes = decode_response(response)
         assert retrieved_attributes == nx_attributes
 
     @pytest.mark.parametrize("format_arg", ("json", "bin", "npy", "csv", "tiff"))
     def test_data_on_array_with_format(self, server, format_arg):
-        """Test /data/ endpoint on array dataset"""
+        """Test /data endpoint on array dataset"""
         # Test condition
         tested_h5entity_path = "/entry/image"
         data = np.random.random((128, 128))
@@ -71,7 +71,7 @@ class BaseTestEndpoints:
             h5file[tested_h5entity_path] = data
 
         response = server.get(
-            f"/data/?{urlencode({'file': filename, 'path': tested_h5entity_path, 'format': format_arg})}"
+            f"/data?{urlencode({'file': filename, 'path': tested_h5entity_path, 'format': format_arg})}"
         )
         retrieved_data = decode_array_response(
             response, format_arg, data.dtype.str, data.shape
@@ -81,7 +81,7 @@ class BaseTestEndpoints:
 
     @pytest.mark.parametrize("format_arg", ("json", "bin", "npy"))
     def test_data_on_scalar_with_format(self, server, format_arg):
-        """Test /data/ endpoint on scalar dataset"""
+        """Test /data endpoint on scalar dataset"""
         # Test condition
         tested_h5entity_path = "/entry/scalar"
         data = 5
@@ -93,7 +93,7 @@ class BaseTestEndpoints:
             shape = dset.shape
 
         response = server.get(
-            f"/data/?{urlencode({'file': filename, 'path': tested_h5entity_path, 'format': format_arg})}"
+            f"/data?{urlencode({'file': filename, 'path': tested_h5entity_path, 'format': format_arg})}"
         )
         retrieved_data = decode_array_response(response, format_arg, dtype.str, shape)
 
@@ -105,7 +105,7 @@ class BaseTestEndpoints:
         server,
         format_arg,
     ):
-        """Test /data/ endpoint on array dataset with dtype=safe"""
+        """Test /data endpoint on array dataset with dtype=safe"""
         # Test condition
         tested_h5entity_path = "/entry/image"
         data = np.random.random((128, 128)).astype(">f2")
@@ -116,7 +116,7 @@ class BaseTestEndpoints:
             h5file[tested_h5entity_path] = data
 
         response = server.get(
-            f"/data/?{urlencode({'file': filename, 'path': tested_h5entity_path, 'format': format_arg, 'dtype': 'safe'})}"
+            f"/data?{urlencode({'file': filename, 'path': tested_h5entity_path, 'format': format_arg, 'dtype': 'safe'})}"
         )
 
         retrieved_data = decode_array_response(response, format_arg, "<f4", data.shape)
@@ -124,7 +124,7 @@ class BaseTestEndpoints:
 
     @pytest.mark.parametrize("format_arg", ("json", "npy"))
     def test_data_on_slice_with_format_and_flatten(self, server, format_arg):
-        """Test /data/ endpoint on array dataset with flatten"""
+        """Test /data endpoint on array dataset with flatten"""
         # Test condition
         tested_h5entity_path = "/entry/image"
         data = np.random.random((128, 128))
@@ -134,14 +134,14 @@ class BaseTestEndpoints:
             h5file[tested_h5entity_path] = data
 
         response = server.get(
-            f"/data/?{urlencode({'file': filename, 'path': tested_h5entity_path, 'selection': '100,0', 'format': format_arg, 'flatten': True})}"
+            f"/data?{urlencode({'file': filename, 'path': tested_h5entity_path, 'selection': '100,0', 'format': format_arg, 'flatten': True})}"
         )
         retrieved_data = np.asarray(decode_response(response, format_arg))
 
         assert retrieved_data - data[100, 0] < 1e-8
 
     def test_data_on_bool(self, server):
-        """Test /data/ endpoint on boolean dataset with format=bin"""
+        """Test /data endpoint on boolean dataset with format=bin"""
         tested_h5entity_path = "/bool"
         data = np.array([True, False, True, True])
 
@@ -152,7 +152,7 @@ class BaseTestEndpoints:
             shape = dset.shape
 
         response = server.get(
-            f"/data/?{urlencode({'file': filename, 'path': tested_h5entity_path, 'format': 'bin'})}"
+            f"/data?{urlencode({'file': filename, 'path': tested_h5entity_path, 'format': 'bin'})}"
         )
 
         content_type = response.find_header_value("content-type")
@@ -162,7 +162,7 @@ class BaseTestEndpoints:
         assert np.array_equal(retrieved_data, data)
 
     def test_data_on_opaque(self, server):
-        """Test /data/ endpoint on opaque dataset with format=bin"""
+        """Test /data endpoint on opaque dataset with format=bin"""
         tested_h5entity_path = "/opaque"
         data = np.void(b"\x00")
 
@@ -171,7 +171,7 @@ class BaseTestEndpoints:
             h5file[tested_h5entity_path] = data
 
         response = server.get(
-            f"/data/?{urlencode({'file': filename, 'path': tested_h5entity_path, 'format': 'bin'})}"
+            f"/data?{urlencode({'file': filename, 'path': tested_h5entity_path, 'format': 'bin'})}"
         )
 
         content_type = response.find_header_value("content-type")
@@ -181,13 +181,13 @@ class BaseTestEndpoints:
         assert np.array_equal(retrieved_data, data)
 
     def test_meta_on_datatype(self, server):
-        """Test /meta/ endpoint on a committed datatype"""
+        """Test /meta endpoint on a committed datatype"""
         filename = "test.h5"
 
         with h5py.File(server.served_directory / filename, mode="w") as h5file:
             h5file["committed_type"] = np.dtype("<f8")
 
-        response = server.get(f"/meta/?file={filename}&path=/committed_type")
+        response = server.get(f"/meta?file={filename}&path=/committed_type")
         content = decode_response(response)
 
         assert content == {
@@ -198,7 +198,7 @@ class BaseTestEndpoints:
         }
 
     def test_meta_on_chunked_compressed_dataset(self, server):
-        """Test /meta/ endpoint on a chunked and compressed dataset"""
+        """Test /meta endpoint on a chunked and compressed dataset"""
         filename = "test.h5"
         tested_h5entity_path = "/data"
 
@@ -212,7 +212,7 @@ class BaseTestEndpoints:
                 chunks=(5, 5),
             )
 
-        response = server.get(f"/meta/?file={filename}&path={tested_h5entity_path}")
+        response = server.get(f"/meta?file={filename}&path={tested_h5entity_path}")
         content = decode_response(response)
 
         assert content == {
@@ -226,7 +226,7 @@ class BaseTestEndpoints:
         }
 
     def test_meta_on_compound_dataset(self, server):
-        """Test /meta/ endpoint on a chunked and compressed dataset"""
+        """Test /meta endpoint on a chunked and compressed dataset"""
         filename = "test.h5"
         tested_h5entity_path = "/dogs"
 
@@ -239,7 +239,7 @@ class BaseTestEndpoints:
                 ),
             )
 
-        response = server.get(f"/meta/?file={filename}&path={tested_h5entity_path}")
+        response = server.get(f"/meta?file={filename}&path={tested_h5entity_path}")
         content = decode_response(response)
 
         assert content == {
@@ -275,7 +275,7 @@ class BaseTestEndpoints:
         }
 
     def test_meta_on_compound_dataset_with_advanced_types(self, server):
-        """Test /meta/ endpoint on compound dataset with advanced types"""
+        """Test /meta endpoint on compound dataset with advanced types"""
         filename = "test.h5"
         tested_h5entity_path = "/foo"
 
@@ -306,7 +306,7 @@ class BaseTestEndpoints:
                 ),
             )
 
-        response = server.get(f"/meta/?file={filename}&path={tested_h5entity_path}")
+        response = server.get(f"/meta?file={filename}&path={tested_h5entity_path}")
         content = decode_response(response)
 
         assert content == {
@@ -373,7 +373,7 @@ class BaseTestEndpoints:
         }
 
     def test_meta_on_group(self, server):
-        """Test /meta/ endpoint on a group"""
+        """Test /meta endpoint on a group"""
         # Test condition
         tested_h5entity_path = "/"
         attributes = {"NX_class": "NXRoot", "default": "entry"}
@@ -386,7 +386,7 @@ class BaseTestEndpoints:
             h5file.create_group("group")
             h5file["data"] = np.arange(10)
 
-        response = server.get(f"/meta/?file={filename}&path={tested_h5entity_path}")
+        response = server.get(f"/meta?file={filename}&path={tested_h5entity_path}")
         content = decode_response(response)
         retrieved_attr_name = [attr["name"] for attr in content["attributes"]]
         retrieved_children_name = [child["name"] for child in content["children"]]
@@ -409,7 +409,7 @@ class BaseTestEndpoints:
             h5file["ext_link"] = h5py.ExternalLink(source_file, "data")
 
         response = server.get(
-            f"/meta/?{urlencode({'file': filename, 'path': '/ext_link', 'resolve_links': resolve_links.value})}"
+            f"/meta?{urlencode({'file': filename, 'path': '/ext_link', 'resolve_links': resolve_links.value})}"
         )
         content = decode_response(response)
 
@@ -448,7 +448,7 @@ class BaseTestEndpoints:
         with h5py.File(server.served_directory / filename, mode="w") as h5file:
             h5file[tested_h5entity_path] = h5data
 
-        response = server.get(f"/stats/?file={filename}&path={tested_h5entity_path}")
+        response = server.get(f"/stats?file={filename}&path={tested_h5entity_path}")
         retrieved_stats = decode_response(response)
         assert retrieved_stats == expected_stats
 
@@ -468,7 +468,7 @@ class BaseTestEndpoints:
         with h5py.File(server.served_directory / filename, mode="w") as h5file:
             h5file[tested_h5entity_path] = h5data
 
-        response = server.get(f"/stats/?file={filename}&path={tested_h5entity_path}")
+        response = server.get(f"/stats?file={filename}&path={tested_h5entity_path}")
         retrieved_stats = decode_response(response)
         assert retrieved_stats == expected_stats
 
@@ -488,7 +488,7 @@ class BaseTestEndpoints:
         with h5py.File(server.served_directory / filename, mode="w") as h5file:
             h5file[tested_h5entity_path] = h5data
 
-        response = server.get(f"/stats/?file={filename}&path={tested_h5entity_path}")
+        response = server.get(f"/stats?file={filename}&path={tested_h5entity_path}")
         retrieved_stats = decode_response(response)
         assert retrieved_stats == expected_stats
 
@@ -503,7 +503,7 @@ class BaseTestEndpoints:
             h5file["tree_2/trunk"] = "birch"
             h5file["tree_3"] = h5py.ExternalLink("test2.h5", "/another_tree")
 
-        response = server.get(f"/paths/?file={filename}")
+        response = server.get(f"/paths?file={filename}")
         retrieved_paths = decode_response(response)
 
         assert retrieved_paths == [
@@ -519,7 +519,7 @@ class BaseTestEndpoints:
             "/tree_3",
         ]
 
-        response = server.get(f"/paths/?file={filename}&path=/tree/branch")
+        response = server.get(f"/paths?file={filename}&path=/tree/branch")
         retrieved_paths = decode_response(response)
 
         assert retrieved_paths == [
@@ -534,21 +534,21 @@ class BaseTestEndpoints:
         with h5py.File(server.served_directory / filename, mode="w") as h5file:
             h5file["data"] = 0
 
-        server.assert_error_code(f"/attr/?file={filename}&path={not_a_path}", 404)
-        server.assert_error_code(f"/data/?file={filename}&path={not_a_path}", 404)
-        server.assert_error_code(f"/meta/?file={filename}&path={not_a_path}", 404)
-        server.assert_error_code(f"/paths/?file={filename}&path={not_a_path}", 404)
-        server.assert_error_code(f"/stats/?file={filename}&path={not_a_path}", 404)
+        server.assert_error_code(f"/attr?file={filename}&path={not_a_path}", 404)
+        server.assert_error_code(f"/data?file={filename}&path={not_a_path}", 404)
+        server.assert_error_code(f"/meta?file={filename}&path={not_a_path}", 404)
+        server.assert_error_code(f"/paths?file={filename}&path={not_a_path}", 404)
+        server.assert_error_code(f"/stats?file={filename}&path={not_a_path}", 404)
 
     def test_404_on_non_existing_file(self, server):
         filename = "not_a_file.h5"
         path = "/"
 
-        server.assert_error_code(f"/attr/?file={filename}&path={path}", 404)
-        server.assert_error_code(f"/data/?file={filename}&path={path}", 404)
-        server.assert_error_code(f"/meta/?file={filename}&path={path}", 404)
-        server.assert_error_code(f"/paths/?file={filename}&path={path}", 404)
-        server.assert_error_code(f"/stats/?file={filename}&path={path}", 404)
+        server.assert_error_code(f"/attr?file={filename}&path={path}", 404)
+        server.assert_error_code(f"/data?file={filename}&path={path}", 404)
+        server.assert_error_code(f"/meta?file={filename}&path={path}", 404)
+        server.assert_error_code(f"/paths?file={filename}&path={path}", 404)
+        server.assert_error_code(f"/stats?file={filename}&path={path}", 404)
 
     @pytest.mark.parametrize(
         "resolve_links",
@@ -560,7 +560,7 @@ class BaseTestEndpoints:
         with h5py.File(server.served_directory / filename, mode="w") as h5file:
             h5file[link_path] = h5py.SoftLink("not_an_entity")
 
-        url = f"/meta/?{urlencode({'file': filename, 'path': link_path, 'resolve_links': resolve_links.value})}"
+        url = f"/meta?{urlencode({'file': filename, 'path': link_path, 'resolve_links': resolve_links.value})}"
 
         # It should return 404 if trying to resolve the broken link
         if resolve_links == LinkResolution.ALL:
@@ -587,11 +587,11 @@ class BaseTestEndpoints:
             mode=stat.S_IWUSR,
         )
 
-        server.assert_error_code(f"/attr/?file={filename}&path={path}", 403)
-        server.assert_error_code(f"/data/?file={filename}&path={path}", 403)
-        server.assert_error_code(f"/meta/?file={filename}&path={path}", 403)
-        server.assert_error_code(f"/paths/?file={filename}&path={path}", 403)
-        server.assert_error_code(f"/stats/?file={filename}&path={path}", 403)
+        server.assert_error_code(f"/attr?file={filename}&path={path}", 403)
+        server.assert_error_code(f"/data?file={filename}&path={path}", 403)
+        server.assert_error_code(f"/meta?file={filename}&path={path}", 403)
+        server.assert_error_code(f"/paths?file={filename}&path={path}", 403)
+        server.assert_error_code(f"/stats?file={filename}&path={path}", 403)
 
     def test_422_on_dtype_safe_with_non_numeric_data(self, server):
         filename = "test.h5"
@@ -600,7 +600,7 @@ class BaseTestEndpoints:
         with h5py.File(server.served_directory / filename, mode="w") as h5file:
             h5file[path] = "I am not numeric"
 
-        server.assert_error_code(f"/data/?file={filename}&path={path}&dtype=safe", 422)
+        server.assert_error_code(f"/data?file={filename}&path={path}&dtype=safe", 422)
 
     @pytest.mark.parametrize(
         "format_arg",
@@ -614,7 +614,7 @@ class BaseTestEndpoints:
             h5file[path] = "I am not numeric"
 
         server.assert_error_code(
-            f"/data/?file={filename}&path={path}&format={format_arg}", 422
+            f"/data?file={filename}&path={path}&format={format_arg}", 422
         )
 
     def test_422_on_invalid_query_arg(self, server):
@@ -626,13 +626,13 @@ class BaseTestEndpoints:
 
         invalid_format = "foo"
         server.assert_error_code(
-            f"/data/?file={filename}&path={path}&format={invalid_format}",
+            f"/data?file={filename}&path={path}&format={invalid_format}",
             422,
         )
 
         invalid_link_resolution = "maybe"
         server.assert_error_code(
-            f"/meta/?file={filename}&path={path}&resolve_links={invalid_link_resolution}",
+            f"/meta?file={filename}&path={path}&resolve_links={invalid_link_resolution}",
             422,
         )
 
@@ -647,8 +647,8 @@ class BaseTestEndpoints:
             h5file["empty"] = h5py.Empty(dtype="<4f")
 
         server.assert_error_code(
-            f"/data/?file={filename}&path=/scalar&format={format_arg}", 422
+            f"/data?file={filename}&path=/scalar&format={format_arg}", 422
         )
         server.assert_error_code(
-            f"/data/?file={filename}&path=/empty&format={format_arg}", 422
+            f"/data?file={filename}&path=/empty&format={format_arg}", 422
         )

@@ -1,10 +1,11 @@
 """Benchmark data requests with server apps in example/ folder"""
 
 from __future__ import annotations
-from collections.abc import Generator
 
 import pathlib
+from collections.abc import Generator
 from urllib.parse import urlencode
+
 import h5py
 import numpy as np
 import pytest
@@ -36,8 +37,8 @@ def h5filepath(subprocess_server) -> Generator[pathlib.Path, None, None]:
 @pytest.mark.parametrize("format", BENCHMARK_FORMAT)
 @pytest.mark.parametrize("h5path", tuple(BENCHMARKS.keys()))
 def test_benchmark_data(h5filepath, subprocess_server, benchmark, h5path, format):
-    """/data/ benchmark data access"""
+    """/data benchmark data access"""
     subprocess_server.get(
-        f"/data/?{urlencode({'file': h5filepath.name, 'path': h5path, 'format': format})}",
+        f"/data?{urlencode({'file': h5filepath.name, 'path': h5path, 'format': format})}",
         benchmark,
     )

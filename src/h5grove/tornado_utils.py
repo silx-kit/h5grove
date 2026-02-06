@@ -1,9 +1,10 @@
 """Helpers for usage with `Tornado <https://www.tornadoweb.org>`_"""
 
 from __future__ import annotations
-from typing import Any
 
 import os
+from typing import Any
+
 from tornado.web import HTTPError, MissingArgumentError, RequestHandler
 
 from .content import (
@@ -97,7 +98,7 @@ class ContentHandler(BaseHandler):
 
 
 class AttributeHandler(ContentHandler):
-    """`/attr/` endpoint handler"""
+    """`/attr` endpoint handler"""
 
     def get_content_response(self, content: EntityContent) -> Response:
         if not isinstance(content, ResolvedEntityContent):
@@ -109,7 +110,7 @@ class AttributeHandler(ContentHandler):
 
 
 class DataHandler(ContentHandler):
-    """`/data/` endpoint handler"""
+    """`/data` endpoint handler"""
 
     def get_content_response(self, content: EntityContent) -> Response:
         dtype = self.get_query_argument("dtype", None)
@@ -126,14 +127,14 @@ class DataHandler(ContentHandler):
 
 
 class MetadataHandler(ContentHandler):
-    """`/meta/` endpoint handler"""
+    """`/meta` endpoint handler"""
 
     def get_content_response(self, content: EntityContent) -> Response:
         return encode(content.metadata())
 
 
 class StatisticsHandler(ContentHandler):
-    """`/stats/` endpoint handler"""
+    """`/stats` endpoint handler"""
 
     def get_content_response(self, content: EntityContent) -> Response:
         selection = self.get_query_argument("selection", None)
@@ -155,7 +156,7 @@ class PathsHandler(BaseHandler):
 
 # TODO: Setting the return type raises mypy errors
 def get_handlers(base_dir: str | None, allow_origin: str | None = None):
-    """Build h5grove handlers (`/`, `/attr/`, `/data/`, `/meta/` and `/stats/`).
+    """Build h5grove handlers (`/`, `/attr`, `/data`, `/meta` and `/stats`).
 
     :param base_dir: Base directory from which the HDF5 files will be served
     :param allow_origin: Allowed origins for CORS
@@ -164,9 +165,9 @@ def get_handlers(base_dir: str | None, allow_origin: str | None = None):
     init_args = {"base_dir": base_dir, "allow_origin": allow_origin}
     return [
         (r"/", RootHandler, init_args),
-        (r"/attr/.*", AttributeHandler, init_args),
-        (r"/data/.*", DataHandler, init_args),
-        (r"/meta/.*", MetadataHandler, init_args),
-        (r"/paths/.*", PathsHandler, init_args),
-        (r"/stats/.*", StatisticsHandler, init_args),
+        (r"/attr", AttributeHandler, init_args),
+        (r"/data", DataHandler, init_args),
+        (r"/meta", MetadataHandler, init_args),
+        (r"/paths", PathsHandler, init_args),
+        (r"/stats", StatisticsHandler, init_args),
     ]
