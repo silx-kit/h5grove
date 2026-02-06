@@ -1,5 +1,8 @@
 from __future__ import annotations
+
+import contextlib
 from collections.abc import Callable, Sequence
+from pathlib import Path
 from typing import (
     Any,
     Generic,
@@ -7,8 +10,6 @@ from typing import (
     cast,
 )
 
-import contextlib
-from pathlib import Path
 import h5py
 import numpy as np
 
@@ -18,16 +19,16 @@ except ImportError:
     pass
 
 from .models import (
-    LinkResolution,
-    Selection,
-    EntityMetadata,
-    ExternalLinkMetadata,
-    SoftLinkMetadata,
     AttributeMetadata,
-    ResolvedEntityMetadata,
-    GroupMetadata,
     DatasetMetadata,
     DatatypeMetadata,
+    EntityMetadata,
+    ExternalLinkMetadata,
+    GroupMetadata,
+    LinkResolution,
+    ResolvedEntityMetadata,
+    Selection,
+    SoftLinkMetadata,
     Stats,
 )
 from .utils import (
@@ -36,13 +37,13 @@ from .utils import (
     attr_metadata,
     convert,
     get_array_stats,
+    get_dataset_slice,
+    get_entity_from_file,
+    get_filters,
+    get_type_metadata,
+    hdf_path_join,
     open_file_with_error_fallback,
     parse_link_resolution_arg,
-    get_type_metadata,
-    get_filters,
-    get_entity_from_file,
-    hdf_path_join,
-    get_dataset_slice,
     sorted_dict,
 )
 

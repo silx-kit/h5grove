@@ -1,15 +1,15 @@
 """Test flask_utils blueprint with Flask testing"""
 
 from __future__ import annotations
-from collections.abc import Callable
 
 import pathlib
-from flask import Flask
-import pytest
+from collections.abc import Callable
 
-from conftest import BaseServer
-from utils import Response
 import base_test
+import pytest
+from conftest import BaseServer
+from flask import Flask
+from utils import Response
 
 from h5grove.flask_utils import BLUEPRINT
 

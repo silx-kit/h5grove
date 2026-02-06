@@ -1,13 +1,14 @@
 from __future__ import annotations
+
+import io
+import numbers
 from collections.abc import Callable
 from typing import Any
 
-import io
+import h5py
 import numpy as np
 import orjson
-import h5py
 import tifffile
-import numbers
 
 from .utils import QueryArgumentError, is_numeric_data
 

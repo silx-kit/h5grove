@@ -25,10 +25,7 @@ fastapi = ["fastapi", "pydantic > 2", "pydantic-settings", "uvicorn"]
 flask = ["Flask", "Flask-Compress", "Flask-Cors"]
 tornado = ["tornado"]
 dev = [
-    "bandit",
-    "black",
     "bump2version",
-    "flake8",
     "hatch",
     "h5grove[fastapi]",
     "h5grove[flask]",
@@ -40,6 +37,7 @@ dev = [
     "pytest-benchmark",
     "pytest-cov",
     "pytest-tornado",
+    "ruff",
     "sphinx",
     "sphinx-argparse",
     "sphinx-autobuild",
@@ -61,8 +59,16 @@ python_version = "3.10"
 module = ["h5py.*", "hdf5plugin", "tifffile"]
 ignore_missing_imports = true
 
-[tool.bandit]
-exclude_dirs = ["src/tests"]
+[tool.ruff.lint]
+select = ["E", "F", "I", "S"]
+ignore = ["E203", "E501", "E701"]
+
+[tool.ruff.lint.per-file-ignores]
+# Ignore `S` violations in all test files
+"src/tests/*.py" = ["S"]
+# Ignore `F401` (imported but unused) in init files
+"__init__.py" = ["F401"]
+
 
 [tool.hatch.envs.default]
 features = ["dev"]
@@ -70,11 +76,10 @@ features = ["dev"]
 [tool.hatch.envs.default.scripts]
 benchmark = "pytest --benchmark-only"
 test = 'pytest --benchmark-skip {args}'
-lint_black = "black --check src/ example/"
-lint_flake8 = 'flake8 -v'
+ruff_format = "ruff format --check src/ example/"
+ruff_check = 'ruff check'
 lint_mypy = 'mypy src/ example/'
-lint_bandit = 'bandit -c pyproject.toml -r src/'
-lint = ['lint_black', 'lint_flake8', 'lint_mypy', 'lint_bandit']
+lint = ['ruff_format', 'ruff_check', 'lint_mypy']
 docbuild = "sphinx-build -W -b html docs _build"
 doc = "sphinx-autobuild -W -b html docs _build"
 
