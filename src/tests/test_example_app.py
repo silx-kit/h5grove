@@ -1,5 +1,5 @@
-import pytest
 import base_test
+import pytest
 
 
 class TestExampleAppEndpoints(base_test.BaseTestEndpoints):

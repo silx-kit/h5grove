@@ -35,17 +35,14 @@ jobs:
         run: |
           hatch run pip freeze
 
-      - name: black ◼️
-        run: hatch run lint_black
+      - name: Ruff format check 🎭
+        run: hatch run ruff_format
 
-      - name: flake8 ❄️
-        run: hatch run lint_flake8
+      - name: Ruff check ✅
+        run: hatch run ruff_check
 
       - name: mypy 🧐
         run: hatch run lint_mypy
-
-      - name: bandit 🦝
-        run: hatch run lint_bandit
 
       - name: pytest tests 👓
         run: |

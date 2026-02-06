@@ -1,22 +1,23 @@
 from __future__ import annotations
+
 from collections.abc import Callable, Iterator
 from contextlib import contextmanager
+from os.path import basename
+from pathlib import Path
 from typing import Any, TypeVar
 
-from pathlib import Path
 import h5py
-from h5py.version import version_tuple as h5py_version
-from os.path import basename
 import numpy as np
+from h5py.version import version_tuple as h5py_version
 
 from .models import (
+    AttributeMetadata,
     H5pyEntity,
     LinkResolution,
     Selection,
+    Stats,
     StrDtype,
     TypeMetadata,
-    Stats,
-    AttributeMetadata,
 )
 
 
@@ -292,7 +293,7 @@ def hdf_path_join(prefix: str | None, suffix: str):
     if prefix is None or prefix == "/":
         return f"/{suffix}"
 
-    return f'{prefix.rstrip("/")}/{suffix}'
+    return f"{prefix.rstrip('/')}/{suffix}"
 
 
 def parse_bool_arg(query_arg: str | None, fallback: bool) -> bool:

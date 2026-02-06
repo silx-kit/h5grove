@@ -1,16 +1,16 @@
 """Test tornado_utils using pytest-tornado"""
 
 from __future__ import annotations
-from collections.abc import Callable
 
 import pathlib
-import pytest
-from tornado.httpclient import HTTPClientError
-import tornado.web
+from collections.abc import Callable
 
-from conftest import BaseServer
-from utils import Response, assert_error_response
 import base_test
+import pytest
+import tornado.web
+from conftest import BaseServer
+from tornado.httpclient import HTTPClientError
+from utils import Response, assert_error_response
 
 from h5grove.tornado_utils import get_handlers
 

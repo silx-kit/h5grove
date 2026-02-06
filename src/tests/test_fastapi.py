@@ -1,15 +1,15 @@
 """Test fastapi_utils with fastapi testing"""
 
 from __future__ import annotations
-from collections.abc import Callable
 
 import pathlib
+from collections.abc import Callable
+
+import base_test
+import pytest
+from conftest import BaseServer
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-import pytest
-
-from conftest import BaseServer
-import base_test
 from utils import Response
 
 from h5grove.fastapi_utils import router, settings

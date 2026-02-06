@@ -1,5 +1,4 @@
 from __future__ import annotations
-from collections.abc import Callable
 
 import os
 import pathlib
@@ -7,11 +6,13 @@ import socketserver
 import subprocess
 import sys
 import time
-from urllib.request import urlopen
+from collections.abc import Callable
 from urllib.error import HTTPError
+from urllib.request import urlopen
 
 import pytest
 from utils import Response, assert_error_response
+
 from h5grove.encoders import orjson_encode
 
 
