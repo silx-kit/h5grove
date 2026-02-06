@@ -1,12 +1,13 @@
 """Helpers for usage with `Flask <https://flask.palletsprojects.com/>`_"""
 
 from __future__ import annotations
+
+import os
 from collections.abc import Callable, Mapping
 from typing import Any
 
+from flask import Blueprint, Request, Response, current_app, request
 from werkzeug.exceptions import HTTPException
-from flask import Blueprint, current_app, request, Response, Request
-import os
 
 from .content import (
     DatasetContent,
@@ -59,7 +60,7 @@ def root_route():
 
 
 def attr_route():
-    """`/attr/` endpoint handler"""
+    """`/attr` endpoint handler"""
     filename = get_filename(request)
     path = request.args.get("path")
     attr_keys = (
@@ -74,7 +75,7 @@ def attr_route():
 
 
 def data_route():
-    """`/data/` endpoint handler"""
+    """`/data` endpoint handler"""
     filename = get_filename(request)
     path = request.args.get("path")
     selection = request.args.get("selection")
@@ -90,7 +91,7 @@ def data_route():
 
 
 def meta_route():
-    """`/meta/` endpoint handler"""
+    """`/meta` endpoint handler"""
     filename = get_filename(request)
     path = request.args.get("path")
     resolve_links = request.args.get("resolve_links", None)
@@ -109,7 +110,7 @@ def paths_route():
 
 
 def stats_route():
-    """`/stats/` endpoint handler"""
+    """`/stats` endpoint handler"""
     filename = get_filename(request)
     path = request.args.get("path")
     selection = request.args.get("selection")
@@ -122,11 +123,11 @@ def stats_route():
 
 URL_RULES = {
     "/": root_route,
-    "/attr/": attr_route,
-    "/data/": data_route,
-    "/meta/": meta_route,
-    "/paths/": paths_route,
-    "/stats/": stats_route,
+    "/attr": attr_route,
+    "/data": data_route,
+    "/meta": meta_route,
+    "/paths": paths_route,
+    "/stats": stats_route,
 }
 """Mapping of Flask URL endpoints to handlers"""
 

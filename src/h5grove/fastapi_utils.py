@@ -1,9 +1,10 @@
 """Helpers for usage with `FastAPI <https://fastapi.tiangolo.com/>`_"""
 
 from __future__ import annotations
+
 from collections.abc import Callable
 
-from fastapi import APIRouter, Depends, Response, Query, Request
+from fastapi import APIRouter, Depends, Query, Request, Response
 from fastapi.routing import APIRoute
 from pydantic_settings import BaseSettings
 
@@ -78,19 +79,19 @@ async def add_base_path(file):
     return f"{settings.base_dir}/{file}" if settings.base_dir else file
 
 
-@router.api_route("/", methods=["GET", "HEAD"])
+@router.api_route("/")
 async def get_root():
     """`/` endpoint handler to check server status"""
     return Response("ok")
 
 
-@router.get("/attr/")
+@router.get("/attr")
 async def get_attr(
     file: str = Depends(add_base_path),
     path: str = "/",
     attr_keys: list[str] | None = Query(default=None),
 ):
-    """`/attr/` endpoint handler"""
+    """`/attr` endpoint handler"""
     with get_content_from_file(file, path, create_error) as content:
         if not isinstance(content, ResolvedEntityContent):
             raise TypeError(f"{content.path} is not a resolved entity")
@@ -100,7 +101,7 @@ async def get_attr(
         )
 
 
-@router.get("/data/")
+@router.get("/data")
 async def get_data(
     file: str = Depends(add_base_path),
     path: str = "/",
@@ -109,7 +110,7 @@ async def get_data(
     flatten: bool = False,
     selection=None,
 ):
-    """`/data/` endpoint handler"""
+    """`/data` endpoint handler"""
     with get_content_from_file(file, path, create_error) as content:
         if not isinstance(content, DatasetContent):
             raise TypeError(f"{content.path} is not a dataset")
@@ -120,13 +121,13 @@ async def get_data(
         )
 
 
-@router.get("/meta/")
+@router.get("/meta")
 async def get_meta(
     file: str = Depends(add_base_path),
     path: str = "/",
     resolve_links: str = "only_valid",
 ):
-    """`/meta/` endpoint handler"""
+    """`/meta` endpoint handler"""
 
     with get_content_from_file(file, path, create_error, resolve_links) as content:
         h5grove_response = encode(content.metadata(), "json")
@@ -135,11 +136,11 @@ async def get_meta(
         )
 
 
-@router.get("/stats/")
+@router.get("/stats")
 async def get_stats(
     file: str = Depends(add_base_path), path: str = "/", selection=None
 ):
-    """`/stats/` endpoint handler"""
+    """`/stats` endpoint handler"""
     with get_content_from_file(file, path, create_error) as content:
         if not isinstance(content, DatasetContent):
             raise TypeError(f"{content.path} is not a dataset")
@@ -149,7 +150,7 @@ async def get_stats(
         )
 
 
-@router.get("/paths/")
+@router.get("/paths")
 async def get_paths(
     file: str = Depends(add_base_path),
     path: str = "/",
