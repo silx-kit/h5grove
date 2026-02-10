@@ -89,6 +89,3 @@ include = ["src/h5grove"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/h5grove"]
-
-[tool.hatch.publish.index]
-disable = true
