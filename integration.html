@@ -5,10 +5,10 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Integration in an existing application &#8212; h5grove 3.0.0-rc1 documentation</title>
+    <title>Integration in an existing application &#8212; h5grove 3.0.0rc1 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="_static/nature.css?v=279e0f84" />
-    <script src="_static/documentation_options.js?v=7b4b2963"></script>
+    <script src="_static/documentation_options.js?v=8e589072"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -31,7 +31,7 @@
         <li class="right" >
           <a href="example.html" title="Example implementations"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">h5grove 3.0.0-rc1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">h5grove 3.0.0rc1 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Integration in an existing application</a></li> 
       </ul>
     </div>  
@@ -65,8 +65,8 @@
 <p>Helpers for usage with <a class="reference external" href="https://fastapi.tiangolo.com/">FastAPI</a></p>
 <dl class="py function">
 <dt class="sig sig-object py" id="h5grove.fastapi_utils.get_attr">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">h5grove.fastapi_utils.</span></span><span class="sig-name descname"><span class="pre">get_attr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file=Depends(dependency=&lt;function</span> <span class="pre">add_base_path&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cache=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scope=None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path='/'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr_keys=Query(None)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.fastapi_utils.get_attr" title="Link to this definition">¶</a></dt>
-<dd><p><cite>/attr/</cite> endpoint handler</p>
+<span class="sig-prename descclassname"><span class="pre">h5grove.fastapi_utils.</span></span><span class="sig-name descname"><span class="pre">get_attr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file=Depends(dependency=&lt;function</span> <span class="pre">add_base_path&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cache=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scope=None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path='/'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr_keys=Query(None)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.fastapi_utils.get_attr" title="Link to this definition">¶</a></dt>
+<dd><p><cite>/attr</cite> endpoint handler</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -80,8 +80,8 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="h5grove.fastapi_utils.get_data">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">h5grove.fastapi_utils.</span></span><span class="sig-name descname"><span class="pre">get_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file=Depends(dependency=&lt;function</span> <span class="pre">add_base_path&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cache=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scope=None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path='/'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype='origin'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format='json'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flatten=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selection=None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.fastapi_utils.get_data" title="Link to this definition">¶</a></dt>
-<dd><p><cite>/data/</cite> endpoint handler</p>
+<span class="sig-prename descclassname"><span class="pre">h5grove.fastapi_utils.</span></span><span class="sig-name descname"><span class="pre">get_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file=Depends(dependency=&lt;function</span> <span class="pre">add_base_path&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cache=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scope=None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path='/'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype='origin'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format='json'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flatten=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selection=None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.fastapi_utils.get_data" title="Link to this definition">¶</a></dt>
+<dd><p><cite>/data</cite> endpoint handler</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -97,8 +97,8 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="h5grove.fastapi_utils.get_meta">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">h5grove.fastapi_utils.</span></span><span class="sig-name descname"><span class="pre">get_meta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file=Depends(dependency=&lt;function</span> <span class="pre">add_base_path&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cache=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scope=None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path='/'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolve_links='only_valid'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.fastapi_utils.get_meta" title="Link to this definition">¶</a></dt>
-<dd><p><cite>/meta/</cite> endpoint handler</p>
+<span class="sig-prename descclassname"><span class="pre">h5grove.fastapi_utils.</span></span><span class="sig-name descname"><span class="pre">get_meta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file=Depends(dependency=&lt;function</span> <span class="pre">add_base_path&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cache=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scope=None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path='/'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolve_links='only_valid'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.fastapi_utils.get_meta" title="Link to this definition">¶</a></dt>
+<dd><p><cite>/meta</cite> endpoint handler</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -112,14 +112,14 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="h5grove.fastapi_utils.get_root">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">h5grove.fastapi_utils.</span></span><span class="sig-name descname"><span class="pre">get_root</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.fastapi_utils.get_root" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">h5grove.fastapi_utils.</span></span><span class="sig-name descname"><span class="pre">get_root</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.fastapi_utils.get_root" title="Link to this definition">¶</a></dt>
 <dd><p><cite>/</cite> endpoint handler to check server status</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="h5grove.fastapi_utils.get_stats">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">h5grove.fastapi_utils.</span></span><span class="sig-name descname"><span class="pre">get_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file=Depends(dependency=&lt;function</span> <span class="pre">add_base_path&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cache=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scope=None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path='/'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selection=None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.fastapi_utils.get_stats" title="Link to this definition">¶</a></dt>
-<dd><p><cite>/stats/</cite> endpoint handler</p>
+<span class="sig-prename descclassname"><span class="pre">h5grove.fastapi_utils.</span></span><span class="sig-name descname"><span class="pre">get_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file=Depends(dependency=&lt;function</span> <span class="pre">add_base_path&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cache=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scope=None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path='/'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selection=None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.fastapi_utils.get_stats" title="Link to this definition">¶</a></dt>
+<dd><p><cite>/stats</cite> endpoint handler</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -185,26 +185,26 @@
 
 <dl class="py data">
 <dt class="sig sig-object py" id="h5grove.flask_utils.URL_RULES">
-<span class="sig-prename descclassname"><span class="pre">h5grove.flask_utils.</span></span><span class="sig-name descname"><span class="pre">URL_RULES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'/':</span> <span class="pre">&lt;function</span> <span class="pre">root_route&gt;,</span> <span class="pre">'/attr/':</span> <span class="pre">&lt;function</span> <span class="pre">attr_route&gt;,</span> <span class="pre">'/data/':</span> <span class="pre">&lt;function</span> <span class="pre">data_route&gt;,</span> <span class="pre">'/meta/':</span> <span class="pre">&lt;function</span> <span class="pre">meta_route&gt;,</span> <span class="pre">'/paths/':</span> <span class="pre">&lt;function</span> <span class="pre">paths_route&gt;,</span> <span class="pre">'/stats/':</span> <span class="pre">&lt;function</span> <span class="pre">stats_route&gt;}</span></em><a class="headerlink" href="#h5grove.flask_utils.URL_RULES" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">h5grove.flask_utils.</span></span><span class="sig-name descname"><span class="pre">URL_RULES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'/':</span> <span class="pre">&lt;function</span> <span class="pre">root_route&gt;,</span> <span class="pre">'/attr':</span> <span class="pre">&lt;function</span> <span class="pre">attr_route&gt;,</span> <span class="pre">'/data':</span> <span class="pre">&lt;function</span> <span class="pre">data_route&gt;,</span> <span class="pre">'/meta':</span> <span class="pre">&lt;function</span> <span class="pre">meta_route&gt;,</span> <span class="pre">'/paths':</span> <span class="pre">&lt;function</span> <span class="pre">paths_route&gt;,</span> <span class="pre">'/stats':</span> <span class="pre">&lt;function</span> <span class="pre">stats_route&gt;}</span></em><a class="headerlink" href="#h5grove.flask_utils.URL_RULES" title="Link to this definition">¶</a></dt>
 <dd><p>Mapping of Flask URL endpoints to handlers</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="h5grove.flask_utils.attr_route">
 <span class="sig-prename descclassname"><span class="pre">h5grove.flask_utils.</span></span><span class="sig-name descname"><span class="pre">attr_route</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.flask_utils.attr_route" title="Link to this definition">¶</a></dt>
-<dd><p><cite>/attr/</cite> endpoint handler</p>
+<dd><p><cite>/attr</cite> endpoint handler</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="h5grove.flask_utils.data_route">
 <span class="sig-prename descclassname"><span class="pre">h5grove.flask_utils.</span></span><span class="sig-name descname"><span class="pre">data_route</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.flask_utils.data_route" title="Link to this definition">¶</a></dt>
-<dd><p><cite>/data/</cite> endpoint handler</p>
+<dd><p><cite>/data</cite> endpoint handler</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="h5grove.flask_utils.meta_route">
 <span class="sig-prename descclassname"><span class="pre">h5grove.flask_utils.</span></span><span class="sig-name descname"><span class="pre">meta_route</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.flask_utils.meta_route" title="Link to this definition">¶</a></dt>
-<dd><p><cite>/meta/</cite> endpoint handler</p>
+<dd><p><cite>/meta</cite> endpoint handler</p>
 </dd></dl>
 
 <dl class="py function">
@@ -216,7 +216,7 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="h5grove.flask_utils.stats_route">
 <span class="sig-prename descclassname"><span class="pre">h5grove.flask_utils.</span></span><span class="sig-name descname"><span class="pre">stats_route</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.flask_utils.stats_route" title="Link to this definition">¶</a></dt>
-<dd><p><cite>/stats/</cite> endpoint handler</p>
+<dd><p><cite>/stats</cite> endpoint handler</p>
 </dd></dl>
 
 </section>
@@ -243,7 +243,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="h5grove.tornado_utils.AttributeHandler">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">h5grove.tornado_utils.</span></span><span class="sig-name descname"><span class="pre">AttributeHandler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">application</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.tornado_utils.AttributeHandler" title="Link to this definition">¶</a></dt>
-<dd><p><cite>/attr/</cite> endpoint handler</p>
+<dd><p><cite>/attr</cite> endpoint handler</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -329,7 +329,7 @@ the “current” exception for purposes of methods like
 <dl class="py class">
 <dt class="sig sig-object py" id="h5grove.tornado_utils.DataHandler">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">h5grove.tornado_utils.</span></span><span class="sig-name descname"><span class="pre">DataHandler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">application</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.tornado_utils.DataHandler" title="Link to this definition">¶</a></dt>
-<dd><p><cite>/data/</cite> endpoint handler</p>
+<dd><p><cite>/data</cite> endpoint handler</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -344,7 +344,7 @@ the “current” exception for purposes of methods like
 <dl class="py class">
 <dt class="sig sig-object py" id="h5grove.tornado_utils.MetadataHandler">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">h5grove.tornado_utils.</span></span><span class="sig-name descname"><span class="pre">MetadataHandler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">application</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.tornado_utils.MetadataHandler" title="Link to this definition">¶</a></dt>
-<dd><p><cite>/meta/</cite> endpoint handler</p>
+<dd><p><cite>/meta</cite> endpoint handler</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -374,7 +374,7 @@ the “current” exception for purposes of methods like
 <dl class="py class">
 <dt class="sig sig-object py" id="h5grove.tornado_utils.StatisticsHandler">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">h5grove.tornado_utils.</span></span><span class="sig-name descname"><span class="pre">StatisticsHandler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">application</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.tornado_utils.StatisticsHandler" title="Link to this definition">¶</a></dt>
-<dd><p><cite>/stats/</cite> endpoint handler</p>
+<dd><p><cite>/stats</cite> endpoint handler</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -389,7 +389,7 @@ the “current” exception for purposes of methods like
 <dl class="py function">
 <dt class="sig sig-object py" id="h5grove.tornado_utils.get_handlers">
 <span class="sig-prename descclassname"><span class="pre">h5grove.tornado_utils.</span></span><span class="sig-name descname"><span class="pre">get_handlers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_origin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#h5grove.tornado_utils.get_handlers" title="Link to this definition">¶</a></dt>
-<dd><p>Build h5grove handlers (<cite>/</cite>, <cite>/attr/</cite>, <cite>/data/</cite>, <cite>/meta/</cite> and <cite>/stats/</cite>).</p>
+<dd><p>Build h5grove handlers (<cite>/</cite>, <cite>/attr</cite>, <cite>/data</cite>, <cite>/meta</cite> and <cite>/stats</cite>).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -513,7 +513,7 @@ the “current” exception for purposes of methods like
         <li class="right" >
           <a href="example.html" title="Example implementations"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">h5grove 3.0.0-rc1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">h5grove 3.0.0rc1 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Integration in an existing application</a></li> 
       </ul>
     </div>
