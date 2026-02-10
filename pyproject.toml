@@ -38,6 +38,7 @@ dev = [
     "pytest-cov",
     "pytest-tornado",
     "ruff",
+    "setuptools<82",     # pytest-tornado still need pkg_resources (https://github.com/eugeniy/pytest-tornado/issues/67)
     "sphinx",
     "sphinx-argparse",
     "sphinx-autobuild",
