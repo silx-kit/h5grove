@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "h5grove"
-version = "2.3.0"
+version = "3.0.0rc1"
 authors = [{ name = "ESRF", email = "h5web@esrf.fr" }]
 description = "Core utilities to serve HDF5 file contents"
 readme = { file = "README.md", content-type = "text/markdown" }

@@ -1,4 +1,4 @@
 from .content import create_content
 from .encoders import encode
 
-version = "2.3.0"
+version = "3.0.0rc1"
