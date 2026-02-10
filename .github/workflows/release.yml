@@ -39,4 +39,4 @@ jobs:
       - name: Release on PyPI 🎉
         env:
           HATCH_INDEX_AUTH: ${{ secrets.PYPI_API_TOKEN }}
-        run: hatch publish -r test
+        run: hatch publish
