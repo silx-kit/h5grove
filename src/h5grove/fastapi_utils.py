@@ -80,13 +80,13 @@ async def add_base_path(file):
 
 
 @router.api_route("/")
-async def get_root():
+def get_root():
     """`/` endpoint handler to check server status"""
     return Response("ok")
 
 
 @router.get("/attr")
-async def get_attr(
+def get_attr(
     file: str = Depends(add_base_path),
     path: str = "/",
     attr_keys: list[str] | None = Query(default=None),
@@ -102,7 +102,7 @@ async def get_attr(
 
 
 @router.get("/data")
-async def get_data(
+def get_data(
     file: str = Depends(add_base_path),
     path: str = "/",
     dtype: str = "origin",
@@ -122,7 +122,7 @@ async def get_data(
 
 
 @router.get("/meta")
-async def get_meta(
+def get_meta(
     file: str = Depends(add_base_path),
     path: str = "/",
     resolve_links: str = "only_valid",
@@ -137,9 +137,7 @@ async def get_meta(
 
 
 @router.get("/stats")
-async def get_stats(
-    file: str = Depends(add_base_path), path: str = "/", selection=None
-):
+def get_stats(file: str = Depends(add_base_path), path: str = "/", selection=None):
     """`/stats` endpoint handler"""
     with get_content_from_file(file, path, create_error) as content:
         if not isinstance(content, DatasetContent):
@@ -151,7 +149,7 @@ async def get_stats(
 
 
 @router.get("/paths")
-async def get_paths(
+def get_paths(
     file: str = Depends(add_base_path),
     path: str = "/",
     resolve_links: str = "only_valid",
