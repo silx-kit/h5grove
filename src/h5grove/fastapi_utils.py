@@ -79,7 +79,7 @@ async def add_base_path(file):
     return f"{settings.base_dir}/{file}" if settings.base_dir else file
 
 
-@router.api_route("/")
+@router.api_route("/", methods=["GET", "HEAD"])
 def get_root():
     """`/` endpoint handler to check server status"""
     return Response("ok")
