@@ -373,6 +373,8 @@ components:
     type:
       type: object
       properties:
+        name:
+          type: string
         class:
           type: integer
         dtype:
@@ -395,8 +397,8 @@ components:
           $ref: '#/components/schemas/shape'
         members:
           oneOf:
-            - type: object
-              additionalProperties:
+            - type: array
+              items:
                 $ref: '#/components/schemas/type'
             - type: object
               additionalProperties:

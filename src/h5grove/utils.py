@@ -147,7 +147,6 @@ def get_type_metadata(type_id: h5py.h5t.TypeID) -> TypeMetadata:
         "dtype": stringify_dtype(type_id.dtype),
         "size": type_id.get_size(),
     }
-    members = {}
 
     if isinstance(type_id, h5py.h5t.TypeIntegerID):
         return {
@@ -177,22 +176,29 @@ def get_type_metadata(type_id: h5py.h5t.TypeID) -> TypeMetadata:
         return {**base_metadata, "tag": type_id.get_tag()}  # type: ignore
 
     if isinstance(type_id, h5py.h5t.TypeCompoundID):
+        compound_members: list[TypeMetadata] = []
+
         for i in range(0, type_id.get_nmembers()):
-            members[type_id.get_member_name(i).decode("utf-8")] = get_type_metadata(
-                type_id.get_member_type(i)
+            compound_members.append(
+                {
+                    "name": type_id.get_member_name(i).decode("utf-8"),
+                    **get_type_metadata(type_id.get_member_type(i)),
+                }
             )
 
-        return {**base_metadata, "members": members}  # type: ignore
+        return {**base_metadata, "members": compound_members}  # type: ignore
 
     if isinstance(type_id, h5py.h5t.TypeEnumID):
+        enum_members = {}
+
         for i in range(0, type_id.get_nmembers()):
-            members[type_id.get_member_name(i).decode("utf-8")] = (
+            enum_members[type_id.get_member_name(i).decode("utf-8")] = (
                 type_id.get_member_value(i)
             )
 
         return {
             **base_metadata,  # type: ignore
-            "members": members,
+            "members": enum_members,
             "base": get_type_metadata(type_id.get_super()),
         }
 
