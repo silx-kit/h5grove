@@ -29,7 +29,8 @@ StrDtype = str | dict[str, "StrDtype"]  # type: ignore
 TypeMetadata = TypedDict(
     "TypeMetadata",
     {
-        "class": int,  # HDF5 class code
+        "name": str,  # if compound member
+        "class": int,  # HDF5 type class code
         "dtype": StrDtype,  # Numpy-style dtype
         "size": int,  # all (but most relevant for int, float, string)
         "order": int,  # int, float, bitfield
@@ -39,7 +40,7 @@ TypeMetadata = TypedDict(
         "vlen": bool,  # string
         "tag": str,  # opaque
         "dims": tuple[int, ...],  # array
-        "members": dict[str, "TypeMetadata"] | dict[str, int],  # compound, enum
+        "members": list["TypeMetadata"] | dict[str, int],  # compound, enum
         "base": "TypeMetadata",  # array, enum, vlen
     },
     total=False,

@@ -253,15 +253,9 @@ class BaseTestEndpoints:
                 "class": 6,
                 "dtype": {"age": "<i4", "name": "|S10", "weight": "<f4"},
                 "size": 18,
-                "members": {
-                    "age": {
-                        "class": 0,
-                        "dtype": "<i4",
-                        "size": 4,
-                        "order": 0,
-                        "sign": 1,
-                    },
-                    "name": {
+                "members": [
+                    {
+                        "name": "name",
                         "class": 3,
                         "dtype": "|S10",
                         "size": 10,
@@ -269,8 +263,22 @@ class BaseTestEndpoints:
                         "strpad": 1,
                         "vlen": False,
                     },
-                    "weight": {"class": 1, "dtype": "<f4", "size": 4, "order": 0},
-                },
+                    {
+                        "name": "age",
+                        "class": 0,
+                        "dtype": "<i4",
+                        "size": 4,
+                        "order": 0,
+                        "sign": 1,
+                    },
+                    {
+                        "name": "weight",
+                        "class": 1,
+                        "dtype": "<f4",
+                        "size": 4,
+                        "order": 0,
+                    },
+                ],
             },
         }
 
@@ -326,9 +334,16 @@ class BaseTestEndpoints:
                     "ref": "|O",
                 },
                 "size": 36,
-                "members": {
-                    "opaque": {"class": 5, "dtype": "|V3", "size": 3, "tag": ""},
-                    "enum": {
+                "members": [
+                    {
+                        "name": "opaque",
+                        "class": 5,
+                        "dtype": "|V3",
+                        "size": 3,
+                        "tag": "",
+                    },
+                    {
+                        "name": "enum",
                         "class": 8,
                         "dtype": "|u1",
                         "size": 1,
@@ -341,7 +356,8 @@ class BaseTestEndpoints:
                             "sign": 0,
                         },
                     },
-                    "arr": {
+                    {
+                        "name": "arr",
                         "class": 10,
                         "dtype": "|V8",
                         "size": 8,
@@ -355,7 +371,8 @@ class BaseTestEndpoints:
                             "vlen": True,
                         },
                     },
-                    "vlen": {
+                    {
+                        "name": "vlen",
                         "class": 9,
                         "dtype": "|O",
                         "size": 16,
@@ -367,8 +384,8 @@ class BaseTestEndpoints:
                             "size": 8,
                         },
                     },
-                    "ref": {"class": 7, "dtype": "|O", "size": 8},
-                },
+                    {"name": "ref", "class": 7, "dtype": "|O", "size": 8},
+                ],
             },
         }
 
