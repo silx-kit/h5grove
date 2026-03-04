@@ -1,8 +1,8 @@
-openapi: 3.0.0
+openapi: 4.0.0rc0
 info:
   title: 'H5Grove API'
   description: 'The API provided by h5grove example implementations.'
-  version: 3.0.0
+  version: 4.0.0rc0
 
 servers:
   - url: http://{ip}:{port}/
@@ -25,6 +25,8 @@ paths:
         - name: attr_keys
           in: query
           description: Names of the attributes to get
+          style: form
+          explode: true # attr_keys=foo&attr_keys=bar
           schema:
             type: array
             items:
@@ -32,7 +34,7 @@ paths:
 
       responses:
         '200':
-          description: Dictionnary where keys are attribute names and values are the associated values
+          description: Dictionary where keys are attribute names and values are the associated values
           content:
             application/json:
               schema:
@@ -196,7 +198,7 @@ paths:
                     min: -5,
                     max: 42,
                     mean: 36,
-                    std: 7.5,
+                    std: 7.5
                   }
         '403':
           $ref: '#/components/responses/403'
@@ -283,7 +285,7 @@ components:
         shape:
           $ref: '#/components/schemas/shape'
         type:
-          $ref: '#/components/schemas/type'
+          $ref: '#/components/schemas/typeMetadata'
     entityMetadata:
       type: object
       properties:
@@ -312,9 +314,9 @@ components:
             kind:
               enum: ['external_link']
               type: string
-              example: 'path/to/another/file.h5'
             target_file:
               type: string
+              example: 'path/to/another/file.h5'
     resolvedEntityMetadata:
       allOf:
         - $ref: '#/components/schemas/entityMetadata'
@@ -335,7 +337,7 @@ components:
             shape:
               $ref: '#/components/schemas/shape'
             type:
-              $ref: '#/components/schemas/type'
+              $ref: '#/components/schemas/typeMetadata'
             chunks:
               $ref: '#/components/schemas/shape'
             filters:
@@ -370,13 +372,18 @@ components:
               type: string
 
     # Other schemas
-    type:
+    typeMetadata:
       type: object
       properties:
+        name:
+          type: string
+          description: Name of compound field
         class:
           type: integer
+          description: HDF5 type class code
         dtype:
           $ref: '#/components/schemas/dtype'
+          description: NumPy-style dtype
         size:
           type: integer
         order:
@@ -394,15 +401,16 @@ components:
         dims:
           $ref: '#/components/schemas/shape'
         members:
+          description: Compound fields or enum members
           oneOf:
-            - type: object
-              additionalProperties:
-                $ref: '#/components/schemas/type'
+            - type: array
+              items:
+                $ref: '#/components/schemas/typeMetadata'
             - type: object
               additionalProperties:
                 type: integer
         base:
-          $ref: '#/components/schemas/type'
+          $ref: '#/components/schemas/typeMetadata'
     dtype:
       oneOf:
         - type: 'string'
