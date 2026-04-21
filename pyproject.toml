@@ -57,8 +57,13 @@ testpaths = ["src/tests"]
 python_version = "3.10"
 
 [[tool.mypy.overrides]]
-module = ["h5py.*", "hdf5plugin", "tifffile"]
+module = ["h5py.*", "hdf5plugin"]
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+# tifffile uses annotations that are only compatible with Python 3.12+
+module = "tifffile"
+follow_imports = "skip"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "S"]

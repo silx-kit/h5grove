@@ -1,9 +1,10 @@
-name: Release
+name: Doc
 
 on:
   push:
     tags:
       - v*
+  workflow_dispatch:
 
 jobs:
   release:
@@ -24,11 +25,11 @@ jobs:
           python -m pip install -U pip hatch
           hatch env create
 
-      - name: Build the package 📦
-        run: hatch build
+      - name: Build documentation with Sphinx 🐪
+        run: hatch run docbuild
 
-      - name: Release on PyPI 🎉
-        env:
-          HATCH_INDEX_USER: '__token__'
-          HATCH_INDEX_AUTH: ${{ secrets.PYPI_API_TOKEN }}
-        run: hatch publish -n
+      - name: Deploy documentation 🚀
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          BRANCH: gh-pages
+          FOLDER: _build
