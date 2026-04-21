@@ -1,7 +1,7 @@
-openapi: 4.0.0
+openapi: 3.0.0
 info:
-  title: 'H5Grove API'
-  description: 'The API provided by h5grove example implementations.'
+  title: "H5Grove API"
+  description: "The API provided by h5grove example implementations."
   version: 4.0.0
 
 servers:
@@ -12,7 +12,7 @@ servers:
       ip:
         default: localhost
       port:
-        default: '8888'
+        default: "8888"
 
 paths:
   /attr:
@@ -20,8 +20,8 @@ paths:
       summary: Get attribute values from an entity
       description: Retrieves attribute names and values
       parameters:
-        - $ref: '#/components/parameters/file'
-        - $ref: '#/components/parameters/path'
+        - $ref: "#/components/parameters/file"
+        - $ref: "#/components/parameters/path"
         - name: attr_keys
           in: query
           description: Names of the attributes to get
@@ -33,146 +33,149 @@ paths:
               type: string
 
       responses:
-        '200':
-          description: Dictionary where keys are attribute names and values are the associated values
+        "200":
+          description: Dictionary where keys are attribute names and values are the
+            associated values
           content:
             application/json:
               schema:
                 type: object
                 additionalProperties:
-                  $ref: '#/components/schemas/value'
+                  $ref: "#/components/schemas/value"
               examples:
-                'all attributes':
+                "all attributes":
                   description: "For an entity with attributes: a1=5, a2='this', a3=[8, 9]"
-                  value: { a1: 5, a2: 'this', a3: [8, 9] }
-                'filtered attributes':
-                  description: 'For the same entity but attr_keys was set to a1'
+                  value: { a1: 5, a2: "this", a3: [ 8, 9 ] }
+                "filtered attributes":
+                  description: "For the same entity but attr_keys was set to a1"
                   value: { a1: 5 }
-        '403':
-          $ref: '#/components/responses/403'
-        '404':
-          $ref: '#/components/responses/404'
-        '422':
-          $ref: '#/components/responses/422'
-        '500':
-          $ref: '#/components/responses/500'
+        "403":
+          $ref: "#/components/responses/403"
+        "404":
+          $ref: "#/components/responses/404"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
 
   /data:
     get:
       summary: Get data of a dataset
       description: Retrieves data contained in a dataset or a slice of dataset
       parameters:
-        - $ref: '#/components/parameters/dtype'
-        - $ref: '#/components/parameters/file'
-        - $ref: '#/components/parameters/format'
-        - $ref: '#/components/parameters/flatten'
-        - $ref: '#/components/parameters/path'
-        - $ref: '#/components/parameters/selection'
+        - $ref: "#/components/parameters/dtype"
+        - $ref: "#/components/parameters/file"
+        - $ref: "#/components/parameters/format"
+        - $ref: "#/components/parameters/flatten"
+        - $ref: "#/components/parameters/path"
+        - $ref: "#/components/parameters/selection"
 
       responses:
-        '200':
-          description: Data of the dataset. The output format is controlled by the format query parameter.
+        "200":
+          description: Data of the dataset. The output format is controlled by the format
+            query parameter.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/value'
+                $ref: "#/components/schemas/value"
               examples:
                 scalar_value:
-                  $ref: '#/components/examples/scalar_value'
+                  $ref: "#/components/examples/scalar_value"
                 2D_value:
-                  $ref: '#/components/examples/2D_value'
+                  $ref: "#/components/examples/2D_value"
                 flattened_2D_value:
-                  $ref: '#/components/examples/flattened_2D_value'
+                  $ref: "#/components/examples/flattened_2D_value"
             application/octet-stream:
               schema:
                 type: string
 
-        '403':
-          $ref: '#/components/responses/403'
-        '404':
-          $ref: '#/components/responses/404'
-        '422':
-          $ref: '#/components/responses/422'
-        '500':
-          $ref: '#/components/responses/500'
+        "403":
+          $ref: "#/components/responses/403"
+        "404":
+          $ref: "#/components/responses/404"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
 
   /meta:
     get:
       summary: Get metadata of an entity
       description: Retrieves metadata of a h5py entity
       parameters:
-        - $ref: '#/components/parameters/file'
-        - $ref: '#/components/parameters/path'
-        - $ref: '#/components/parameters/resolve_links'
+        - $ref: "#/components/parameters/file"
+        - $ref: "#/components/parameters/path"
+        - $ref: "#/components/parameters/resolve_links"
       responses:
-        '200':
+        "200":
           description: Metadata of the h5py entity
           content:
             application/json:
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/datasetMetadata'
-                  - $ref: '#/components/schemas/externalLinkMetadata'
-                  - $ref: '#/components/schemas/resolvedEntityMetadata'
-                  - $ref: '#/components/schemas/groupMetadata'
-                  - $ref: '#/components/schemas/softLinkMetadata'
+                  - $ref: "#/components/schemas/datasetMetadata"
+                  - $ref: "#/components/schemas/externalLinkMetadata"
+                  - $ref: "#/components/schemas/resolvedEntityMetadata"
+                  - $ref: "#/components/schemas/groupMetadata"
+                  - $ref: "#/components/schemas/softLinkMetadata"
                 discriminator:
                   propertyName: kind
                   mapping:
-                    dataset: '#/components/schemas/datasetMetadata'
-                    external_link: '#/components/schemas/externalLinkMetadata'
-                    group: '#/components/schemas/groupMetadata'
-                    other: '#/components/schemas/resolvedEntityMetadata'
-                    soft_link: '#/components/schemas/softLinkMetadata'
+                    dataset: "#/components/schemas/datasetMetadata"
+                    external_link: "#/components/schemas/externalLinkMetadata"
+                    group: "#/components/schemas/groupMetadata"
+                    other: "#/components/schemas/resolvedEntityMetadata"
+                    soft_link: "#/components/schemas/softLinkMetadata"
 
-        '403':
-          $ref: '#/components/responses/403'
-        '404':
-          $ref: '#/components/responses/404'
-        '422':
-          $ref: '#/components/responses/422'
-        '500':
-          $ref: '#/components/responses/500'
+        "403":
+          $ref: "#/components/responses/403"
+        "404":
+          $ref: "#/components/responses/404"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
 
   /paths:
     get:
       summary: Get the list of paths contained in a group
-      description: Retrieves the list of paths of entities contained in a group. Includes the group path.
+      description: Retrieves the list of paths of entities contained in a group.
+        Includes the group path.
       parameters:
-        - $ref: '#/components/parameters/file'
-        - $ref: '#/components/parameters/path'
-        - $ref: '#/components/parameters/resolve_links'
+        - $ref: "#/components/parameters/file"
+        - $ref: "#/components/parameters/path"
+        - $ref: "#/components/parameters/resolve_links"
       responses:
-        '200':
+        "200":
           description: Paths in the group
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/paths'
+                $ref: "#/components/schemas/paths"
               examples:
-                'All paths':
-                  description: 'For an file containing an empty group and a group with a dataset'
-                  value: ['/', '/group_1', '/group_2', '/group_2/dataset']
+                "All paths":
+                  description: "For an file containing an empty group and a group with a dataset"
+                  value: [ "/", "/group_1", "/group_2", "/group_2/dataset" ]
 
-        '403':
-          $ref: '#/components/responses/403'
-        '404':
-          $ref: '#/components/responses/404'
-        '422':
-          $ref: '#/components/responses/422'
-        '500':
-          $ref: '#/components/responses/500'
+        "403":
+          $ref: "#/components/responses/403"
+        "404":
+          $ref: "#/components/responses/404"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
 
   /stats:
     get:
       summary: Get statistics on data of a dataset
       description: Retrieves statistics on data contained in a dataset or a slice of dataset
       parameters:
-        - $ref: '#/components/parameters/file'
-        - $ref: '#/components/parameters/path'
-        - $ref: '#/components/parameters/selection'
+        - $ref: "#/components/parameters/file"
+        - $ref: "#/components/parameters/path"
+        - $ref: "#/components/parameters/selection"
       responses:
-        '200':
+        "200":
           description: Statistics of the dataset
           content:
             application/json:
@@ -180,17 +183,17 @@ paths:
                 type: object
                 properties:
                   strict_positive_min:
-                    $ref: '#/components/schemas/numberOrNull'
+                    $ref: "#/components/schemas/numberOrNull"
                   positive_min:
-                    $ref: '#/components/schemas/numberOrNull'
+                    $ref: "#/components/schemas/numberOrNull"
                   min:
-                    $ref: '#/components/schemas/numberOrNull'
+                    $ref: "#/components/schemas/numberOrNull"
                   max:
-                    $ref: '#/components/schemas/numberOrNull'
+                    $ref: "#/components/schemas/numberOrNull"
                   mean:
-                    $ref: '#/components/schemas/numberOrNull'
+                    $ref: "#/components/schemas/numberOrNull"
                   std:
-                    $ref: '#/components/schemas/numberOrNull'
+                    $ref: "#/components/schemas/numberOrNull"
                 example:
                   {
                     strict_positive_min: 3.4,
@@ -198,16 +201,16 @@ paths:
                     min: -5,
                     max: 42,
                     mean: 36,
-                    std: 7.5
+                    std: 7.5,
                   }
-        '403':
-          $ref: '#/components/responses/403'
-        '404':
-          $ref: '#/components/responses/404'
-        '422':
-          $ref: '#/components/responses/422'
-        '500':
-          $ref: '#/components/responses/500'
+        "403":
+          $ref: "#/components/responses/403"
+        "404":
+          $ref: "#/components/responses/404"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
 
 components:
   parameters:
@@ -216,9 +219,9 @@ components:
       description: Data type conversion. Only for arrays and scalars. Defaults to "origin".
       in: query
       schema:
-        enum: ['origin', 'safe']
+        enum: [ "origin", "safe" ]
         type: string
-      example: 'safe'
+      example: "safe"
     file:
       name: file
       description: Location of the HDF5 file.
@@ -226,15 +229,15 @@ components:
       required: true
       schema:
         type: string
-        example: 'data/my_hdf_file.h5'
+        example: "data/my_hdf_file.h5"
     format:
       name: format
       description: Format in which the response should be encoded. Defaults to "json".
       in: query
       schema:
-        enum: ['json', 'npy', 'bin', 'tiff', 'csv']
+        enum: [ "json", "npy", "bin", "tiff", "csv" ]
         type: string
-      example: 'json'
+      example: "json"
     flatten:
       name: flatten
       description: Whether the resulting array should be flattened. Defaults to False.
@@ -243,35 +246,40 @@ components:
         type: boolean
     path:
       name: path
-      description: Path of the entity in the HDF5 file. Default to '/' (root) if not present.
+      description: Path of the entity in the HDF5 file. Default to '/' (root) if not
+        present.
       in: query
       schema:
         type: string
-      example: '/path/to/entity'
+      example: "/path/to/entity"
     resolve_links:
       name: resolve_links
-      description: Tells which soft and external links should be resolved. Defaults to only_valid. Broken links will not be resolved with 'only_valid' and will raise an error with 'all'.
+      description: Tells which soft and external links should be resolved. Defaults to
+        only_valid. Broken links will not be resolved with 'only_valid' and will
+        raise an error with 'all'.
       in: query
       schema:
-        enum: ['none', 'only_valid', 'all']
+        enum: [ "none", "only_valid", "all" ]
         type: string
     selection:
       name: selection
       in: query
-      description: NumPy-like indexing to define a selection as a slice. For the stats endpoint, providing a selection will compute stats only on the selected slice.
+      description: NumPy-like indexing to define a selection as a slice. For the stats
+        endpoint, providing a selection will compute stats only on the selected
+        slice.
       schema:
-        $ref: '#/components/schemas/selectionSchema'
+        $ref: "#/components/schemas/selectionSchema"
       explode: false
       examples:
         integers:
           description: Gets data[0, 1, 4]
-          value: [0, 1, 4]
+          value: [ 0, 1, 4 ]
         slice:
           description: Gets data[5:10]
-          value: '5:10'
+          value: "5:10"
         mixed:
           description: Gets data[5, 0:10:2]
-          value: [5, '0:10:2']
+          value: [ 5, "0:10:2" ]
 
   schemas:
     # Metadata schemas
@@ -281,94 +289,94 @@ components:
       properties:
         name:
           type: string
-          example: 'attr1_name'
+          example: "attr1_name"
         shape:
-          $ref: '#/components/schemas/shape'
+          $ref: "#/components/schemas/shape"
         type:
-          $ref: '#/components/schemas/typeMetadata'
+          $ref: "#/components/schemas/typeMetadata"
     entityMetadata:
       type: object
       properties:
         kind:
-          enum: ['other']
+          enum: [ "other" ]
           type: string
         name:
           type: string
-          example: 'entity_name'
+          example: "entity_name"
     softLinkMetadata:
       allOf:
-        - $ref: '#/components/schemas/entityMetadata'
+        - $ref: "#/components/schemas/entityMetadata"
         - type: object
           properties:
             kind:
-              enum: ['soft_link']
+              enum: [ "soft_link" ]
               type: string
             target_path:
               type: string
-              example: '/path/to/linked/entity'
+              example: "/path/to/linked/entity"
     externalLinkMetadata:
       allOf:
-        - $ref: '#/components/schemas/softLinkMetadata'
+        - $ref: "#/components/schemas/softLinkMetadata"
         - type: object
           properties:
             kind:
-              enum: ['external_link']
+              enum: [ "external_link" ]
               type: string
             target_file:
               type: string
-              example: 'path/to/another/file.h5'
+              example: "path/to/another/file.h5"
     resolvedEntityMetadata:
       allOf:
-        - $ref: '#/components/schemas/entityMetadata'
+        - $ref: "#/components/schemas/entityMetadata"
         - type: object
           properties:
             attributes:
               type: array
               items:
-                $ref: '#/components/schemas/attrMetadata'
+                $ref: "#/components/schemas/attrMetadata"
     datasetMetadata:
       allOf:
-        - $ref: '#/components/schemas/resolvedEntityMetadata'
+        - $ref: "#/components/schemas/resolvedEntityMetadata"
         - type: object
           properties:
             kind:
-              enum: ['dataset']
+              enum: [ "dataset" ]
               type: string
             shape:
-              $ref: '#/components/schemas/shape'
+              $ref: "#/components/schemas/shape"
             type:
-              $ref: '#/components/schemas/typeMetadata'
+              $ref: "#/components/schemas/typeMetadata"
             chunks:
-              $ref: '#/components/schemas/shape'
+              $ref: "#/components/schemas/shape"
             filters:
               type: array
               items:
-                $ref: '#/components/schemas/filterInfo'
+                $ref: "#/components/schemas/filterInfo"
               nullable: true
     groupMetadata:
       allOf:
-        - $ref: '#/components/schemas/resolvedEntityMetadata'
+        - $ref: "#/components/schemas/resolvedEntityMetadata"
         - type: object
           properties:
             kind:
-              enum: ['group']
+              enum: [ "group" ]
               type: string
             children:
               type: array
               items:
                 anyOf:
-                  - $ref: '#/components/schemas/childGroupMetadata'
-                  - $ref: '#/components/schemas/datasetMetadata'
-                  - $ref: '#/components/schemas/externalLinkMetadata'
-                  - $ref: '#/components/schemas/resolvedEntityMetadata'
-                  - $ref: '#/components/schemas/softLinkMetadata'
+                  - $ref: "#/components/schemas/childGroupMetadata"
+                  - $ref: "#/components/schemas/datasetMetadata"
+                  - $ref: "#/components/schemas/externalLinkMetadata"
+                  - $ref: "#/components/schemas/resolvedEntityMetadata"
+                  - $ref: "#/components/schemas/softLinkMetadata"
     childGroupMetadata:
       allOf:
-        - $ref: '#/components/schemas/resolvedEntityMetadata'
+        - $ref: "#/components/schemas/resolvedEntityMetadata"
         - type: object
           properties:
             kind:
-              enum: ['group']
+              enum: [ "group" ]
               type: string
 
     # Other schemas
@@ -382,7 +390,7 @@ components:
           type: integer
           description: HDF5 type class code
         dtype:
-          $ref: '#/components/schemas/dtype'
+          $ref: "#/components/schemas/dtype"
           description: NumPy-style dtype
         size:
           type: integer
@@ -399,26 +407,26 @@ components:
         tag:
           type: string
         dims:
-          $ref: '#/components/schemas/shape'
+          $ref: "#/components/schemas/shape"
         members:
           description: Compound fields or enum members
           oneOf:
             - type: array
               items:
-                $ref: '#/components/schemas/typeMetadata'
+                $ref: "#/components/schemas/typeMetadata"
             - type: object
               additionalProperties:
                 type: integer
         base:
-          $ref: '#/components/schemas/typeMetadata'
+          $ref: "#/components/schemas/typeMetadata"
     dtype:
       oneOf:
-        - type: 'string'
-          example: '<f4'
+        - type: "string"
+          example: "<f4"
         - type: object
           additionalProperties:
             type: string
-          example: { 'name': '|S10', 'age': '<i4' }
+          example: { "name": "|S10", "age": "<i4" }
     filterInfo:
       type: object
       properties:
@@ -441,16 +449,16 @@ components:
         - type: integer
     selectionSchema:
       oneOf:
-        - $ref: '#/components/schemas/selectionItem'
+        - $ref: "#/components/schemas/selectionItem"
         - type: array
           items:
-            $ref: '#/components/schemas/selectionItem'
+            $ref: "#/components/schemas/selectionItem"
     shape:
       type: array
       items:
         type: integer
       nullable: true
-      example: [5, 2]
+      example: [ 5, 2 ]
     valueItem:
       anyOf:
         - type: string
@@ -458,25 +466,25 @@ components:
       nullable: true
     value:
       oneOf:
-        - $ref: '#/components/schemas/valueItem'
+        - $ref: "#/components/schemas/valueItem"
         - type: array
           items:
-            $ref: '#/components/schemas/valueItem'
+            $ref: "#/components/schemas/valueItem"
   examples:
     scalar_value:
       value: 3.14
     2D_value:
-      value: [[5, 4], [7, 8], [10, 5], [7, 8], [9, 12]]
+      value: [ [ 5, 4 ], [ 7, 8 ], [ 10, 5 ], [ 7, 8 ], [ 9, 12 ] ]
     flattened_2D_value:
       description: With flatten set to True
-      value: [5, 4, 7, 8, 10, 5, 7, 8, 9, 12]
+      value: [ 5, 4, 7, 8, 10, 5, 7, 8, 9, 12 ]
 
   responses:
-    '403':
+    "403":
       description: The file is not allowed to be read.
-    '404':
+    "404":
       description: The file was not found or the queried path does not exist in the file.
-    '422':
+    "422":
       description: A query argument is invalid.
-    '500':
+    "500":
       description: The h5py entity type is not supported.
