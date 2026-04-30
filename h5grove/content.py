@@ -54,6 +54,7 @@ from .utils import (
     is_file_type,
     FileTypeEnum,
     close_file,
+    ensure_slash,
 )
 
 
@@ -299,7 +300,7 @@ def create_content(
 
 @contextlib.contextmanager
 def get_content_from_file(
-    filepath: str | Path,
+    filepath: str | Path | zarr.storage.StoreLike,
     path: str | None,
     create_error: Callable[[int, str], Exception],
     resolve_links_arg: str | None = LinkResolution.ONLY_VALID,
@@ -330,7 +331,7 @@ def get_content_from_file(
 
 @contextlib.contextmanager
 def get_list_of_paths(
-    filepath: str | Path,
+    filepath: str | Path | zarr.storage.StoreLike,
     base_path: str | None,
     create_error: Callable[[int, str], Exception],
     resolve_links_arg: str | None = LinkResolution.ONLY_VALID,
@@ -370,6 +371,6 @@ def get_list_of_paths(
     else:
         entity = get_entity_from_file(f, base_path, resolve_links)
         if isinstance(entity, zarr.Group):
-            yield [m[0] for m in entity.members(max_depth=None)]
+            yield [ensure_slash(m[0]) for m in entity.members(max_depth=None)]
         else:
-            yield entity.path
+            yield ensure_slash(entity.path)

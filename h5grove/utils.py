@@ -421,6 +421,8 @@ def is_file_type(filepath, file_type = FileTypeEnum.H5PY):
         case FileTypeEnum.H5PY:
             return is_h5py_file(filepath_str)
         case FileTypeEnum.ZARR:
+            if isinstance(filepath, zarr.storage.StoreLike):
+                return True
             return is_zarr_file(filepath_str)
 
 def close_file(filepath, f):
@@ -430,10 +432,11 @@ def close_file(filepath, f):
         f.store.close()
 
 def open_file_with_error_fallback(
-    filepath: str | Path,
+    filepath: str | Path | zarr.storage.StoreLike,
     create_error: Callable[[int, str], Exception],
     options: dict[str, Any] = {},
 ) -> TFile:
+
     try:
         if is_file_type(filepath, file_type=FileTypeEnum.H5PY):
             f = h5py.File(filepath, "r", **options)
@@ -449,3 +452,8 @@ def open_file_with_error_fallback(
         raise e
 
     return f
+
+def ensure_slash(path):
+    if not path.startswith('/'):
+        return "/" + path
+    return path
