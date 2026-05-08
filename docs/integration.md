@@ -85,28 +85,27 @@ To do so, one shall subclass the `utils.H5FileResolver` class and implement the 
 The custom resolver can then be assigned via the `assign_resolver` function.
 
 ```python
+from contextlib import contextmanager
+from pathlib import Path
+
 from s3fs import S3FileSystem
+
 from h5grove import H5FileResolver, assign_resolver
 
-
 class S3Resolver(H5FileResolver):
-    def __init__(self, nominal_path: str):
-        super().__init__(nominal_path)
+    def __init__(self):
+        super().__init__()
         # using a local deployment for illustration
         # assuming anonymous access
-        self._s3 = S3FileSystem(anon=True, endpoint_url='http://localhost:8333')
-        self._fo = None
+        self._s3 = S3FileSystem(anon=True, endpoint_url="http://localhost:8333")
 
-    def __enter__(self):
-        self._fo = self._s3.open(self.nominal_path)
-        return self._fo
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        if self._fo is not None:
-            self._fo.close()
+    @contextmanager
+    def resolve(self, nominal_path: str | Path):
+        with self._s3.open(nominal_path) as file:
+            yield file
 
 
-assign_resolver(S3Resolver)
+assign_resolver(S3Resolver())
 ```
 
 The `fsspec` library allows files stored in various sources to be accessed.
