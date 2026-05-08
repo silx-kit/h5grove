@@ -108,3 +108,10 @@ class S3Resolver(H5FileResolver):
 
 assign_resolver(S3Resolver)
 ```
+
+The `fsspec` library allows files stored in various sources to be accessed.
+
+However, please note that if a file-like object is returned by the resolver, the external links may not work as
+intended.
+Since HDF5 library has no idea about different abstractions of file systems, it is almost certain that links have to be
+**manually** resolved.

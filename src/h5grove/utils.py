@@ -383,7 +383,10 @@ class H5FileResolver(ABC):
     A base class to define how the H5 files are resolved.
     The constructor will be called with a single input argument `nominal_path`.
 
-    The derived class must implement the context manager protocol to return a file-like object opened in binary mode.
+    The derived class must implement the context manager protocol to return
+
+    1. a file-like object opened in binary mode, or
+    2. a local path to the target file.
     """
 
     def __init__(self, nominal_path: str | Path):
