@@ -397,24 +397,11 @@ class H5FileResolver(ABC):
 
 
 class LocalResolver(H5FileResolver):
-    """
-    A base class to define how the H5 files are resolved.
-    The constructor will be called with a single input argument `nominal_path`.
-
-    The derived class must implement the context manager protocol to return a file-like object opened in binary mode.
-    """
-
-    def __init__(self, nominal_path: str | Path):
-        super().__init__(nominal_path)
-        self._fo = None
-
     def __enter__(self):
-        self._fo = open(self.nominal_path, "rb")
-        return self._fo
+        return self.nominal_path
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        if self._fo is not None:
-            self._fo.close()
+        pass
 
 
 _resolver: type[H5FileResolver] = LocalResolver
