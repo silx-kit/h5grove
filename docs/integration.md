@@ -76,3 +76,35 @@ app.add_handlers(h5grove_handlers)
 .. automodule:: h5grove.tornado_utils
     :members:
 ```
+
+## Custom File Resolving
+
+By default, the HDF5 files are assumed to be on the local file system.
+It is possible to serve HDF5 files stored on a remote location.
+To do so, one shall subclass the `utils.H5FileResolver` class and implement the context manager protocol.
+The custom resolver can then be assigned via the `assign_resolver` function.
+
+```python
+from s3fs import S3FileSystem
+from h5grove import H5FileResolver, assign_resolver
+
+
+class S3Resolver(H5FileResolver):
+    def __init__(self, nominal_path: str):
+        super().__init__(nominal_path)
+        # using a local deployment for illustration
+        # assuming anonymous access
+        self._s3 = S3FileSystem(anon=True, endpoint_url='http://localhost:8333')
+        self._fo = None
+
+    def __enter__(self):
+        self._fo = self._s3.open(self.nominal_path)
+        return self._fo
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if self._fo is not None:
+            self._fo.close()
+
+
+assign_resolver(S3Resolver)
+```
