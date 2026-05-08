@@ -417,7 +417,7 @@ class LocalResolver(H5FileResolver):
             self._fo.close()
 
 
-_resolver = LocalResolver
+_resolver: type[H5FileResolver] = LocalResolver
 
 
 @contextmanager
