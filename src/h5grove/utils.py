@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from abc import ABC, abstractmethod
 from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from os.path import basename
@@ -377,6 +378,48 @@ def stringify_dtype(dtype: np.dtype) -> StrDtype:
     }
 
 
+class H5FileResolver(ABC):
+    """
+    A base class to define how the H5 files are resolved.
+    The constructor will be called with a single input argument `nominal_path`.
+
+    The derived class must implement the context manager protocol to return a file-like object opened in binary mode.
+    """
+
+    def __init__(self, nominal_path: str | Path):
+        self.nominal_path = nominal_path
+
+    @abstractmethod
+    def __enter__(self): ...
+
+    @abstractmethod
+    def __exit__(self, exc_type, exc_val, exc_tb): ...
+
+
+class LocalResolver(H5FileResolver):
+    """
+    A base class to define how the H5 files are resolved.
+    The constructor will be called with a single input argument `nominal_path`.
+
+    The derived class must implement the context manager protocol to return a file-like object opened in binary mode.
+    """
+
+    def __init__(self, nominal_path: str | Path):
+        super().__init__(nominal_path)
+        self._fo = None
+
+    def __enter__(self):
+        self._fo = open(self.nominal_path, "rb")
+        return self._fo
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if self._fo is not None:
+            self._fo.close()
+
+
+_resolver = LocalResolver
+
+
 @contextmanager
 def open_file_with_error_fallback(
     filepath: str | Path,
@@ -384,7 +427,7 @@ def open_file_with_error_fallback(
     h5py_options: dict[str, Any] = {},
 ) -> Iterator[h5py.File]:
     try:
-        with h5py.File(filepath, "r", **h5py_options) as f:
+        with _resolver(filepath) as fo, h5py.File(fo, "r", **h5py_options) as f:
             yield f
     except OSError as e:
         if isinstance(e, FileNotFoundError) or "No such file or directory" in str(e):
