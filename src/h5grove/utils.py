@@ -385,11 +385,20 @@ class H5FileResolver:
 
     1. a file-like object opened in binary mode, or
     2. a local path to the target file.
+
+    To pass further options to the `h5py.File` constructor, override the `extra_options` property.
     """
 
     @contextmanager
     def resolve(self, nominal_path: str | Path):
         yield nominal_path
+
+    @property
+    def extra_options(self) -> dict:
+        """
+        Return extra kwargs to be passed to `h5py.File`.
+        """
+        return {}
 
 
 _resolver: H5FileResolver = H5FileResolver()
@@ -402,7 +411,10 @@ def open_file_with_error_fallback(
     h5py_options: dict[str, Any] = {},
 ) -> Iterator[h5py.File]:
     try:
-        with _resolver.resolve(filepath) as fo, h5py.File(fo, "r", **h5py_options) as f:
+        with (
+            _resolver.resolve(filepath) as fo,
+            h5py.File(fo, "r", **(_resolver.extra_options | h5py_options)) as f,
+        ):
             yield f
     except OSError as e:
         if isinstance(e, FileNotFoundError) or "No such file or directory" in str(e):
