@@ -634,6 +634,25 @@ class BaseTestEndpoints:
             f"/data?file={filename}&path={path}&format={format_arg}", 422
         )
 
+    def test_403_on_external_dataset(self, server):
+        filename = "test.h5"
+        external_filename = "external.bin"
+        path = "/external"
+
+        (server.served_directory / external_filename).write_bytes(
+            np.arange(4, dtype="<i4").tobytes()
+        )
+        with h5py.File(server.served_directory / filename, mode="w") as h5file:
+            h5file.create_dataset(
+                path,
+                shape=(4,),
+                dtype="<i4",
+                external=[(str(server.served_directory / external_filename), 0, 16)],
+            )
+
+        server.assert_error_code(f"/data?file={filename}&path={path}", 403)
+        server.assert_error_code(f"/stats?file={filename}&path={path}", 403)
+
     def test_422_on_invalid_query_arg(self, server):
         filename = "test.h5"
         path = "/data"
