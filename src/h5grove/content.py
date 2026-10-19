@@ -32,6 +32,7 @@ from .models import (
     Stats,
 )
 from .utils import (
+    NotAllowedError,
     NotFoundError,
     QueryArgumentError,
     attr_metadata,
@@ -180,6 +181,9 @@ class DatasetContent(ResolvedEntityContent[h5py.Dataset]):
           - `origin` (default): No conversion
           - `safe`: Convert to a type supported by JS typedarray (https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/TypedArray)
         """
+        if self._h5py_entity.external:
+            raise NotAllowedError("Cannot resolve external datasets")
+
         result = convert(get_dataset_slice(self._h5py_entity, selection), dtype)
 
         # Do not flatten scalars nor h5py.Empty
@@ -309,6 +313,8 @@ def get_content_from_file(
     try:
         with open_file_with_error_fallback(filepath, create_error, h5py_options) as f:
             yield create_content(f, path, resolve_links)
+    except NotAllowedError as e:
+        raise create_error(403, str(e))
     except NotFoundError as e:
         raise create_error(404, str(e))
     except QueryArgumentError as e:

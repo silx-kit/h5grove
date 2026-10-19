@@ -37,6 +37,10 @@ class QueryArgumentError(ValueError):
     pass
 
 
+class NotAllowedError(Exception):
+    pass
+
+
 def _get_attr_id(entity_attrs: h5py.AttributeManager, attr_name: str):
     return entity_attrs.get_id(attr_name)
 
