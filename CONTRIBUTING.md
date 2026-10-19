@@ -17,10 +17,10 @@ will install `h5grove` in editable mode with all the linting/formating/testing p
 All lint checks can be run with
 
 ```
-hatch run lint
+ruff format --check src/ example/
+ruff check
+mypy src/ example/
 ```
-
-Configuration entries are located in `pyproject.toml`.
 
 **Code is checked at each push on main and for each PR** (see `lint-test.yml` workflow).
 

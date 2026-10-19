@@ -1,4 +1,6 @@
+import importlib.metadata
+
 from .content import create_content
 from .encoders import encode
 
-version = "4.0.0"
+version = importlib.metadata.version("h5grove")
