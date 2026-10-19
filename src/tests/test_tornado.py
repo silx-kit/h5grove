@@ -1,89 +1,67 @@
-"""Test tornado_utils using pytest-tornado"""
-
 from __future__ import annotations
 
 import pathlib
+import threading
 from collections.abc import Callable
 
 import base_test
+import httpx
 import pytest
+import tornado.httpserver
+import tornado.ioloop
+import tornado.testing
 import tornado.web
 from conftest import BaseServer
-from tornado.httpclient import HTTPClientError
-from utils import Response, assert_error_response
+from utils import Response
 
 from h5grove.tornado_utils import get_handlers
 
 # Fixtures ###
 
-
-@pytest.fixture(scope="session")
-def _base_dir(tmp_path_factory):
-    """Fixture creating base_dir.
-
-    Needed to share base_dir between `app` and `server` fixtures
-    """
-    yield tmp_path_factory.mktemp("h5grove_tornado_served").absolute()
-
-
-@pytest.fixture
-def app(_base_dir):
-    """Fixture used by pytest-tornado"""
-    return tornado.web.Application(get_handlers(_base_dir), debug=True)
+TIMEOUT = 10
 
 
 class _TornadoServer(BaseServer):
     """Class of objects provided by :func:`tornado_server` fixture"""
 
-    def __init__(self, served_dir: pathlib.Path, io_loop, http_client, base_url: str):
+    def __init__(self, served_dir: pathlib.Path, base_url: str):
         super().__init__(served_dir)
-        self.__io_loop = io_loop
-        self.__http_client = http_client
-        self.__base_url = base_url
-
-    def __fetch(self, url: str):
-        """Make a synchronous fetch of given url"""
-        future = self.__http_client.fetch(self.__base_url + url)
-        self.__io_loop.run_sync(lambda: future)
-        return future.result()
+        self.__client = httpx.Client(base_url=base_url)
 
     def _get_response(self, url: str, benchmark: Callable) -> Response:
-        r = benchmark(lambda: self.__fetch(url))
+        r = benchmark(lambda: self.__client.get(url))
         return Response(
-            status=r.code, headers=list(r.headers.get_all()), content=r.body
-        )
-
-    def assert_error_code(self, url: str, error_code: int):
-        with pytest.raises(HTTPClientError) as e:
-            self._get_response(url, lambda f: f())
-        r = e.value.response
-        assert r is not None
-        assert_error_response(
-            Response(
-                status=r.code,
-                headers=list(r.headers.get_all()),
-                content=r.body,
-            ),
-            error_code,
+            status=r.status_code,
+            headers=[(k, v) for k, v in r.headers.items()],
+            content=r.content,
         )
 
 
-@pytest.fixture
-def tornado_server(_base_dir, io_loop, http_client, base_url):
-    """tornado test client-based `server` fixture.
+@pytest.fixture(scope="session")
+def tornado_server(tmp_path_factory):
+    """Run the tornado app in a thread and provide a `server` object."""
+    base_dir = tmp_path_factory.mktemp("h5grove_tornado_served").absolute()
 
-    Provides a function to fetch endpoints from the server.
-    """
-    yield _TornadoServer(_base_dir, io_loop, http_client, base_url)
+    io_loop = tornado.ioloop.IOLoop(make_current=False)
+
+    sock, port = tornado.testing.bind_unused_port()
+    app = tornado.web.Application(get_handlers(base_dir))
+    server = tornado.httpserver.HTTPServer(app)
+    # Register the listening socket in the thread of the io_loop
+    io_loop.add_callback(server.add_sockets, [sock])
+
+    thread = threading.Thread(target=io_loop.start, daemon=True)
+    thread.start()
+    yield _TornadoServer(base_dir, f"http://127.0.0.1:{port}")
+    io_loop.add_callback(server.stop)
+    io_loop.add_callback(io_loop.stop)
+    thread.join(TIMEOUT)
 
 
 # Tests ###
 
 
 class TestTornadoEndpoints(base_test.BaseTestEndpoints):
-    """Test tornado handler enpoints using pytest-tornado"""
-
     @pytest.fixture
     def server(self, tornado_server):
-        """Override TestEndpoints.server fixture to use pytest-tornado"""
         yield tornado_server
