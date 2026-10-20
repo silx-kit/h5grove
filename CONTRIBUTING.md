@@ -2,11 +2,15 @@
 
 ## Quick install
 
+The development environment is managed with [pixi](https://pixi.sh). Install it, then run:
+
 ```
-pip install -e .[dev]
+pixi install
 ```
 
-will install `h5grove` in editable mode with all the linting/formating/testing packages. This will also install the [fastapi](https://fastapi.tiangolo.com/), [flask](https://flask.palletsprojects.com/en/) and [tornado](https://www.tornadoweb.org/en/stable/) packages as they are needed to build the documentation and test the project.
+This will install `h5grove` in editable mode with all the linting/formating/testing packages. This will also install the [fastapi](https://fastapi.tiangolo.com/), [flask](https://flask.palletsprojects.com/en/) and [tornado](https://www.tornadoweb.org/en/stable/) packages as they are needed to build the documentation and test the project.
+
+The default env is on Python 3.12. The `py315` environment can be used to test with Python 3.15 e.g. `pixi run -e py315 test`.
 
 ## Linting
 
@@ -17,7 +21,7 @@ will install `h5grove` in editable mode with all the linting/formating/testing p
 All lint checks can be run with
 
 ```
-hatch run lint
+pixi run lint
 ```
 
 Configuration entries are located in `pyproject.toml`.
@@ -28,16 +32,16 @@ Configuration entries are located in `pyproject.toml`.
 
 Tests are handled with [pytest](https://docs.pytest.org/en/stable/index.html). These are mostly integration tests for now that tests the responses of the endpoints of the tornado and flask example apps.
 
-Once `h5grove` is installed in editable mode, run the tests with
+Run the tests with
 
 ```
-hatch run test
+pixi run test
 ```
 
 All `pytest` options can be used. For example, to run tests in verbose mode:
 
 ```
-hatch run test -vv
+pixi run test -vv
 ```
 
 ### Benchmarks
@@ -47,7 +51,7 @@ Benchmarks of different formats (`json`, `.npy`) and web server frameworks (`fla
 Benchmarks can be run with:
 
 ```
-hatch run benchmark
+pixi run benchmark
 ```
 
 ## Release
@@ -88,11 +92,11 @@ The relevant files are in `docs/`:
 To build the documentation in development, with live reload at http://127.0.0.1:8000/, run:
 
 ```
-hatch run doc
+pixi run doc
 ```
 
 To build the documentation once into the `_build` folder, run:
 
 ```
-hatch run docbuild
+pixi run docbuild
 ```
