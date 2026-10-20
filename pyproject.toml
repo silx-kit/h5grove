@@ -26,7 +26,6 @@ flask = ["Flask", "Flask-Compress", "Flask-Cors"]
 tornado = ["tornado"]
 dev = [
     "bump2version",
-    "hatch",
     "h5grove[fastapi]",
     "h5grove[flask]",
     "h5grove[tornado]",
@@ -69,19 +68,49 @@ ignore = ["E203", "E501", "E701"]
 # Ignore `F401` (imported but unused) in init files
 "__init__.py" = ["F401"]
 
+[tool.pixi.activation.env]
+PYTHONIOENCODING = "utf-8"
+PYTHONNOUSERSITE = "1"
 
-[tool.hatch.envs.default]
-features = ["dev"]
+[tool.pixi.workspace]
+channels = ["conda-forge"]
+platforms = ["linux-64", "osx-arm64", "win-64"]
 
-[tool.hatch.envs.default.scripts]
+[tool.pixi.dependencies]
+python = ">=3.12"
+numpy = "*"
+h5py = "*"
+orjson = "*"
+
+[tool.pixi.pypi-dependencies]
+h5grove = { path = ".", editable = true, extras = ["dev"] }
+
+[tool.pixi.environments]
+default = { features = ["py312"] }
+py315 = { features = ["py315"] }
+build = { features = ["build"], no-default-feature = true }
+
+[tool.pixi.feature.py312.dependencies]
+python = "3.12.*"
+
+[tool.pixi.feature.py315.dependencies]
+python = "3.15.*"
+
+[tool.pixi.tasks]
 benchmark = "pytest --benchmark-only"
-test = 'pytest --benchmark-skip {args}'
+test = "pytest --benchmark-skip"
 ruff_format = "ruff format --check src/ example/"
-ruff_check = 'ruff check'
-lint_mypy = 'mypy src/ example/'
-lint = ['ruff_format', 'ruff_check', 'lint_mypy']
+ruff_check = "ruff check"
+lint_mypy = "mypy src/ example/"
+lint = { depends-on = ["ruff_format", "ruff_check", "lint_mypy"] }
 docbuild = "sphinx-build -W -b html docs _build"
 doc = "sphinx-autobuild -W -b html docs _build"
+
+[tool.pixi.feature.build.dependencies]
+python-build = "*"
+
+[tool.pixi.feature.build.tasks]
+build = "python -m build"
 
 [tool.hatch.build.targets.sdist]
 include = ["src/h5grove"]
