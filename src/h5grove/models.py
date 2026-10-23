@@ -1,10 +1,9 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import TypedDict
+from typing import NotRequired, TypedDict
 
 import h5py
-from typing_extensions import NotRequired
 
 H5pyEntity = (
     h5py.Dataset | h5py.Datatype | h5py.ExternalLink | h5py.Group | h5py.SoftLink
