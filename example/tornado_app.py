@@ -8,10 +8,6 @@ import os
 import tornado.ioloop
 import tornado.web
 
-# Disable libhdf5 file locking since h5grove is only reading files
-# This needs to be done before any import of h5py, so before h5grove import
-os.environ["HDF5_USE_FILE_LOCKING"] = "FALSE"
-
 from h5grove.tornado_utils import get_handlers  # noqa
 
 

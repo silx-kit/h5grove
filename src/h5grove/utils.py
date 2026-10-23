@@ -381,14 +381,19 @@ def stringify_dtype(dtype: np.dtype) -> StrDtype:
     }
 
 
+DEFAULT_H5PY_OPTIONS = {"locking": False}
+
+
 @contextmanager
 def open_file_with_error_fallback(
     filepath: str | Path,
     create_error: Callable[[int, str], Exception],
     h5py_options: dict[str, Any] = {},
 ) -> Iterator[h5py.File]:
+
+    merged_h5py_options = {**DEFAULT_H5PY_OPTIONS, **h5py_options}
     try:
-        with h5py.File(filepath, "r", **h5py_options) as f:
+        with h5py.File(filepath, "r", **merged_h5py_options) as f:
             yield f
     except OSError as e:
         if isinstance(e, FileNotFoundError) or "No such file or directory" in str(e):
