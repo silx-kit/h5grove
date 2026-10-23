@@ -154,13 +154,13 @@ class PathsHandler(BaseHandler):
             return encode(paths)
 
 
-# TODO: Setting the return type raises mypy errors
-def get_handlers(base_dir: str | None, allow_origin: str | None = None):
+def get_handlers(
+    base_dir: str | None, allow_origin: str | None = None
+) -> list[tuple[str, type[BaseHandler], dict]]:
     """Build h5grove handlers (`/`, `/attr`, `/data`, `/meta` and `/stats`).
 
     :param base_dir: Base directory from which the HDF5 files will be served
     :param allow_origin: Allowed origins for CORS
-    :return type: List[Tuple[str, BaseHandler, dict]]
     """
     init_args = {"base_dir": base_dir, "allow_origin": allow_origin}
     return [
