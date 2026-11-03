@@ -3649,7 +3649,7 @@ packages:
   requires_dist:
   - numpy
   - orjson
-  - h5py>=3
+  - h5py>=3.5
   - tifffile
   - typing-extensions
   - fastapi ; extra == 'fastapi'

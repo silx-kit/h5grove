@@ -9,10 +9,6 @@ from flask import Flask
 from flask_compress import Compress  # type: ignore
 from flask_cors import CORS  # type: ignore
 
-# Disable libhdf5 file locking since h5grove is only reading files
-# This needs to be done before any import of h5py, so before h5grove import
-os.environ["HDF5_USE_FILE_LOCKING"] = "FALSE"
-
 from h5grove.flask_utils import BLUEPRINT as h5grove_blueprint  # noqa
 
 
