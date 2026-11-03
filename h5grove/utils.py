@@ -421,9 +421,13 @@ def is_file_type(filepath, file_type = FileTypeEnum.H5PY):
         case FileTypeEnum.H5PY:
             return is_h5py_file(filepath_str)
         case FileTypeEnum.ZARR:
-            if isinstance(filepath, zarr.storage.StoreLike):
+            if is_zarr_file(filepath_str):
                 return True
-            return is_zarr_file(filepath_str)
+
+            if zarr.storage._has_fsspec and isinstance(filepath, zarr.storage.FSMap):
+                return True
+
+            return isinstance(filepath, zarr.storage.Store | zarr.storage.StorePath | zarr.storage.Path)
 
 def close_file(filepath, f):
     if is_file_type(filepath, FileTypeEnum.H5PY):
