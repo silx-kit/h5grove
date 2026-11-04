@@ -2,7 +2,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from enum import Enum, auto
 from typing import Any
-
+import importlib
 from pathlib import Path
 import zarr
 import h5py
@@ -28,6 +28,7 @@ from .models import (
     AttributeMetadata,
 )
 
+_has_fsspec = importlib.util.find_spec("fsspec")
 
 class FileTypeEnum(Enum):
     H5PY = auto()
@@ -424,7 +425,7 @@ def is_file_type(filepath, file_type = FileTypeEnum.H5PY):
             if is_zarr_file(filepath_str):
                 return True
 
-            if zarr.storage._has_fsspec and isinstance(filepath, zarr.storage.FSMap):
+            if _has_fsspec and isinstance(filepath, zarr.storage.FSMap):
                 return True
 
             return isinstance(filepath, zarr.storage.Store | zarr.storage.StorePath | zarr.storage.Path)
