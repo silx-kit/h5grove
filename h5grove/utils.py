@@ -29,6 +29,11 @@ from .models import (
 )
 
 _has_fsspec = importlib.util.find_spec("fsspec")
+if _has_fsspec:
+    import zarr.storage.FSMap
+else:
+    FSMap = None
+
 
 class FileTypeEnum(Enum):
     H5PY = auto()
@@ -425,8 +430,8 @@ def is_file_type(filepath, file_type = FileTypeEnum.H5PY):
             if is_zarr_file(filepath_str):
                 return True
 
-            if _has_fsspec and isinstance(filepath, zarr.storage.FSMap):
-                return True
+            if _has_fsspec:
+                return isinstance(filepath, FSMap)
 
             return isinstance(filepath, zarr.storage.Store | zarr.storage.StorePath | zarr.storage.Path)
 
