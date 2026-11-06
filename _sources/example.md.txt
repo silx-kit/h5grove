@@ -8,7 +8,7 @@ The endpoints API is described [here](api.md).
 
 ```{eval-rst}
 .. argparse::
-   :filename: example/fastapi_app.py
+   :filename: ../example/fastapi_app.py
    :func: parser_fn
    :prog: fastapi_app.py
 ```
@@ -17,7 +17,7 @@ The endpoints API is described [here](api.md).
 
 ```{eval-rst}
 .. argparse::
-   :filename: example/flask_app.py
+   :filename: ../example/flask_app.py
    :func: parser_fn
    :prog: flask_app.py
 ```
@@ -26,7 +26,7 @@ The endpoints API is described [here](api.md).
 
 ```{eval-rst}
 .. argparse::
-   :filename: example/tornado_app.py
+   :filename: ../example/tornado_app.py
    :func: parser_fn
    :prog: tornado_app.py
 ```

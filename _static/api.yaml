@@ -481,7 +481,7 @@ components:
 
   responses:
     "403":
-      description: The file is not allowed to be read.
+      description: The file or the entity is not allowed to be read.
     "404":
       description: The file was not found or the queried path does not exist in the file.
     "422":
