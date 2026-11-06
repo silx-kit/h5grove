@@ -4,7 +4,7 @@ from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from os.path import basename
 from pathlib import Path
-from typing import Any, TypeVar
+from typing import Any
 
 import h5py
 import numpy as np
@@ -237,10 +237,9 @@ def _sanitize_dtype(dtype: np.dtype) -> np.dtype:
     return dtype
 
 
-T = TypeVar("T", np.ndarray, np.number, np.bool_)
-
-
-def convert(data: T, dtype: str | None = "origin") -> T:
+def convert[T: (np.ndarray, np.number, np.bool_)](
+    data: T, dtype: str | None = "origin"
+) -> T:
     """Convert array or numpy scalar to given dtype query param
 
     :param data: nD array or scalar to convert

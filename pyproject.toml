@@ -16,7 +16,6 @@ dependencies = [
     "orjson",
     "h5py >= 3.5",
     "tifffile",
-    "typing-extensions",
 ]
 
 [project.urls]

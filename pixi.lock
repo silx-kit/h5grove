@@ -3651,7 +3651,6 @@ packages:
   - orjson
   - h5py>=3.5
   - tifffile
-  - typing-extensions
   - fastapi ; extra == 'fastapi'
   - pydantic>2 ; extra == 'fastapi'
   - pydantic-settings ; extra == 'fastapi'

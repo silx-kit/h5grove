@@ -3,12 +3,7 @@ from __future__ import annotations
 import contextlib
 from collections.abc import Callable, Sequence
 from pathlib import Path
-from typing import (
-    Any,
-    Generic,
-    TypeVar,
-    cast,
-)
+from typing import Any, cast
 
 import h5py
 import numpy as np
@@ -119,10 +114,9 @@ class SoftLinkContent(EntityContent):
         return self._target_path
 
 
-T = TypeVar("T", h5py.Dataset, h5py.Datatype, h5py.Group)
-
-
-class ResolvedEntityContent(EntityContent, Generic[T]):
+class ResolvedEntityContent[T: (h5py.Dataset, h5py.Datatype, h5py.Group)](
+    EntityContent
+):
     """Content for a link that can be resolved into a h5py entity"""
 
     def __init__(self, path: str, h5py_entity: T):
