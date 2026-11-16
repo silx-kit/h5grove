@@ -30,6 +30,7 @@ from .utils import (
     NotAllowedError,
     NotFoundError,
     QueryArgumentError,
+    UnavailableFilterError,
     attr_metadata,
     convert,
     get_array_stats,
@@ -178,7 +179,26 @@ class DatasetContent(ResolvedEntityContent[h5py.Dataset]):
         if self._h5py_entity.external:
             raise NotAllowedError("Cannot resolve external datasets")
 
-        result = convert(get_dataset_slice(self._h5py_entity, selection), dtype)
+        try:
+            data = get_dataset_slice(self._h5py_entity, selection)
+        except OSError as error:
+            unavailable = []
+            for filter in get_filters(self._h5py_entity) or []:
+                filter_id = int(filter["id"])
+                if not h5py.h5z.filter_avail(filter_id) or not (
+                    h5py.h5z.get_filter_info(filter_id)
+                    & h5py.h5z.FILTER_CONFIG_DECODE_ENABLED
+                ):
+                    unavailable.append(str(filter_id))
+            if unavailable:
+                raise UnavailableFilterError(
+                    "Cannot read dataset. HDF5 filters unavailable for decoding: "
+                    f"{', '.join(unavailable)}. "
+                    "Check that the required filter plugins are installed."
+                ) from error
+            raise
+
+        result = convert(data, dtype)
 
         # Do not flatten scalars nor h5py.Empty
         if flatten and isinstance(result, np.ndarray):
@@ -307,6 +327,8 @@ def get_content_from_file(
     try:
         with open_file_with_error_fallback(filepath, create_error, h5py_options) as f:
             yield create_content(f, path, resolve_links)
+    except UnavailableFilterError as e:
+        raise create_error(500, str(e))
     except NotAllowedError as e:
         raise create_error(403, str(e))
     except NotFoundError as e:

@@ -41,6 +41,10 @@ class NotAllowedError(Exception):
     pass
 
 
+class UnavailableFilterError(OSError):
+    pass
+
+
 def _get_attr_id(entity_attrs: h5py.AttributeManager, attr_name: str):
     return entity_attrs.get_id(attr_name)
 

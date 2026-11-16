@@ -13,8 +13,6 @@ from urllib.request import urlopen
 import pytest
 from utils import Response, assert_error_response
 
-from h5grove.encoders import orjson_encode
-
 
 class BaseServer:
     """Base class for object provided through `server` fixture"""
@@ -49,8 +47,10 @@ class BaseServer:
 
         return response
 
-    def assert_error_code(self, url: str, error_code: int):
-        assert_error_response(self._get_response(url, lambda f: f()), error_code)
+    def assert_error_code(self, url: str, error_code: int, message: str | None = None):
+        assert_error_response(
+            self._get_response(url, lambda f: f()), error_code, message
+        )
 
 
 # subprocess_server fixture  ###
@@ -67,7 +67,7 @@ class SubprocessServer(BaseServer):
         r = benchmark(lambda: urlopen(self.__base_url + url))
         return Response(status=r.status, headers=r.headers.items(), content=r.read())
 
-    def assert_error_code(self, url: str, error_code: int):
+    def assert_error_code(self, url: str, error_code: int, message: str | None = None):
         with pytest.raises(HTTPError) as e:
             self._get_response(url, lambda f: f())
         assert e is not None
@@ -76,9 +76,10 @@ class SubprocessServer(BaseServer):
             Response(
                 status=error.code,
                 headers=error.headers.items(),
-                content=orjson_encode({"message": error.reason}),
+                content=error.read(),
             ),
             error_code,
+            message,
         )
 
 
