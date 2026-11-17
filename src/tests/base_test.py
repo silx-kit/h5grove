@@ -122,6 +122,67 @@ class BaseTestEndpoints:
         retrieved_data = decode_array_response(response, format_arg, "<f4", data.shape)
         assert np.array_equal(retrieved_data, data)
 
+    @pytest.mark.parametrize("byteorder", ("<", ">"))
+    @pytest.mark.parametrize("selected", (False, True))
+    @pytest.mark.parametrize(
+        ("dtype_code", "value"),
+        (
+            ("i2", -257),
+            ("u8", 2**53 + 1),
+            ("f2", 1.5),
+            ("f4", 0.1),
+            ("c16", 1.25 - 2.5j),
+        ),
+    )
+    def test_scalar_byte_order(self, server, byteorder, selected, dtype_code, value):
+        dtype = np.dtype(byteorder + dtype_code)
+        data = np.array([value, value] if selected else value, dtype=dtype)
+        expected = data[0] if selected else data[()]
+        filename = "test.h5"
+        with h5py.File(server.served_directory / filename, "w") as h5file:
+            h5file.create_dataset("values", data=data)
+
+        query = {"file": filename, "path": "/values"}
+        if selected:
+            query["selection"] = "0"
+        for dtype_arg in ("origin", "safe"):
+            wire_dtype = dtype if dtype_arg == "origin" else dtype.newbyteorder("<")
+            if dtype_arg == "safe" and dtype_code == "f2":
+                wire_dtype = np.dtype("<f4")
+            for flatten in (False, True):
+                for format_arg in ("bin", "npy", "json"):
+                    response = server.get(
+                        "/data?"
+                        + urlencode(
+                            dict(
+                                query,
+                                dtype=dtype_arg,
+                                flatten=flatten,
+                                format=format_arg,
+                            )
+                        )
+                    )
+                    if format_arg == "json":
+                        result = decode_response(response)
+                        if dtype.kind == "c":
+                            assert result == [expected.real, expected.imag]
+                        elif dtype.kind in "iu":
+                            assert result == int(expected)
+                        else:
+                            assert result == pytest.approx(expected)
+                    else:
+                        result = decode_array_response(
+                            response, format_arg, wire_dtype.str, ()
+                        )
+                        assert result.shape == ()
+                        assert result.dtype == wire_dtype
+                        assert result == expected
+                        if format_arg == "bin":
+                            assert (
+                                response.content
+                                == np.asarray(expected, dtype=wire_dtype).tobytes()
+                            )
+
     @pytest.mark.parametrize("format_arg", ("json", "npy"))
     def test_data_on_slice_with_format_and_flatten(self, server, format_arg):
         """Test /data endpoint on array dataset with flatten"""

@@ -47,6 +47,14 @@ def orjson_encode(content: Any, default: Callable | None = None) -> bytes:
     :param: content: Content to encode
     :param default: orjson default (https://github.com/ijl/orjson#default)
     """
+    if (
+        isinstance(content, np.ndarray)
+        and content.ndim == 0
+        and not content.dtype.isnative
+        and np.issubdtype(content.dtype, np.number)
+    ):
+        # JSON has no byte order; keep the same scalar serialization.
+        content = content[()]
     if default is None:
         default = orjson_default
 
