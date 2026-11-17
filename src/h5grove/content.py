@@ -174,14 +174,28 @@ class DatasetContent(ResolvedEntityContent[h5py.Dataset]):
         :param dtype: Data type conversion query parameter
           - `origin` (default): No conversion
           - `safe`: Convert to a type supported by JS typedarray (https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/TypedArray)
+
+        Numeric scalars may be zero-dimensional arrays to preserve their byte order.
         """
         if self._h5py_entity.external:
             raise NotAllowedError("Cannot resolve external datasets")
 
-        result = convert(get_dataset_slice(self._h5py_entity, selection), dtype)
+        data = get_dataset_slice(self._h5py_entity, selection)
+        is_scalar = isinstance(data, np.number)
+        if (
+            is_scalar
+            and data.dtype != self._h5py_entity.dtype
+            and data.dtype.newbyteorder(self._h5py_entity.dtype.byteorder)
+            == self._h5py_entity.dtype
+        ):
+            # NumPy scalars lose the byte order retained by array reads.
+            data = np.asarray(data, dtype=self._h5py_entity.dtype)
+        result = convert(data, dtype)
+        if is_scalar and dtype == "safe" and result.dtype.isnative:
+            result = result[()]
 
         # Do not flatten scalars nor h5py.Empty
-        if flatten and isinstance(result, np.ndarray):
+        if flatten and isinstance(result, np.ndarray) and result.ndim > 0:
             return np.ravel(result)
 
         return result
