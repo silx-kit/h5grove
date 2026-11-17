@@ -545,6 +545,41 @@ class BaseTestEndpoints:
             "/tree/branch/fruit_2",
         ]
 
+    @pytest.mark.parametrize("endpoint", ("data", "stats"))
+    @pytest.mark.parametrize("filter_mask", (0, 1))
+    def test_unavailable_filter(self, server, endpoint, filter_mask):
+        filename = "test.h5"
+        data = np.arange(4, dtype="<i4")
+        with h5py.File(server.served_directory / filename, mode="w") as h5file:
+            dataset = h5file.create_dataset(
+                "filtered",
+                shape=data.shape,
+                dtype=data.dtype,
+                chunks=data.shape,
+                compression=65535,
+                allow_unknown_filter=True,
+            )
+            dataset.id.write_direct_chunk((0,), data.tobytes(), filter_mask=filter_mask)
+
+        # Metadata does not require the decoding plugin.
+        server.get(f"/meta?file={filename}&path=/filtered")
+        url = f"/{endpoint}?file={filename}&path=/filtered"
+        if filter_mask == 0:
+            server.assert_error_code(
+                url,
+                500,
+                "Cannot read dataset. HDF5 filters unavailable for decoding: 65535. "
+                "Check that the required filter plugins are installed.",
+            )
+        else:
+            # Optional filters can be skipped for individual chunks.
+            content = decode_response(server.get(url))
+            if endpoint == "data":
+                assert content == data.tolist()
+            else:
+                assert content["min"] == 0
+                assert content["max"] == 3
+
     def test_404_on_non_existing_path(self, server):
         filename = "test.h5"
         not_a_path = "not_a_path"
