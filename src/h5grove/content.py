@@ -332,11 +332,13 @@ def get_list_of_paths(
         raise create_error(422, str(e))
 
     names = []
+    links_to_resolve = []
 
-    def get_path(name: bytes):
+    def get_path(name: bytes, info: h5py.h5l.LinkInfo):
         full_path = hdf_path_join(base_path, name.decode())
-        content = create_content(f, full_path, resolve_links)
-        names.append(content.path)
+        names.append(full_path)
+        if info.type != h5py.h5l.TYPE_HARD:
+            links_to_resolve.append(full_path)
 
     try:
         with open_file_with_error_fallback(filepath, create_error, h5py_options) as f:
@@ -344,7 +346,10 @@ def get_list_of_paths(
             if not isinstance(base_content, GroupContent):
                 raise TypeError(f"{base_content.path} is not a group")
             names.append(base_content.path)
-            base_content._h5py_entity.id.links.visit(get_path)
+            base_content._h5py_entity.id.links.visit(get_path, info=True)
+            # Resolve links outside the HDF5 visitor so errors reach the handler.
+            for path in links_to_resolve:
+                create_content(f, path, resolve_links)
             yield names
     except NotFoundError as e:
         raise create_error(404, str(e))
