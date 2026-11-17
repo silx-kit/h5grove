@@ -61,10 +61,7 @@ class BaseTestEndpoints:
 
     @pytest.mark.parametrize("byteorder", ("<", ">"))
     @pytest.mark.parametrize("scalar", (False, True))
-    @pytest.mark.parametrize("endpoint", ("data", "attr"))
-    def test_json_on_compound_with_array_fields(
-        self, server, byteorder, scalar, endpoint
-    ):
+    def test_json_on_compound_with_array_fields(self, server, byteorder, scalar):
         data = np.array(
             [(10, [1, -2, 256, 65536], [1.5, 2.25, -3.5])],
             dtype=[
@@ -83,10 +80,11 @@ class BaseTestEndpoints:
             dataset = h5file.create_dataset("compound", data=data)
             dataset.attrs["values"] = data
 
-        response = server.get(f"/{endpoint}?file={filename}&path=/compound")
-        assert decode_response(response) == (
-            {"values": expected} if endpoint == "attr" else expected
-        )
+        response = server.get(f"/data?file={filename}&path=/compound")
+        assert decode_response(response) == expected
+
+        response = server.get(f"/attr?file={filename}&path=/compound")
+        assert decode_response(response) == {"values": expected}
 
         # JSON conversion must not alter the byte order of stored or binary data.
         binary_response = server.get(f"/data?file={filename}&path=/compound&format=bin")
