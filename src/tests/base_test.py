@@ -545,6 +545,30 @@ class BaseTestEndpoints:
             "/tree/branch/fruit_2",
         ]
 
+    @pytest.mark.parametrize("resolve_links", tuple(LinkResolution))
+    @pytest.mark.parametrize("broken_link", (None, "soft", "external"))
+    def test_paths_link_resolution(self, server, resolve_links, broken_link):
+        filename = "paths.h5"
+        with h5py.File(server.served_directory / "external.h5", "w") as h5file:
+            h5file["target"] = [1, 2]
+        with h5py.File(server.served_directory / filename, "w") as h5file:
+            h5file["data"] = [3, 4]
+            h5file["soft"] = h5py.SoftLink("/data")
+            h5file["external"] = h5py.ExternalLink("external.h5", "/target")
+            if broken_link == "external":
+                h5file["broken"] = h5py.ExternalLink("missing.h5", "/target")
+            elif broken_link == "soft":
+                h5file["broken"] = h5py.SoftLink("/missing")
+
+        url = f"/paths?{urlencode({'file': filename, 'resolve_links': resolve_links.value})}"
+        if broken_link and resolve_links == LinkResolution.ALL:
+            server.assert_error_code(url, 404)
+        else:
+            expected = ["/", "/data", "/external", "/soft"]
+            if broken_link:
+                expected.insert(1, "/broken")
+            assert decode_response(server.get(url)) == expected
+
     def test_404_on_non_existing_path(self, server):
         filename = "test.h5"
         not_a_path = "not_a_path"
