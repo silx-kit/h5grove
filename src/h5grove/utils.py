@@ -375,6 +375,18 @@ def get_filter_info(
     return {"id": filter_id, "name": name}
 
 
+def get_unavailable_filter_ids(dataset: h5py.Dataset) -> list[int]:
+    """Return IDs of dataset filters unavailable for decoding."""
+    unavailable = []
+    for filter in get_filters(dataset) or []:
+        filter_id = int(filter["id"])
+        if not h5py.h5z.filter_avail(filter_id) or not (
+            h5py.h5z.get_filter_info(filter_id) & h5py.h5z.FILTER_CONFIG_DECODE_ENABLED
+        ):
+            unavailable.append(filter_id)
+    return unavailable
+
+
 def stringify_dtype(dtype: np.dtype) -> StrDtype:
     if dtype.fields is None:
         return dtype.str

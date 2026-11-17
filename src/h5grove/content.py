@@ -38,6 +38,7 @@ from .utils import (
     get_entity_from_file,
     get_filters,
     get_type_metadata,
+    get_unavailable_filter_ids,
     hdf_path_join,
     open_file_with_error_fallback,
     parse_link_resolution_arg,
@@ -182,18 +183,11 @@ class DatasetContent(ResolvedEntityContent[h5py.Dataset]):
         try:
             data = get_dataset_slice(self._h5py_entity, selection)
         except OSError as error:
-            unavailable = []
-            for filter in get_filters(self._h5py_entity) or []:
-                filter_id = int(filter["id"])
-                if not h5py.h5z.filter_avail(filter_id) or not (
-                    h5py.h5z.get_filter_info(filter_id)
-                    & h5py.h5z.FILTER_CONFIG_DECODE_ENABLED
-                ):
-                    unavailable.append(str(filter_id))
+            unavailable = get_unavailable_filter_ids(self._h5py_entity)
             if unavailable:
                 raise UnavailableFilterError(
                     "Cannot read dataset. HDF5 filters unavailable for decoding: "
-                    f"{', '.join(unavailable)}. "
+                    f"{', '.join(map(str, unavailable))}. "
                     "Check that the required filter plugins are installed."
                 ) from error
             raise
