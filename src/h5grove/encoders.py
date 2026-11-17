@@ -31,6 +31,10 @@ def orjson_default(o: Any) -> list | float | str | None:
     if isinstance(o, numbers.Complex):
         return [o.real, o.imag]
     if isinstance(o, (np.generic, np.ndarray)):
+        if o.dtype.fields is not None:
+            # tolist() keeps array fields as ndarrays, which orjson requires
+            # to have native byte order.
+            o = o.astype(o.dtype.newbyteorder("="), copy=False)
         return o.tolist()
     if isinstance(o, h5py.Empty):
         return None

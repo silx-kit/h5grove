@@ -59,6 +59,37 @@ class BaseTestEndpoints:
         retrieved_attributes = decode_response(response)
         assert retrieved_attributes == nx_attributes
 
+    @pytest.mark.parametrize("byteorder", ("<", ">"))
+    @pytest.mark.parametrize("scalar", (False, True))
+    def test_json_on_compound_with_array_fields(self, server, byteorder, scalar):
+        data = np.array(
+            [(10, [1, -2, 256, 65536], [1.5, 2.25, -3.5])],
+            dtype=[
+                ("id", "i4"),
+                ("integers", f"{byteorder}i4", (4,)),
+                ("floats", f"{byteorder}f4", (3,)),
+            ],
+        )
+        expected = [[10, [1, -2, 256, 65536], [1.5, 2.25, -3.5]]]
+        if scalar:
+            data = data[0]
+            expected = expected[0]
+
+        filename = "test.h5"
+        with h5py.File(server.served_directory / filename, mode="w") as h5file:
+            dataset = h5file.create_dataset("compound", data=data)
+            dataset.attrs["values"] = data
+
+        response = server.get(f"/data?file={filename}&path=/compound")
+        assert decode_response(response) == expected
+
+        response = server.get(f"/attr?file={filename}&path=/compound")
+        assert decode_response(response) == {"values": expected}
+
+        # JSON conversion must not alter the byte order of stored or binary data.
+        binary_response = server.get(f"/data?file={filename}&path=/compound&format=bin")
+        assert binary_response.content == data.tobytes()
+
     @pytest.mark.parametrize("format_arg", ("json", "bin", "npy", "csv", "tiff"))
     def test_data_on_array_with_format(self, server, format_arg):
         """Test /data endpoint on array dataset"""
