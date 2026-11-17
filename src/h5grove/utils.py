@@ -216,6 +216,11 @@ def get_type_metadata(type_id: h5py.h5t.TypeID) -> TypeMetadata:
             "base": get_type_metadata(type_id.get_super()),
         }
 
+    if hasattr(h5py.h5t, "TypeComplexID") and isinstance(
+        type_id, h5py.h5t.TypeComplexID
+    ):
+        return {**base_metadata, "base": get_type_metadata(type_id.get_super())}  # type: ignore
+
     return base_metadata
 
 

@@ -197,6 +197,54 @@ class BaseTestEndpoints:
             "type": {"class": 1, "dtype": "<f8", "size": 8, "order": 0},
         }
 
+    @pytest.mark.skipif(
+        not hasattr(h5py.h5t, "COMPLEX_IEEE_F32LE"),
+        reason="Native complex types require h5py 3.16 and HDF5 2.0",
+    )
+    @pytest.mark.parametrize("bits", (32, 64))
+    @pytest.mark.parametrize("byteorder", ("<", ">"))
+    def test_native_complex_metadata(self, server, bits, byteorder):
+        filename = "native_complex.h5"
+        order = "LE" if byteorder == "<" else "BE"
+        type_id = getattr(h5py.h5t, f"COMPLEX_IEEE_F{bits}{order}")
+        dtype = np.dtype(f"{byteorder}c{bits // 4}")
+        values = np.array([1.25 + 2.5j, -3.5 - 4.75j], dtype=dtype)
+        with h5py.File(server.served_directory / filename, "w") as h5file:
+            h5file.create_dataset("array", data=values, dtype=type_id)
+            h5file.create_dataset("scalar", data=values[0], dtype=type_id)
+            space = h5py.h5s.create_simple(values.shape)
+            attr = h5py.h5a.create(h5file.id, b"complex", type_id, space)
+            try:
+                attr.write(values, mtype=type_id)
+            finally:
+                attr.close()
+                space.close()
+            committed_type = type_id.copy()
+            try:
+                committed_type.commit(h5file.id, b"committed_type")
+            finally:
+                committed_type.close()
+
+        expected_type = {
+            "class": 11,
+            "dtype": dtype.str,
+            "size": dtype.itemsize,
+            "base": {
+                "class": 1,
+                "dtype": f"{byteorder}f{bits // 8}",
+                "size": bits // 8,
+                "order": 0 if byteorder == "<" else 1,
+            },
+        }
+        for path in ("array", "scalar", "committed_type"):
+            metadata = decode_response(
+                server.get(f"/meta?file={filename}&path=/{path}")
+            )
+            assert metadata["type"] == expected_type
+
+        root = decode_response(server.get(f"/meta?file={filename}&path=/&depth=0"))
+        assert root["attributes"][0]["type"] == expected_type
+
     def test_meta_on_chunked_compressed_dataset(self, server):
         """Test /meta endpoint on a chunked and compressed dataset"""
         filename = "test.h5"
