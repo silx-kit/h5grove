@@ -545,6 +545,46 @@ class BaseTestEndpoints:
             "/tree/branch/fruit_2",
         ]
 
+    @pytest.fixture
+    def paths_file(self, server):
+        path = server.served_directory / "paths.h5"
+        with h5py.File(server.served_directory / "external.h5", "w") as h5file:
+            h5file["target"] = [1, 2]
+        with h5py.File(path, "w") as h5file:
+            h5file["data"] = [3, 4]
+            h5file["soft"] = h5py.SoftLink("/data")
+            h5file["external"] = h5py.ExternalLink("external.h5", "/target")
+        return path
+
+    @pytest.mark.parametrize("resolve_links", tuple(LinkResolution))
+    def test_paths_link_resolution(self, server, paths_file, resolve_links):
+        url = f"/paths?{urlencode({'file': paths_file.name, 'resolve_links': resolve_links.value})}"
+        assert decode_response(server.get(url)) == ["/", "/data", "/external", "/soft"]
+
+    @pytest.mark.parametrize("resolve_links", tuple(LinkResolution))
+    def test_paths_with_broken_soft_link(self, server, paths_file, resolve_links):
+        with h5py.File(paths_file, "a") as h5file:
+            h5file["broken"] = h5py.SoftLink("/missing")
+
+        url = f"/paths?{urlencode({'file': paths_file.name, 'resolve_links': resolve_links.value})}"
+        if resolve_links == LinkResolution.ALL:
+            server.assert_error_code(url, 404)
+        else:
+            expected = ["/", "/broken", "/data", "/external", "/soft"]
+            assert decode_response(server.get(url)) == expected
+
+    @pytest.mark.parametrize("resolve_links", tuple(LinkResolution))
+    def test_paths_with_broken_external_link(self, server, paths_file, resolve_links):
+        with h5py.File(paths_file, "a") as h5file:
+            h5file["broken"] = h5py.ExternalLink("missing.h5", "/target")
+
+        url = f"/paths?{urlencode({'file': paths_file.name, 'resolve_links': resolve_links.value})}"
+        if resolve_links == LinkResolution.ALL:
+            server.assert_error_code(url, 404)
+        else:
+            expected = ["/", "/broken", "/data", "/external", "/soft"]
+            assert decode_response(server.get(url)) == expected
+
     @pytest.mark.parametrize("endpoint", ("data", "stats"))
     @pytest.mark.parametrize("filter_mask", (0, 1))
     def test_unavailable_filter(self, server, endpoint, filter_mask):
