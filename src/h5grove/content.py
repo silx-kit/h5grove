@@ -30,6 +30,7 @@ from .utils import (
     NotAllowedError,
     NotFoundError,
     QueryArgumentError,
+    UnavailableFilterError,
     attr_metadata,
     convert,
     get_array_stats,
@@ -37,6 +38,7 @@ from .utils import (
     get_entity_from_file,
     get_filters,
     get_type_metadata,
+    get_unavailable_filter_ids,
     hdf_path_join,
     open_file_with_error_fallback,
     parse_link_resolution_arg,
@@ -180,7 +182,18 @@ class DatasetContent(ResolvedEntityContent[h5py.Dataset]):
         if self._h5py_entity.external:
             raise NotAllowedError("Cannot resolve external datasets")
 
-        data = get_dataset_slice(self._h5py_entity, selection)
+        try:
+            data = get_dataset_slice(self._h5py_entity, selection)
+        except OSError as error:
+            unavailable = get_unavailable_filter_ids(self._h5py_entity)
+            if unavailable:
+                raise UnavailableFilterError(
+                    "Cannot read dataset. HDF5 filters unavailable for decoding: "
+                    f"{', '.join(map(str, unavailable))}. "
+                    "Check that the required filter plugins are installed."
+                ) from error
+            raise
+
         is_scalar = isinstance(data, np.number)
         if (
             is_scalar
@@ -321,6 +334,8 @@ def get_content_from_file(
     try:
         with open_file_with_error_fallback(filepath, create_error, h5py_options) as f:
             yield create_content(f, path, resolve_links)
+    except UnavailableFilterError as e:
+        raise create_error(500, str(e))
     except NotAllowedError as e:
         raise create_error(403, str(e))
     except NotFoundError as e:
@@ -346,11 +361,13 @@ def get_list_of_paths(
         raise create_error(422, str(e))
 
     names = []
+    links_to_resolve = []
 
-    def get_path(name: bytes):
+    def get_path(name: bytes, info: h5py.h5l.LinkInfo):
         full_path = hdf_path_join(base_path, name.decode())
-        content = create_content(f, full_path, resolve_links)
-        names.append(content.path)
+        names.append(full_path)
+        if info.type != h5py.h5l.TYPE_HARD:
+            links_to_resolve.append(full_path)
 
     try:
         with open_file_with_error_fallback(filepath, create_error, h5py_options) as f:
@@ -358,7 +375,10 @@ def get_list_of_paths(
             if not isinstance(base_content, GroupContent):
                 raise TypeError(f"{base_content.path} is not a group")
             names.append(base_content.path)
-            base_content._h5py_entity.id.links.visit(get_path)
+            base_content._h5py_entity.id.links.visit(get_path, info=True)
+            # Resolve links outside the HDF5 visitor so errors reach the handler.
+            for path in links_to_resolve:
+                create_content(f, path, resolve_links)
             yield names
     except NotFoundError as e:
         raise create_error(404, str(e))

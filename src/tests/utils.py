@@ -69,7 +69,11 @@ def decode_array_response(
     return np.asarray(decode_response(response, format))
 
 
-def assert_error_response(response: Response, error_code: int):
+def assert_error_response(
+    response: Response, error_code: int, message: str | None = None
+):
     assert response.status == error_code
     content = decode_response(response)
     assert isinstance(content, dict) and isinstance(content["message"], str)
+    if message is not None:
+        assert content["message"] == message
