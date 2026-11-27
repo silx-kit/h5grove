@@ -545,29 +545,80 @@ class BaseTestEndpoints:
             "/tree/branch/fruit_2",
         ]
 
-    @pytest.mark.parametrize("resolve_links", tuple(LinkResolution))
-    @pytest.mark.parametrize("broken_link", (None, "soft", "external"))
-    def test_paths_link_resolution(self, server, resolve_links, broken_link):
-        filename = "paths.h5"
+    @pytest.fixture
+    def paths_file(self, server):
+        path = server.served_directory / "paths.h5"
         with h5py.File(server.served_directory / "external.h5", "w") as h5file:
             h5file["target"] = [1, 2]
-        with h5py.File(server.served_directory / filename, "w") as h5file:
+        with h5py.File(path, "w") as h5file:
             h5file["data"] = [3, 4]
             h5file["soft"] = h5py.SoftLink("/data")
             h5file["external"] = h5py.ExternalLink("external.h5", "/target")
-            if broken_link == "external":
-                h5file["broken"] = h5py.ExternalLink("missing.h5", "/target")
-            elif broken_link == "soft":
-                h5file["broken"] = h5py.SoftLink("/missing")
+        return path
 
-        url = f"/paths?{urlencode({'file': filename, 'resolve_links': resolve_links.value})}"
-        if broken_link and resolve_links == LinkResolution.ALL:
+    @pytest.mark.parametrize("resolve_links", tuple(LinkResolution))
+    def test_paths_link_resolution(self, server, paths_file, resolve_links):
+        url = f"/paths?{urlencode({'file': paths_file.name, 'resolve_links': resolve_links.value})}"
+        assert decode_response(server.get(url)) == ["/", "/data", "/external", "/soft"]
+
+    @pytest.mark.parametrize("resolve_links", tuple(LinkResolution))
+    def test_paths_with_broken_soft_link(self, server, paths_file, resolve_links):
+        with h5py.File(paths_file, "a") as h5file:
+            h5file["broken"] = h5py.SoftLink("/missing")
+
+        url = f"/paths?{urlencode({'file': paths_file.name, 'resolve_links': resolve_links.value})}"
+        if resolve_links == LinkResolution.ALL:
             server.assert_error_code(url, 404)
         else:
-            expected = ["/", "/data", "/external", "/soft"]
-            if broken_link:
-                expected.insert(1, "/broken")
+            expected = ["/", "/broken", "/data", "/external", "/soft"]
             assert decode_response(server.get(url)) == expected
+
+    @pytest.mark.parametrize("resolve_links", tuple(LinkResolution))
+    def test_paths_with_broken_external_link(self, server, paths_file, resolve_links):
+        with h5py.File(paths_file, "a") as h5file:
+            h5file["broken"] = h5py.ExternalLink("missing.h5", "/target")
+
+        url = f"/paths?{urlencode({'file': paths_file.name, 'resolve_links': resolve_links.value})}"
+        if resolve_links == LinkResolution.ALL:
+            server.assert_error_code(url, 404)
+        else:
+            expected = ["/", "/broken", "/data", "/external", "/soft"]
+            assert decode_response(server.get(url)) == expected
+
+    @pytest.mark.parametrize("endpoint", ("data", "stats"))
+    @pytest.mark.parametrize("filter_mask", (0, 1))
+    def test_unavailable_filter(self, server, endpoint, filter_mask):
+        filename = "test.h5"
+        data = np.arange(4, dtype="<i4")
+        with h5py.File(server.served_directory / filename, mode="w") as h5file:
+            dataset = h5file.create_dataset(
+                "filtered",
+                shape=data.shape,
+                dtype=data.dtype,
+                chunks=data.shape,
+                compression=65535,
+                allow_unknown_filter=True,
+            )
+            dataset.id.write_direct_chunk((0,), data.tobytes(), filter_mask=filter_mask)
+
+        # Metadata does not require the decoding plugin.
+        server.get(f"/meta?file={filename}&path=/filtered")
+        url = f"/{endpoint}?file={filename}&path=/filtered"
+        if filter_mask == 0:
+            server.assert_error_code(
+                url,
+                500,
+                "Cannot read dataset. HDF5 filters unavailable for decoding: 65535. "
+                "Check that the required filter plugins are installed.",
+            )
+        else:
+            # Optional filters can be skipped for individual chunks.
+            content = decode_response(server.get(url))
+            if endpoint == "data":
+                assert content == data.tolist()
+            else:
+                assert content["min"] == 0
+                assert content["max"] == 3
 
     def test_404_on_non_existing_path(self, server):
         filename = "test.h5"
